@@ -1,4 +1,3 @@
-
 from hazenlib.utils import get_dicom_files
 from hazenlib.tasks.acr_snr import ACRSNR
 from hazenlib.tasks.acr_uniformity import ACRUniformity
@@ -14,7 +13,9 @@ import pydicom
 import sys
 import glob
 from datetime import date
-
+from hazenlib.logger import logger
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # get the args
 parser = argparse.ArgumentParser()
@@ -64,11 +65,16 @@ Data = ACRDICOMSFiles[Seq]
 ToleranceTable = {}
 ToleranceTable["SNR"]=[None,None]
 ToleranceTable["Geometric Acuracy"]=[None,None]
-ToleranceTable["Spatial Resolution"]=[None,None]
 ToleranceTable["Uniformity"]=[None,None]
 ToleranceTable["Ghosting"]=[None,None]
 ToleranceTable["Slice Position"]=[None,None]
 ToleranceTable["Slice Thickness"]=[None,None]
+ToleranceTable["Spatial Resolution 1.1mm"]=[None,None]
+ToleranceTable["Spatial Resolution 1.0mm"]=[None,None]
+ToleranceTable["Spatial Resolution 0.9mm"]=[None,None]
+ToleranceTable["Spatial Resolution 0.8mm"]=[None,None]
+ToleranceTable["Spatial Resolution MTF50 Raw"]=[None,None]
+ToleranceTable["Spatial Resolution MTF50 Fitted"]=[None,None]
 
 f = open("ToleranceTable/ToleranceTable.txt")
 for line in f: 
@@ -84,6 +90,8 @@ for line in f:
             Upper = None
         else:
             Upper=float(Upper)
+        if Name not in ToleranceTable.keys():
+            logger.error("Unknown test name in the tolerance table")
         ToleranceTable[Name] = [Lower,Upper]
 
 FileName = "OutputFolder/Results_" + Seq +"_" + str(date.today())+".txt"
@@ -157,14 +165,24 @@ else:
 ReportFile.write("\nSpatial Resoloution Module\n")
 if args.RunAll==True or args.RunSpatialRes == True:
     print("Running Spatial Resoloution")
+    #Run the dot matrix version
     acr_spatial_resolution_task = ACRSpatialResolution(input_data=Data,report_dir="OutputFolder",report=True,MediumACRPhantom=True,UseDotMatrix=True)
     Res = acr_spatial_resolution_task.run()
 
-    ReportFile.write( '\t1.1mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["1.1mm holes"]),GetPassResult(Res["measurement"]["1.1mm holes"],"Spatial Resolution") ))
-    ReportFile.write( '\t1.0mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["1.0mm holes"]),GetPassResult(Res["measurement"]["1.0mm holes"],"Spatial Resolution") ))
-    ReportFile.write( '\t0.9mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["0.9mm holes"]),GetPassResult(Res["measurement"]["0.9mm holes"],"Spatial Resolution") ))
-    ReportFile.write( '\t0.8mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["0.8mm holes"]),GetPassResult(Res["measurement"]["0.8mm holes"],"Spatial Resolution") ))
+    ReportFile.write( '\t1.1mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["1.1mm holes"]),GetPassResult(Res["measurement"]["1.1mm holes"],"Spatial Resolution 1.1mm") ))
+    ReportFile.write( '\t1.0mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["1.0mm holes"]),GetPassResult(Res["measurement"]["1.0mm holes"],"Spatial Resolution 1.0mm") ))
+    ReportFile.write( '\t0.9mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["0.9mm holes"]),GetPassResult(Res["measurement"]["0.9mm holes"],"Spatial Resolution 0.9mm") ))
+    ReportFile.write( '\t0.8mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["0.8mm holes"]),GetPassResult(Res["measurement"]["0.8mm holes"],"Spatial Resolution 0.8mm") ))
+    
+    #Run the MTF
+    acr_spatial_resolution_task = ACRSpatialResolution(input_data=Data,report_dir="OutputFolder",report=True,MediumACRPhantom=True,UseDotMatrix=False)
+    Res = acr_spatial_resolution_task.run()
+    ReportFile.write( '\tRaw MTF50 :        %-12s%-12s\n' % (str(Res["measurement"]["raw mtf50"]),GetPassResult(Res["measurement"]["raw mtf50"],"Spatial Resolution MTF50 Raw") ))
+    ReportFile.write( '\tFitted MTF50:      %-12s%-12s\n' % (str(Res["measurement"]["fitted mtf50"]),GetPassResult(Res["measurement"]["fitted mtf50"],"Spatial Resolution MTF50 Fitted") ))
+
     TestCounter+=1
+
+
     print("Progress " +str(TestCounter) +"/" +str(TotalTests))
 else:
     ReportFile.write("\tNot Run\n")

@@ -36,9 +36,11 @@ namespace ACR_Phantom_GUI
 
         private BackgroundWorker Worker;
         private BackgroundWorker Updater;
+        private BackgroundWorker Loader;
         private string Arguments = "";
         private Dictionary<string, List<FileInfo>> FileDict;
         private string UpdaterString = "";
+        private List<string> ImageChecker = new List<string>();
         public Form1()
         {
             try
@@ -51,16 +53,42 @@ namespace ACR_Phantom_GUI
                 Worker.WorkerReportsProgress = true;
                 Worker.WorkerSupportsCancellation = true;
 
-                if (!this.IsHandleCreated)
-                    this.CreateControl();
-
                 Updater = new BackgroundWorker();
                 Updater.DoWork += Updater_DoWork;
                 Updater.RunWorkerCompleted += Updater_RunWorkerCompleted;
-                Updater.RunWorkerAsync();
+
+                Loader = new BackgroundWorker();
+                Loader.DoWork += Loader_DoWork;
+                Loader.RunWorkerCompleted += Loader_RunWorkerCompleted;
+
+                var processInfo = new ProcessStartInfo("docker", $"images doctorspacemanphd/dockeracrphantom");
+                RunProcess(processInfo, new DataReceivedEventHandler(OutputImageCheck), new DataReceivedEventHandler(OutputImageCheck));
+                ImageChecker.RemoveAt(0);
+                bool ImageFound = false;
+                foreach(string Image in ImageChecker)
+                {
+                    ImageFound= Image.Contains("doctorspacemanphd/dockeracrphantom");
+                }
+
+               if (ImageFound==false)
+                    LogBoxField.AppendText("No docker image found, update backend or set offline mode" + Environment.NewLine);
+                else
+                    LogBoxField.AppendText("Docker image found" + Environment.NewLine);
+
                 UpdateSequences();
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
+        }
+
+        void OutputImageCheck(object sendingProcess, DataReceivedEventArgs outLine)
+        {
+            if (outLine.Data != null)
+                ImageChecker.Add(outLine.Data);
+        }
+
+        void ErrorImageCheck(object sendingProcess, DataReceivedEventArgs outLine)
+        {
+            LogBoxField.AppendText(outLine.Data+Environment.NewLine);
         }
 
         private void UpdateSequences()
@@ -123,10 +151,36 @@ namespace ACR_Phantom_GUI
                 DCMPath.Enabled = false;
                 OutputPath.Enabled = false;
                 Worker.RunWorkerAsync();
-
-
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
+        }
+
+        private void RunProcess(ProcessStartInfo processInfo, DataReceivedEventHandler Output, DataReceivedEventHandler ErrorOut)
+        {
+            processInfo.CreateNoWindow = true;
+            processInfo.UseShellExecute = false;
+            processInfo.RedirectStandardOutput = true;
+            processInfo.RedirectStandardError = true;
+            int exitCode;
+            using (var process = new Process())
+            {
+                process.StartInfo = processInfo;
+                //process.OutputDataReceived += new DataReceivedEventHandler(OutputHandler);
+                process.OutputDataReceived += Output;
+                process.ErrorDataReceived += ErrorOut;
+
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+                process.WaitForExit(1200000);
+                if (!process.HasExited)
+                {
+                    process.Kill();
+                }
+
+                exitCode = process.ExitCode;
+                process.Close();
+            }
         }
 
         private void Worker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
@@ -141,57 +195,27 @@ namespace ACR_Phantom_GUI
                 string Sequence = null;
                 SeqSelector.Invoke(new MethodInvoker(delegate { Sequence = SeqSelector.Text; }));
 
-                var processInfo = new ProcessStartInfo("docker", $"run -v " + DCMFolder + ":/app/DataTransfer -v" + OutputFolder + ":/app/OutputFolder -v C:/Users/John/Desktop/DockerLocalTest/ToleranceTable:/app/ToleranceTable doctorspacemanphd/dockeracrphantom -seq \"" + Sequence + "\" " + Arguments);
-                processInfo.CreateNoWindow = true;
-                processInfo.UseShellExecute = false;
-                processInfo.RedirectStandardOutput = true;
-                processInfo.RedirectStandardError = true;
-                int exitCode;
-                using (var process = new Process())
-                {
-                    process.StartInfo = processInfo;
-                    process.OutputDataReceived += new DataReceivedEventHandler(OutputHandler);
-                    process.ErrorDataReceived += new DataReceivedEventHandler(OutputHandler);
-
-                    process.Start();
-                    process.BeginOutputReadLine();
-                    process.BeginErrorReadLine();
-                    process.WaitForExit(1200000);
-                    if (!process.HasExited)
-                    {
-                        process.Kill();
-                    }
-
-                    exitCode = process.ExitCode;
-                    process.Close();
-                }
+                var processInfo = new ProcessStartInfo("docker", $"run --pull=never -v " + DCMFolder + ":/app/DataTransfer -v" + OutputFolder + ":/app/OutputFolder -v C:/Users/John/Desktop/DockerLocalTest/ToleranceTable:/app/ToleranceTable doctorspacemanphd/dockeracrphantom -seq \"" + Sequence + "\" " + Arguments);
+                RunProcess(processInfo, new DataReceivedEventHandler(OutputHandler), new DataReceivedEventHandler(OutputErrorHandler));
 
                 //Prune the container we just made
                 processInfo = new ProcessStartInfo("docker", $"container prune -f");
-                processInfo.CreateNoWindow = true;
-                processInfo.UseShellExecute = false;
-                processInfo.RedirectStandardOutput = true;
-                processInfo.RedirectStandardError = true;
-                using (var process = new Process())
-                {
-                    process.StartInfo = processInfo;
-                    process.OutputDataReceived += new DataReceivedEventHandler(OutputHandler);
-                    process.ErrorDataReceived += new DataReceivedEventHandler(OutputHandler);
-                    process.Start();
-                    process.BeginOutputReadLine();
-                    process.BeginErrorReadLine();
-                    process.WaitForExit(1200000);
-                    if (!process.HasExited)
-                    {
-                        process.Kill();
-                    }
+                RunProcess(processInfo, new DataReceivedEventHandler(OutputHandler), new DataReceivedEventHandler(OutputErrorHandler));
 
-                    exitCode = process.ExitCode;
-                    process.Close();
-                }
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
+        
+        void OutputErrorHandler(object sendingProcess, DataReceivedEventArgs outLine)
+        {
+            try
+            {
+                LogBoxField.Invoke(new MethodInvoker(delegate { LogBoxField.Text += outLine.Data + Environment.NewLine; ; LogBoxField.SelectionStart = LogBoxField.Text.Length; LogBoxField.ScrollToCaret(); }));
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
+        }
+
+
         void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
             try
@@ -199,7 +223,7 @@ namespace ACR_Phantom_GUI
                 bool OutputAll = false;
                 string Line = "";
                 LogBoxField.Invoke(new MethodInvoker(delegate { OutputAll = ShowAllOutput.Checked; }));
-                LogBoxField.Invoke(new MethodInvoker(delegate { Line = outLine.Data + Environment.NewLine; }));
+                Line = outLine.Data + Environment.NewLine;
 
                 if (OutputAll == true)
                 {
@@ -233,10 +257,9 @@ namespace ACR_Phantom_GUI
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
-        void OutputUpdaterHandler(object sendingProcess, DataReceivedEventArgs outLine)
+        void OutputAllHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
             LogBoxField.Invoke(new MethodInvoker(delegate { LogBoxField.Text += outLine.Data+Environment.NewLine; LogBoxField.SelectionStart = LogBoxField.Text.Length; LogBoxField.ScrollToCaret(); }));
-            //UpdaterString+= outLine.Data + Environment.NewLine;
         }
 
         private void Worker_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
@@ -339,12 +362,9 @@ namespace ACR_Phantom_GUI
                     FileInfo[] Files = info.GetFiles("*.png");
                     foreach (FileInfo file in Files)
                     {
-                        List<string> SeqExtracted = file.Name.Split('_').ToList();
-                        SeqExtracted.RemoveAt(SeqExtracted.Count - 1);
-                        SeqExtracted.RemoveAt(SeqExtracted.Count - 1);
-                        string ExtractSeq = string.Join(" ", SeqExtracted);
+                        string underlinedSeq = SeqSelector.Text.Replace(' ', '_');
 
-                        if (ExtractSeq == SeqSelector.Text)
+                        if (file.Name.StartsWith(underlinedSeq) == true)
                         {
                             FileDict[Keys[i]].Add(file);
                         }
@@ -452,39 +472,55 @@ namespace ACR_Phantom_GUI
 
         private void Updater_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-            StartButton.Enabled = false;    
             var processInfo = new ProcessStartInfo("docker", "pull doctorspacemanphd/dockeracrphantom:latest");
-            processInfo.CreateNoWindow = true;
-            processInfo.UseShellExecute = false;
-            processInfo.RedirectStandardOutput = true;
-            processInfo.RedirectStandardError = true;
-            int exitCode;
-            using (var process = new Process())
-            {
-                process.StartInfo = processInfo;
-                process.OutputDataReceived += new DataReceivedEventHandler(OutputUpdaterHandler);
-                process.ErrorDataReceived += new DataReceivedEventHandler(OutputUpdaterHandler);
-
-                process.Start();
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-                process.WaitForExit(1200000);
-                if (!process.HasExited)
-                {
-                    process.Kill();
-                }
-
-                exitCode = process.ExitCode;
-                process.Close();
-            }
+            RunProcess(processInfo, new DataReceivedEventHandler(OutputAllHandler), new DataReceivedEventHandler(OutputAllHandler));
         }
 
         private void Updater_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
             StartButton.Enabled = true;
+            UpdateDocker.Enabled = true;
+            OfflineMode.Enabled = true;
             LogBoxField.AppendText(UpdaterString);
         }
 
+        private void UpdateDocker_Click(object sender, EventArgs e)
+        {
+            StartButton.Enabled = false;
+            UpdateDocker.Enabled = false;
+            OfflineMode.Enabled = false ;
+            Updater.RunWorkerAsync();
         }
+
+        private void OfflineMode_CheckedChanged(object sender, EventArgs e)
+        {
+            if (OfflineMode.Checked == true) 
+            {
+                UpdateDocker.Enabled = false;
+                OfflineMode.Enabled = false;
+                StartButton.Enabled = false;
+                LogBoxField.AppendText("Loading local docker image." +Environment.NewLine);
+                LogBoxField.SelectionStart = LogBoxField.Text.Length; 
+                LogBoxField.ScrollToCaret();
+                Loader.RunWorkerAsync();
+            }
+            else
+            {
+                UpdateDocker.Enabled = true;
+            }
+        }
+
+        private void Loader_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            var processInfo = new ProcessStartInfo("docker", "load -i DockerImage/ACRPhantomImage.tar");
+            RunProcess(processInfo, new DataReceivedEventHandler(OutputAllHandler), new DataReceivedEventHandler(OutputAllHandler));
+        }
+
+        private void Loader_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        {
+            OfflineMode.Enabled = true;
+            StartButton.Enabled = true;
+        }
+    }
 }
 

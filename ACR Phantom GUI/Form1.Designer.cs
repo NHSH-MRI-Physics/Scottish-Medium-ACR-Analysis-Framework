@@ -52,6 +52,8 @@
             this.RunSpatialRes = new System.Windows.Forms.CheckBox();
             this.Results = new System.Windows.Forms.RichTextBox();
             this.label7 = new System.Windows.Forms.Label();
+            this.UpdateDocker = new System.Windows.Forms.Button();
+            this.OfflineMode = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label3
@@ -125,7 +127,7 @@
             // 
             this.SeqSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.SeqSelector.FormattingEnabled = true;
-            this.SeqSelector.Location = new System.Drawing.Point(546, 34);
+            this.SeqSelector.Location = new System.Drawing.Point(546, 51);
             this.SeqSelector.Name = "SeqSelector";
             this.SeqSelector.Size = new System.Drawing.Size(220, 21);
             this.SeqSelector.TabIndex = 8;
@@ -134,7 +136,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(546, 18);
+            this.label4.Location = new System.Drawing.Point(546, 35);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(103, 13);
             this.label4.TabIndex = 9;
@@ -296,11 +298,34 @@
             this.label7.TabIndex = 25;
             this.label7.Text = "Results";
             // 
+            // UpdateDocker
+            // 
+            this.UpdateDocker.Location = new System.Drawing.Point(546, 6);
+            this.UpdateDocker.Name = "UpdateDocker";
+            this.UpdateDocker.Size = new System.Drawing.Size(108, 23);
+            this.UpdateDocker.TabIndex = 26;
+            this.UpdateDocker.Text = "Update Backend";
+            this.UpdateDocker.UseVisualStyleBackColor = true;
+            this.UpdateDocker.Click += new System.EventHandler(this.UpdateDocker_Click);
+            // 
+            // OfflineMode
+            // 
+            this.OfflineMode.AutoSize = true;
+            this.OfflineMode.Location = new System.Drawing.Point(670, 10);
+            this.OfflineMode.Name = "OfflineMode";
+            this.OfflineMode.Size = new System.Drawing.Size(86, 17);
+            this.OfflineMode.TabIndex = 27;
+            this.OfflineMode.Text = "Offline Mode";
+            this.OfflineMode.UseVisualStyleBackColor = true;
+            this.OfflineMode.CheckedChanged += new System.EventHandler(this.OfflineMode_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(778, 357);
+            this.Controls.Add(this.OfflineMode);
+            this.Controls.Add(this.UpdateDocker);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.Results);
             this.Controls.Add(this.LogBoxField);
@@ -359,6 +384,8 @@
         private System.Windows.Forms.CheckBox RunSpatialRes;
         private System.Windows.Forms.RichTextBox Results;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button UpdateDocker;
+        private System.Windows.Forms.CheckBox OfflineMode;
     }
 }
 

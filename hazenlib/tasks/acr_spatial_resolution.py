@@ -550,7 +550,7 @@ class ACRSpatialResolution(HazenTask):
             axes[4].set_title("MTF", fontsize=14)
 
             img_path = os.path.realpath(
-                os.path.join(self.report_path, f"{self.img_desc(dcm)}.png")
+                os.path.join(self.report_path, f"{self.img_desc(dcm)}_MTF.png")
             )
             fig.savefig(img_path)
             self.report_files.append(img_path)
@@ -637,7 +637,7 @@ class ACRSpatialResolution(HazenTask):
                     axes[i+1].spines[axis].set_color(colors[i])
 
             img_path = os.path.realpath(
-            os.path.join(self.report_path, f"{self.img_desc(dcm)}.png"))
+            os.path.join(self.report_path, f"{self.img_desc(dcm)}_DotPairs.png"))
             fig.savefig(img_path)
             self.report_files.append(img_path)
 
