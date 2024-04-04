@@ -1,5 +1,5 @@
 ### Devlopment branch for the medium ACR Phantom QA project. 
-Please note this project is currently a work in progress. The documentation and project is incpomplete, the code is messy and bugs will almost certainly be present. If any bugs or issues are found please raise an [issue](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/issues) within github. 
+Please note this project is currently a work in progress, dervived from the [Hazen MRI QA framework](https://github.com/GSTT-CSC/hazen). The documentation and project is incpomplete, the code is messy and bugs will almost certainly be present. If any bugs or issues are found please raise an [issue](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/issues) within github. 
 ## Current Status and To Do
 - [x] Add medium ACR phantom compatibility to the Hazen code base.
 - [x] Incorporate docker image of the Hazen code base with medium ACR compatibility.
