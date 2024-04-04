@@ -28,6 +28,8 @@ using static System.Net.WebRequestMethods;
 using System.Collections;
 using EvilDICOM.Core.Element;
 using static System.Windows.Forms.LinkLabel;
+using FellowOakDicom.Imaging.LUT;
+using System.Diagnostics.Metrics;
 
 namespace ACR_Phantom_GUI
 {
@@ -40,6 +42,7 @@ namespace ACR_Phantom_GUI
         private string Arguments = "";
         private Dictionary<string, List<FileInfo>> FileDict;
         private string UpdaterString = "";
+        private string ErrorFindingDocker = "";
         private List<string> ImageChecker = new List<string>();
         public Form1()
         {
@@ -62,20 +65,29 @@ namespace ACR_Phantom_GUI
                 Loader.RunWorkerCompleted += Loader_RunWorkerCompleted;
 
                 var processInfo = new ProcessStartInfo("docker", $"images doctorspacemanphd/dockeracrphantom");
-                RunProcess(processInfo, new DataReceivedEventHandler(OutputImageCheck), new DataReceivedEventHandler(OutputImageCheck));
-                ImageChecker.RemoveAt(0);
-                bool ImageFound = false;
-                foreach(string Image in ImageChecker)
+                RunProcess(processInfo, new DataReceivedEventHandler(OutputImageCheck), new DataReceivedEventHandler(ErrorImageCheck));
+                if (ErrorFindingDocker!= "")
                 {
-                    ImageFound= Image.Contains("doctorspacemanphd/dockeracrphantom");
+                    LogBoxField.AppendText("Error loading Docker, is docker installed?" + Environment.NewLine);
+                    LogBoxField.AppendText("Error Text: ");
+                    LogBoxField.AppendText(ErrorFindingDocker);
                 }
-
-               if (ImageFound==false)
-                    LogBoxField.AppendText("No docker image found, update backend or set offline mode" + Environment.NewLine);
                 else
-                    LogBoxField.AppendText("Docker image found" + Environment.NewLine);
+                {
+                    ImageChecker.RemoveAt(0);
+                    bool ImageFound = false;
+                    foreach (string Image in ImageChecker)
+                    {
+                        ImageFound = Image.Contains("doctorspacemanphd/dockeracrphantom");
+                    }
 
-                UpdateSequences();
+                    if (ImageFound == false)
+                        LogBoxField.AppendText("No docker image found, update backend or set offline mode" + Environment.NewLine);
+                    else
+                        LogBoxField.AppendText("Docker image found" + Environment.NewLine);
+
+                    UpdateSequences();
+                }
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
@@ -88,7 +100,8 @@ namespace ACR_Phantom_GUI
 
         void ErrorImageCheck(object sendingProcess, DataReceivedEventArgs outLine)
         {
-            LogBoxField.AppendText(outLine.Data+Environment.NewLine);
+            if (outLine.Data != null)
+                ErrorFindingDocker += outLine.Data + Environment.NewLine;
         }
 
         private void UpdateSequences()
@@ -195,7 +208,13 @@ namespace ACR_Phantom_GUI
                 string Sequence = null;
                 SeqSelector.Invoke(new MethodInvoker(delegate { Sequence = SeqSelector.Text; }));
 
-                var processInfo = new ProcessStartInfo("docker", $"run --pull=never -v " + DCMFolder + ":/app/DataTransfer -v" + OutputFolder + ":/app/OutputFolder -v C:/Users/John/Desktop/DockerLocalTest/ToleranceTable:/app/ToleranceTable doctorspacemanphd/dockeracrphantom -seq \"" + Sequence + "\" " + Arguments);
+                //Tolerance table now lives in the executable location
+                string ToleranceTablePath = AppDomain.CurrentDomain.BaseDirectory;
+                ToleranceTablePath = "\"" + ToleranceTablePath.Remove(ToleranceTablePath.Length - 1, 1) + "\"";
+     
+
+                var processInfo = new ProcessStartInfo("docker", $"run --pull=never -v " + DCMFolder + ":/app/DataTransfer -v " + OutputFolder + ":/app/OutputFolder -v "+ ToleranceTablePath + ":/app/ToleranceTable doctorspacemanphd/dockeracrphantom -seq \"" + Sequence + "\" " + Arguments);
+                Console.WriteLine("run --pull=never -v " + DCMFolder + ":/app/DataTransfer -v " + OutputFolder + ":/app/OutputFolder -v " + ToleranceTablePath + ":/app/ToleranceTable doctorspacemanphd/dockeracrphantom -seq \"" + Sequence + "\" " + Arguments);
                 RunProcess(processInfo, new DataReceivedEventHandler(OutputHandler), new DataReceivedEventHandler(OutputErrorHandler));
 
                 //Prune the container we just made
@@ -399,8 +418,8 @@ namespace ACR_Phantom_GUI
                     DialogResult result = fbd.ShowDialog();
                     if (result == DialogResult.OK)
                     {
-                        UpdateSequences();
                         DCMPath.Text = fbd.SelectedPath;
+                        UpdateSequences();
                     }
                 }
             }

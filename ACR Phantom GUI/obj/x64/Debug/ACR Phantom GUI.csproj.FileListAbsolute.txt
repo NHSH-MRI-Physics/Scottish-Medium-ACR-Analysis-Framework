@@ -60,3 +60,65 @@ D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Text.Encodings.We
 D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Text.Json.xml
 D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Threading.Channels.xml
 D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.ValueTuple.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\ACR Phantom GUI.exe.config
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\ACR Phantom GUI.exe
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\ACR Phantom GUI.pdb
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\CommunityToolkit.HighPerformance.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\EvilDICOM.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\fo-dicom.core.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Bcl.HashCode.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Extensions.Configuration.Abstractions.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Extensions.Configuration.Binder.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Extensions.Configuration.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Extensions.DependencyInjection.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Extensions.Logging.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Extensions.Options.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Extensions.Primitives.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Buffers.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.ComponentModel.Annotations.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Diagnostics.DiagnosticSource.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Memory.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Numerics.Vectors.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Runtime.CompilerServices.Unsafe.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Text.Encoding.CodePages.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Text.Encodings.Web.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Text.Json.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Threading.Channels.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Threading.Tasks.Extensions.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.ValueTuple.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\CommunityToolkit.HighPerformance.pdb
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\CommunityToolkit.HighPerformance.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\fo-dicom.core.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Bcl.AsyncInterfaces.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Bcl.HashCode.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Extensions.Configuration.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Extensions.Configuration.Abstractions.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Extensions.Configuration.Binder.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Extensions.DependencyInjection.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Extensions.DependencyInjection.Abstractions.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Extensions.Logging.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Extensions.Logging.Abstractions.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Extensions.Options.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.Extensions.Primitives.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Buffers.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Diagnostics.DiagnosticSource.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Memory.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Numerics.Vectors.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Text.Encoding.CodePages.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Text.Encodings.Web.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Text.Json.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Threading.Channels.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Threading.Tasks.Extensions.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.ValueTuple.xml
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x64\Debug\ACR Phantom GUI.csproj.AssemblyReference.cache
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x64\Debug\ACR_Phantom_GUI.Form1.resources
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x64\Debug\ACR_Phantom_GUI.Properties.Resources.resources
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x64\Debug\ACR Phantom GUI.csproj.GenerateResource.cache
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x64\Debug\ACR Phantom GUI.csproj.CoreCompileInputs.cache
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x64\Debug\ACR Phan.827D4748.Up2Date
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x64\Debug\ACR Phantom GUI.exe
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x64\Debug\ACR Phantom GUI.pdb
