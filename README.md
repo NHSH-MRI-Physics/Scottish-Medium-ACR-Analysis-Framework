@@ -8,7 +8,7 @@ Please note this project is currently a work in progress, dervived from the [Haz
 - [ ] Make a release package
 - [ ] Build unit tests.
 - [ ] Write documentation.
-- [ ] get baseline values from a serious of scanners/
+- [ ] get baseline values from a series of scanners
 
 ## Instalation and Set up
 
