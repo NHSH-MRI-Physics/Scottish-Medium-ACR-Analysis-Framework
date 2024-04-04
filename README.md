@@ -3,8 +3,9 @@ Please note this project is currently a work in progress, dervived from the [Haz
 ## Current Status and To Do
 - [x] Add medium ACR phantom compatibility to the Hazen code base.
 - [x] Incorporate docker image of the Hazen code base with medium ACR compatibility.
-- [ ] Build GUI for the medium ACR phantom implementation.
-- [ ] Build a version of the GUI which does not require internet connection (to update Docker image).
+- [x] Build GUI for the medium ACR phantom implementation.
+- [x] Build a version of the GUI which does not require internet connection (to update Docker image).
+- [ ] Make a release package
 - [ ] Build unit tests.
 - [ ] Write documentation.
 - [ ] get baseline values from a serious of scanners/
