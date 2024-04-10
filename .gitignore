@@ -38,3 +38,6 @@ build
 # miscellaneous
 .vscode
 ACR Phantom GUI/bin/x64/Debug/DockerImage/ACRPhantomImage.tar
+ACR Phantom GUI/bin/x64/Files/Dockerimage/ACRPhantomImage.tar
+ACR Phantom GUI/RequiredFiles/ACRPhantomImage.tar
+ACR Phantom GUI/bin/x64/ACR Phantom GUI.zip
