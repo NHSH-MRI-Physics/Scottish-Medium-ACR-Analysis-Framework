@@ -23,7 +23,7 @@ Please note this project is currently a work in progress, dervived from the [Haz
 1. Before each use ensure Docker Desktop is [running](https://docs.docker.com/desktop/install/windows-install/).
 2. Run the ACR Phantom GUI file.
 3. Refer to the image below for instructions on how to use the GUI.
-![Qucikstart Image](https://i.imgur.com/2EWp9PR.png)
+![Quickstart Image](https://i.imgur.com/MqiAZBT.png)
 
 
 ## Python 
