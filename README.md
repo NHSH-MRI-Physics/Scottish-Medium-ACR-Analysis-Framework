@@ -10,29 +10,24 @@ Please note this project is currently a work in progress, dervived from the [Haz
 - [ ] Write documentation.
 - [ ] get baseline values from a series of scanners
 
-## Instalation and Set up
+## Instalation, Set up and quickstart
 
 ## GUI 
 ### Requirements 
-- (Docker)[https://www.docker.com/products/docker-desktop/]
+- [Docker](https://www.docker.com/products/docker-desktop/)
 ### Instalation 
 1. Download the [GUI Package](https://scottish-my.sharepoint.com/:u:/g/personal/john_tracey_nhsh_nhs_scot/EX5Y-Kya6olArn-rsOz0x4AB7nc_5kFH1e2-tw-V3Nl2yQ?e=x7VDTT) (click download at the top left). You will need a NHS Scotland email address to access this. In the future we will explore other hosting options.
-2. Ensure Docker Desktop is [installed and running](https://docs.docker.com/desktop/install/windows-install/). 
-### Usage
-To Do
+2. unzip the folder somewhere convienant
+3. Ensure Docker Desktop is [installed](https://docs.docker.com/desktop/install/windows-install/).
+### Qucik Start
+1. Before each use ensure Docker Desktop is [running](https://docs.docker.com/desktop/install/windows-install/).
+2. Run the ACR Phantom GUI file.
+3. Refer to the image below for instructions on how to use the GUI.
+![Qucikstart Image](https://i.imgur.com/2EWp9PR.png)
+
 
 ## Python 
-### Requirements 
-To Do
-### Instalation 
-To Do
-### Usage
 To Do
 
 ## Docker
-### Requirements 
-To Do
-### Instalation 
-To Do
-### Usage
 To Do
