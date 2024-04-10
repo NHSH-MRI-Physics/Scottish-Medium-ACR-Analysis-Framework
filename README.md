@@ -16,7 +16,7 @@ Please note this project is currently a work in progress, dervived from the [Haz
 ### Requirements 
 To Do
 ### Instalation 
-To Do
+Download the [GUI Package](https://scottish-my.sharepoint.com/:u:/g/personal/john_tracey_nhsh_nhs_scot/EX5Y-Kya6olArn-rsOz0x4AB7nc_5kFH1e2-tw-V3Nl2yQ?e=x7VDTT) 
 ### Usage
 To Do
 
