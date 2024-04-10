@@ -30,6 +30,7 @@ using EvilDICOM.Core.Element;
 using static System.Windows.Forms.LinkLabel;
 using FellowOakDicom.Imaging.LUT;
 using System.Diagnostics.Metrics;
+using Microsoft.Extensions.Primitives;
 
 namespace ACR_Phantom_GUI
 {
@@ -64,11 +65,14 @@ namespace ACR_Phantom_GUI
                 Loader.DoWork += Loader_DoWork;
                 Loader.RunWorkerCompleted += Loader_RunWorkerCompleted;
 
+
+
+                //This bit tests if docker is running
                 var processInfo = new ProcessStartInfo("docker", $"images doctorspacemanphd/dockeracrphantom");
                 RunProcess(processInfo, new DataReceivedEventHandler(OutputImageCheck), new DataReceivedEventHandler(ErrorImageCheck));
                 if (ErrorFindingDocker!= "")
                 {
-                    LogBoxField.AppendText("Error loading Docker, is docker installed?" + Environment.NewLine);
+                    LogBoxField.AppendText("Error loading Docker, is docker running?" + Environment.NewLine);
                     LogBoxField.AppendText("Error Text: ");
                     LogBoxField.AppendText(ErrorFindingDocker);
                 }
@@ -87,9 +91,11 @@ namespace ACR_Phantom_GUI
                         LogBoxField.AppendText("Docker image found" + Environment.NewLine);
 
                     UpdateSequences();
+
+                   
                 }
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
 
         void OutputImageCheck(object sendingProcess, DataReceivedEventArgs outLine)
@@ -127,7 +133,7 @@ namespace ACR_Phantom_GUI
                     if (SeqSelector.Items.Count > 0) { SeqSelector.SelectedIndex = 0; }
                 }
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
 
         private void SeqSelector_SelectedIndexChanged(object sender, EventArgs e)
@@ -165,7 +171,7 @@ namespace ACR_Phantom_GUI
                 OutputPath.Enabled = false;
                 Worker.RunWorkerAsync();
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
 
         private void RunProcess(ProcessStartInfo processInfo, DataReceivedEventHandler Output, DataReceivedEventHandler ErrorOut)
@@ -174,6 +180,14 @@ namespace ACR_Phantom_GUI
             processInfo.UseShellExecute = false;
             processInfo.RedirectStandardOutput = true;
             processInfo.RedirectStandardError = true;
+
+            string Path = System.Environment.GetEnvironmentVariable("Path");
+            if (Path.Contains("Docker") == false)
+            {
+                throw new Exception("Error finding docker, is Docker installed?");
+            }
+
+
             int exitCode;
             using (var process = new Process())
             {
@@ -222,7 +236,7 @@ namespace ACR_Phantom_GUI
                 RunProcess(processInfo, new DataReceivedEventHandler(OutputHandler), new DataReceivedEventHandler(OutputErrorHandler));
 
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
         
         void OutputErrorHandler(object sendingProcess, DataReceivedEventArgs outLine)
@@ -231,7 +245,7 @@ namespace ACR_Phantom_GUI
             {
                 LogBoxField.Invoke(new MethodInvoker(delegate { LogBoxField.Text += outLine.Data + Environment.NewLine; ; LogBoxField.SelectionStart = LogBoxField.Text.Length; LogBoxField.ScrollToCaret(); }));
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
 
 
@@ -273,7 +287,7 @@ namespace ACR_Phantom_GUI
                     }
                 }
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
 
         void OutputAllHandler(object sendingProcess, DataReceivedEventArgs outLine)
@@ -287,7 +301,7 @@ namespace ACR_Phantom_GUI
             {
                 //will leave this here incase somepoint i want a progress bar or something
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
         private void Worker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
@@ -334,7 +348,7 @@ namespace ACR_Phantom_GUI
 
                 UpdateResultList();
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
 
         private void UpdateResultList()
@@ -467,7 +481,7 @@ namespace ACR_Phantom_GUI
                     RunSpatialRes.Enabled = true;
                 }
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
 
         }
 
@@ -486,7 +500,7 @@ namespace ACR_Phantom_GUI
                     System.Diagnostics.Process.Start(file.FullName);
                 }
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
 
         private void Updater_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)

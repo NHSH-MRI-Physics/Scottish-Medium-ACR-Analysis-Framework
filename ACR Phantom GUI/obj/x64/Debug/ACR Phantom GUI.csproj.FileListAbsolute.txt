@@ -122,3 +122,15 @@ C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x64\D
 C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x64\Debug\ACR Phan.827D4748.Up2Date
 C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x64\Debug\ACR Phantom GUI.exe
 C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x64\Debug\ACR Phantom GUI.pdb
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.CSharp.dll
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.ComponentModel.DataAnnotations.dll
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Data.DataSetExtensions.dll
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Data.dll
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Deployment.dll
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.dll
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Drawing.dll
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Net.Http.dll
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Numerics.dll
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Windows.Forms.dll
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Xml.dll
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Xml.Linq.dll
