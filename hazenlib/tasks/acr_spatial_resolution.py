@@ -573,20 +573,21 @@ class ACRSpatialResolution(HazenTask):
         Crop = PixelArray[leftCorner[1]-ROISize[1]:leftCorner[1],leftCorner[0]:leftCorner[0]+ROISize[0]]
         Binary_Crop = Crop > np.max(Crop)*0.1
 
-        plt.imshow(Crop)
+        plt.imshow(Binary_Crop)
         plt.savefig("test.png")
 
         #This line gets rid of anything touching the border edge, super handy!
         Binary_Crop=skimage.segmentation.clear_border(Binary_Crop)
         #Close any gaps within the footprint
         Binary_Crop=skimage.morphology.binary_closing(Binary_Crop,skimage.morphology.square(3))
+
         label_image = skimage.morphology.label(Binary_Crop)
         ResSquares=[]
         Xpos=[]
         CropsBB = []
         ROIS=[]
         for region in skimage.measure.regionprops(label_image):
-            if region.area >= 100:
+            if region.area >= 40:
                 minr, minc, maxr, maxc = region.bbox
                 ROI = Crop[minr:maxr,minc:maxc]
                 ResSquares.append(ROI)
@@ -598,7 +599,10 @@ class ACRSpatialResolution(HazenTask):
         del ResSquares[Xpos.index(min(Xpos))]
         del CropsBB[Xpos.index(min(Xpos))]
         del ROIS[Xpos.index(min(Xpos))]
-        
+
+        if (len(ROIS)!=4):
+            raise Exception("Error: The number of found resolution square does not equal exactly 4.")
+
         return ResSquares,CropsBB,ROIS
 
     def get_dotpairs(self,dcm):

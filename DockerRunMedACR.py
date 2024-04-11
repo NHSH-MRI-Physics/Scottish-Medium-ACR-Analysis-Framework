@@ -52,7 +52,7 @@ else:
         
 #load in the DICOM
 DICOMPath="DataTransfer"
-#DICOMPath="MedACRTesting\ACR_ARDL_Tests"
+#DICOMPath="C:\\Users\\John\\Desktop\\ACR Blair T1"
 files = get_dicom_files(DICOMPath)
 ACRDICOMSFiles = {}
 for file in files:

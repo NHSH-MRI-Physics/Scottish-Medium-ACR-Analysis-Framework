@@ -217,8 +217,10 @@ namespace ACR_Phantom_GUI
                 //Run the docker image
                 string DCMFolder = null;
                 DCMPath.Invoke(new MethodInvoker(delegate { DCMFolder = DCMPath.Text; }));
+                DCMFolder = "\"" + DCMFolder + "\"";
                 string OutputFolder = null;
                 OutputPath.Invoke(new MethodInvoker(delegate { OutputFolder = OutputPath.Text; }));
+                OutputFolder = "\"" + OutputFolder + "\"";
                 string Sequence = null;
                 SeqSelector.Invoke(new MethodInvoker(delegate { Sequence = SeqSelector.Text; }));
 

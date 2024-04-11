@@ -190,8 +190,8 @@ class ACRUniformity(HazenTask):
                 c="white",
             )
             axes[1].plot(
-                r_large * np.cos(theta) + cxy[1],
-                r_large * np.sin(theta) + cxy[0] + 5 / res[1],
+                r_large * np.cos(theta) + cxy[0],
+                r_large * np.sin(theta) + cxy[1] + 5 / res[1],
                 c="black",
             )
             axes[1].axis("off")
