@@ -15,7 +15,7 @@ Please note this project is currently a work in progress, dervived from the [Haz
 ## GUI 
 ### Requirements 
 - [Docker](https://www.docker.com/products/docker-desktop/)
-### Instalation 
+### Installation 
 1. Download the [GUI Package](https://scottish-my.sharepoint.com/:u:/g/personal/john_tracey_nhsh_nhs_scot/EX5Y-Kya6olArn-rsOz0x4AB7nc_5kFH1e2-tw-V3Nl2yQ?e=x7VDTT) (click download at the top left). You will need a NHS Scotland email address to access this. In the future we will explore other hosting options.
 2. unzip the folder somewhere convienant
 3. Ensure Docker Desktop is [installed](https://docs.docker.com/desktop/install/windows-install/).
