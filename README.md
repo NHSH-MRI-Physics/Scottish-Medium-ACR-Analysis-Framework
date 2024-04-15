@@ -10,7 +10,7 @@ Please note this project is currently a work in progress, dervived from the [Haz
 - [ ] Write documentation.
 - [ ] get baseline values from a series of scanners
 
-## Instalation, Set up and quickstart
+## Instalation, Set up and Quickstart
 
 ## GUI 
 ### Requirements 
