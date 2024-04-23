@@ -183,9 +183,6 @@ class ACRSlicePosition(HazenTask):
             np.diff(mean_y_profile)
         )  # absolute first derivative of mean
        
-        plt.plot(abs_diff_y_profile)
-        plt.savefig("test.png")
-        plt.close()
 
         y_peaks, _ = self.ACR_obj.find_n_highest_peaks(
             abs_diff_y_profile, 2
@@ -220,10 +217,6 @@ class ACRSlicePosition(HazenTask):
 
         plt.axhline(y=44, color='g', linestyle='--')
         plt.axhline(y=80, color='g', linestyle='--')
-
-
-        plt.savefig("test2.png")
-        plt.close()
 
         return x_pts, y_pts
 

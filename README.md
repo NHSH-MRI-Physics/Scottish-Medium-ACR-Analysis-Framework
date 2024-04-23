@@ -19,7 +19,7 @@ Please note this project is currently a work in progress, dervived from the [Haz
 1. Download the [GUI Package](https://scottish-my.sharepoint.com/:u:/g/personal/john_tracey_nhsh_nhs_scot/EX5Y-Kya6olArn-rsOz0x4AB7nc_5kFH1e2-tw-V3Nl2yQ?e=x7VDTT) (click download at the top left). You will need a NHS Scotland email address to access this. In the future we will explore other hosting options.
 2. unzip the folder somewhere convienant
 3. Ensure Docker Desktop is [installed](https://docs.docker.com/desktop/install/windows-install/).
-### Qucik Start
+### Quick Start
 1. Before each use ensure Docker Desktop is [running](https://docs.docker.com/desktop/install/windows-install/).
 2. Run the ACR Phantom GUI file.
 3. Refer to the image below for instructions on how to use the GUI.
@@ -27,7 +27,12 @@ Please note this project is currently a work in progress, dervived from the [Haz
 
 
 ## Python 
-To Do
-
-## Docker
-To Do
+### Requirements 
+- Python 3
+### Installation
+- Download this repository by clicking [here](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/archive/refs/heads/main.zip).
+- unzip and navigate to where you unzipped it.
+- enter "pip install -r requirements.txt" to install all dependencies. 
+### Quick Start
+- To run analysis use python RunMedACRAnalysis.py -seq <Sequence Name> <Args>
+- Run python .\RunMedACRAnalysis.py -h to get a description of all arguments.6

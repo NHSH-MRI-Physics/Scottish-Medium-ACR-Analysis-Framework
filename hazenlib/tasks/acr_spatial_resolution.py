@@ -573,9 +573,6 @@ class ACRSpatialResolution(HazenTask):
         Crop = PixelArray[leftCorner[1]-ROISize[1]:leftCorner[1],leftCorner[0]:leftCorner[0]+ROISize[0]]
         Binary_Crop = Crop > np.max(Crop)*0.1
 
-        plt.imshow(Binary_Crop)
-        plt.savefig("test.png")
-
         #This line gets rid of anything touching the border edge, super handy!
         Binary_Crop=skimage.segmentation.clear_border(Binary_Crop)
         #Close any gaps within the footprint

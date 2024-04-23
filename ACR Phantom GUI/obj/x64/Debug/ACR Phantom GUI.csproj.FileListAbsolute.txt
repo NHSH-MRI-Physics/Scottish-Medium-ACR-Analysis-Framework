@@ -134,3 +134,15 @@ D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Numerics.dll
 D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Windows.Forms.dll
 D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Xml.dll
 D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Xml.Linq.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\Microsoft.CSharp.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.ComponentModel.DataAnnotations.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Data.DataSetExtensions.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Data.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Deployment.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Drawing.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Net.Http.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Numerics.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Windows.Forms.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Xml.dll
+C:\Users\Johnt\Documents\GitHub\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x64\Debug\System.Xml.Linq.dll
