@@ -35,4 +35,4 @@ Please note this project is currently a work in progress, dervived from the [Haz
 - enter "pip install -r requirements.txt" to install all dependencies. 
 ### Quick Start
 - To run analysis use python RunMedACRAnalysis.py -seq <Sequence Name> <Args>
-- Run python .\RunMedACRAnalysis.py -h to get a description of all arguments.6
+- Run python .\RunMedACRAnalysis.py -h to get a description of all arguments.
