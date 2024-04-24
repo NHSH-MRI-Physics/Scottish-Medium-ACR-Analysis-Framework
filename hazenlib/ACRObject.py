@@ -203,8 +203,12 @@ class ACRObject:
                 minRadius=int(155 / (2 * dy)),
                 maxRadius=int(180 / (2 * dx)),
             ).flatten()
-        centre = [int(i) for i in detected_circles[:2]]
-        radius = int(detected_circles[2])
+        #centre = [int(i) for i in detected_circles[:2]]
+        centre = [int(round(i)) for i in detected_circles[:2]] # This is better as round than just int otherwise its always rounding down.
+        
+        #radius = int(detected_circles[2])
+        radius = int(round(detected_circles[2]))
+
         return centre, radius
 
     def get_mask_image(self, image, mag_threshold=0.05, open_threshold=500):

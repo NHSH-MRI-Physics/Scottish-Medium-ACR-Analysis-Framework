@@ -84,17 +84,14 @@ class ACRGhosting(HazenTask):
         mask = self.ACR_obj.mask_image
         cxy = self.ACR_obj.centre
 
-        nx = np.linspace(1, dims[0], dims[0])
-        ny = np.linspace(1, dims[1], dims[1])
+        #For some reason this started at 1 meaning that everything was offset by 1,1. I changed this back to start at 0 now everything looks centered. 
+        nx = np.linspace(0, dims[0]-1, dims[0])
+        ny = np.linspace(0, dims[1]-1, dims[1])
 
         x, y = np.meshgrid(nx, ny)
 
-        lroi = np.square(x - cxy[0]) + np.square(
-            y - cxy[1] - np.divide(5, res[1])
-        ) <= np.square(r_large)
-        sad = 2 * np.ceil(
-            np.sqrt(1000 / (4 * np.pi)) / res[0]
-        )  # Short axis diameter for an ellipse of 10cm2 with a 1:4 axis ratio
+        lroi = np.square(x - cxy[0]) + np.square(y - cxy[1] - np.divide(5, res[1])) <= np.square(r_large)
+        sad = 2 * np.ceil(np.sqrt(1000 / (4 * np.pi)) / res[0])  # Short axis diameter for an ellipse of 10cm2 with a 1:4 axis ratio
 
         # WEST ELLIPSE
         w_point = np.argwhere(np.sum(mask, 0) > 0)[0]  # find first column in mask
@@ -231,6 +228,11 @@ class ACRGhosting(HazenTask):
                 r_large * np.sin(theta) + cxy[1] + 5 / res[1],
                 c="black",
             )
+            axes[1].scatter(cxy[0], cxy[1], c="red")
+            axes[1].imshow(lroi,alpha=0.4)
+            circle1 = plt.Circle((cxy[0], cxy[1]), self.ACR_obj.radius, color='r',fill=False)
+            axes[1].add_patch(circle1)
+
             axes[1].text(
                 cxy[0] - 3 * np.floor(10 / res[0]),
                 cxy[1] + np.floor(10 / res[1]),

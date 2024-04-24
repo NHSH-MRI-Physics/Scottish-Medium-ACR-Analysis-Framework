@@ -257,6 +257,7 @@ class ACRSNR(HazenTask):
         """
         centre = self.ACR_obj.centre
         col, row = centre
+        
         noise_img = self.get_noise_image(dcm)
 
         signal = [

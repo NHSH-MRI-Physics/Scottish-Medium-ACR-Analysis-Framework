@@ -7,14 +7,12 @@ from hazenlib.tasks.acr_ghosting import ACRGhosting
 from hazenlib.tasks.acr_slice_position import ACRSlicePosition
 from hazenlib.tasks.acr_slice_thickness import ACRSliceThickness
 from hazenlib.ACRObject import ACRObject
-from tests import TEST_DATA_DIR, TEST_REPORT_DIR
 import pydicom
-import sys
-import glob
 from datetime import date
 from hazenlib.logger import logger
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
+import os 
 
 #This is a file which simply contains a function to run the analysis. It is in a seperate file so i can reuse it for the various implementations.
 def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False):
@@ -81,7 +79,10 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
                 logger.error("Unknown test name in the tolerance table")
             ToleranceTable[Name] = [Lower,Upper]
 
-    FileName = "OutputFolder/Results_" + Seq +"_" + str(date.today())+".txt"
+
+    if os.path.exists(OutputPath)==False:
+        os.mkdir(OutputPath)
+    FileName = os.path.join(OutputPath,"Results_" + Seq +"_" + str(date.today())+".txt")
     ReportFile = open(FileName,"w")
 
     ReportFile.write("Date Analysed: " + str(date.today()) + "\n")
