@@ -28,5 +28,5 @@ ChosenSeq = "ACR AxT2"
 #if os.path.exists(OuptutFolder)==True:
 #    shutil.rmtree(OuptutFolder)
 
-MedACRAnalysis.RunAnalysis(ChosenSeq,inputdata,OuptutFolder,RunAll=False, RunSNR=True, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
+MedACRAnalysis.RunAnalysis(ChosenSeq,inputdata,OuptutFolder,RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=True, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
 

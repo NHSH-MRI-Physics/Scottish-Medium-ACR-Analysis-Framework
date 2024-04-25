@@ -84,7 +84,7 @@ class ACRGhosting(HazenTask):
         mask = self.ACR_obj.mask_image
         cxy = self.ACR_obj.centre
 
-        #For some reason this started at 1 meaning that everything was offset by 1,1. I changed this back to start at 0 now everything looks centered. 
+        ##Bug Fix: For some reason this started at 1 meaning that everything was offset by 1,1. I changed this back to start at 0 now everything looks centered. 
         nx = np.linspace(0, dims[0]-1, dims[0])
         ny = np.linspace(0, dims[1]-1, dims[1])
 

@@ -123,8 +123,7 @@ class ACRGeometricAccuracy(HazenTask):
             tuple of float: horizontal and vertical distances
         """
         img = dcm.pixel_array
-
-        mask = self.ACR_obj.get_mask_image(self.ACR_obj.images[6])
+        mask = self.ACR_obj.get_mask_image(self.ACR_obj.images[6],mag_threshold=0.4)
         cxy = self.ACR_obj.centre
         length_dict = self.ACR_obj.measure_orthogonal_lengths(mask)
 
@@ -141,14 +140,16 @@ class ACRGeometricAccuracy(HazenTask):
 
             axes[1].imshow(mask)
             axes[1].set_title("Thresholding Result")
-
+            
             axes[2].imshow(img)
+            axes[2].imshow(mask,alpha=0.4)
+            #Bug Fix: The arrow width should be 0 not 1 
             axes[2].arrow(
                 length_dict["Horizontal Extent"][0],
                 cxy[1],
                 length_dict["Horizontal Extent"][-1]
                 - length_dict["Horizontal Extent"][0],
-                1,
+                0,
                 color="blue",
                 length_includes_head=True,
                 head_width=5,
@@ -156,7 +157,7 @@ class ACRGeometricAccuracy(HazenTask):
             axes[2].arrow(
                 cxy[0],
                 length_dict["Vertical Extent"][0],
-                1,
+                0,
                 length_dict["Vertical Extent"][-1] - length_dict["Vertical Extent"][0],
                 color="orange",
                 length_includes_head=True,
@@ -212,12 +213,13 @@ class ACRGeometricAccuracy(HazenTask):
             axes[1].set_title("Thresholding Result")
 
             axes[2].imshow(img)
+            axes[2].imshow(mask,alpha=0.4)
             axes[2].arrow(
                 length_dict["Horizontal Extent"][0],
                 cxy[1],
                 length_dict["Horizontal Extent"][-1]
                 - length_dict["Horizontal Extent"][0],
-                1,
+                0,
                 color="blue",
                 length_includes_head=True,
                 head_width=5,
@@ -225,7 +227,7 @@ class ACRGeometricAccuracy(HazenTask):
             axes[2].arrow(
                 cxy[0],
                 length_dict["Vertical Extent"][0],
-                1,
+                0,
                 length_dict["Vertical Extent"][-1] - length_dict["Vertical Extent"][0],
                 color="orange",
                 length_includes_head=True,

@@ -2,7 +2,7 @@ Date Analysed: 2024-04-24
 Sequence Analysed: ACR AxT2
 
 SNR Module
-	SNR: 172.43      Result: No Tolerance Set
+	Not Run
 
 Geometric Accuracy Module
 	Not Run
@@ -11,7 +11,7 @@ Spatial Resoloution Module
 	Not Run
 
 Uniformity Module
-	Not Run
+	Uniformity:  76.2%       Result: Fail      Tolerance: >90.0
 
 Ghosting Module
 	Not Run
