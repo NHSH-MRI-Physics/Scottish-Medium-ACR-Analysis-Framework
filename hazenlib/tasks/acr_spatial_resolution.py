@@ -618,7 +618,7 @@ class ACRSpatialResolution(HazenTask):
             fig.set_size_inches(8, 40)
             fig.tight_layout(pad=4)
 
-            axes[0].imshow(img, interpolation="none")
+            axes[0].imshow(img, interpolation="none",vmin=0,vmax=np.max(img))
             axes[0].set_title("Phantom Image")
             colors = ["blue","orange","green","red"]
             Titles = ["1.1 mm holes","1.0 mm holes","0.9 mm holes","0.8 mm holes"]
@@ -631,7 +631,7 @@ class ACRSpatialResolution(HazenTask):
                 by = (minr, minr, maxr, maxr, minr)
                 axes[0].plot(bx, by,color=colors[i], linewidth=2.5)
 
-                axes[i+1].imshow(ROIS[i])
+                axes[i+1].imshow(ROIS[i],vmin=0,vmax=np.max(img))
                 axes[i+1].set_title(Titles[i] + " Res Score: " + str("{:0.3e}".format(Results[i])))
                 for axis in ['top','bottom','left','right']:
                     axes[i+1].spines[axis].set_linewidth(6)

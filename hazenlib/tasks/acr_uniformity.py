@@ -161,10 +161,13 @@ class ACRUniformity(HazenTask):
 
             axes[0].imshow(img)
             axes[0].scatter(cxy[0], cxy[1], c="red")
+            circle1 = plt.Circle((cxy[0], cxy[1]), self.ACR_obj.radius, color='r',fill=False)
+            axes[0].add_patch(circle1)
             axes[0].axis("off")
             axes[0].set_title("Centroid Location")
 
             axes[1].imshow(img)
+            axes[1].imshow(lroi,alpha=0.4)
             axes[1].scatter(
                 [max_loc[1], min_loc[1]], [max_loc[0], min_loc[0]], c="red", marker="x"
             )
@@ -189,11 +192,13 @@ class ACRUniformity(HazenTask):
                 [max_loc[1], max_loc[0] + 10 / res[0]],
                 c="white",
             )
+
             axes[1].plot(
                 r_large * np.cos(theta) + cxy[0],
-                r_large * np.sin(theta) + cxy[1] + 5 / res[1],
+                r_large * np.sin(theta) + cxy[1] + d_void,
                 c="black",
             )
+
             axes[1].axis("off")
             axes[1].set_title(
                 "Percent Integral Uniformity = " + str(np.round(piu, 2)) + "%"

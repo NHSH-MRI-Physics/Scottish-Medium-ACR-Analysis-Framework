@@ -310,7 +310,8 @@ class ACRSlicePosition(HazenTask):
             fig.set_size_inches(8, 32)
             fig.tight_layout(pad=4)
 
-            axes[0].imshow(mask)
+            axes[0].imshow(img)
+            axes[0].imshow(mask,alpha=0.4)
             axes[0].axis("off")
             axes[0].set_title("Thresholding Result")
 

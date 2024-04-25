@@ -21,12 +21,20 @@ OuptutFolder = "OutputFolder"
 
 
 inputdata = "MedACRTesting/TestData/ACR_Phantom_Data"
-ChosenSeq = "ACR AxT2"
+
 
 
 #CLear the output folder so i dont need to do it everytime
 #if os.path.exists(OuptutFolder)==True:
 #    shutil.rmtree(OuptutFolder)
+ChosenSeq = "ACR AxT2"
+MedACRAnalysis.RunAnalysis(ChosenSeq,inputdata,OuptutFolder,RunAll=False, RunSNR=True, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
 
-MedACRAnalysis.RunAnalysis(ChosenSeq,inputdata,OuptutFolder,RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=True, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
+ChosenSeq = "ACR Ax T2 PROPELLER"
+MedACRAnalysis.RunAnalysis(ChosenSeq,inputdata,OuptutFolder,RunAll=False, RunSNR=True, RunGeoAcc=True, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
 
+ChosenSeq = "ACR AxT1"
+MedACRAnalysis.RunAnalysis(ChosenSeq,inputdata,OuptutFolder,RunAll=False, RunSNR=True, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
+
+ChosenSeq = "ACR Ax T1 SE brain+ gad"
+MedACRAnalysis.RunAnalysis(ChosenSeq,inputdata,OuptutFolder,RunAll=False, RunSNR=True, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)

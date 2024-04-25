@@ -174,11 +174,11 @@ class ACRObject:
         """
         img = self.images[6]
         dx, dy = self.pixel_spacing
-        img_blur = cv2.GaussianBlur(img, (1, 1), 0)
-        img_grad = cv2.Sobel(img_blur, 0, dx=1, dy=1)
+
 
         if (self.MediumACRPhantom==False):
-
+            img_blur = cv2.GaussianBlur(img, (1, 1), 0)
+            img_grad = cv2.Sobel(img_blur, 0, dx=1, dy=1)
             detected_circles = cv2.HoughCircles(
                 img_grad,
                 cv2.HOUGH_GRADIENT,
@@ -189,7 +189,8 @@ class ACRObject:
                 minRadius=int(180 / (2 * dy)),
                 maxRadius=int(200 / (2 * dx)),
             ).flatten()
-        else: #TODO See if we can improve this further...
+        else: #Tried to improve this by implementing a circle fitting algo, seems to be more relaiable needs more testing though.
+            '''
             img_blur = cv2.medianBlur(img,5)
             img_grad = cv2.Sobel(img_blur, 0, dx=1, dy=1)
 
@@ -201,8 +202,24 @@ class ACRObject:
                 param2=30,
                 minDist=int(180 / dy),
                 minRadius=int(155 / (2 * dy)),
-                maxRadius=int(180 / (2 * dx)),
+                maxRadius=int(175 / (2 * dx)),
             ).flatten()
+            '''
+
+            values = img[img > np.mean(img)*0.1] 
+            image = img > np.median(values)*0.5
+            from skimage import io, color, measure, draw, img_as_bool
+            from scipy import optimize
+            def cost(params):
+                x0, y0, r = params
+                coords = draw.disk((y0, x0), r, shape=image.shape)
+                template = np.zeros_like(image)
+                template[coords] = 1
+                return -np.sum(template == image)
+            test = image.shape
+            x0, y0, r = optimize.fmin(cost, (int(image.shape[0]/2), int(image.shape[1]/2), 165 / (2 * dx)))
+            detected_circles= [x0,y0,r]
+
         #centre = [int(i) for i in detected_circles[:2]]
         centre = [int(round(i)) for i in detected_circles[:2]] # This is better as round than just int otherwise its always rounding down.
         
@@ -269,8 +286,9 @@ class ACRObject:
             A sorted stack of images, where each image is represented as a 2D numpy array.
         """
         # Define a circular logical mask
-        x = np.linspace(1, dims[0], dims[0])
-        y = np.linspace(1, dims[1], dims[1])
+        #BugFix, should this not start at 0?
+        x = np.linspace(0, dims[0]-1, dims[0])
+        y = np.linspace(0, dims[1]-1, dims[1])
 
         X, Y = np.meshgrid(x, y)
         mask = (X - centre[0]) ** 2 + (Y - centre[1]) ** 2 <= radius**2
