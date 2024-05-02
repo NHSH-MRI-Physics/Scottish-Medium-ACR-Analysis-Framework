@@ -6,7 +6,7 @@ Please note this project is currently a work in progress, dervived from the [Haz
 - [x] Build GUI for the medium ACR phantom implementation.
 - [x] Build a version of the GUI which does not require internet connection (to update Docker image).
 - [x] Make a release package
-- [ ] Build unit tests.
+- [x] Build unit tests.
 - [ ] Write documentation.
 - [ ] get baseline values from a series of scanners
 
