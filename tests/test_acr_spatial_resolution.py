@@ -94,3 +94,21 @@ class TestACRSpatialResolutionGE(TestACRSpatialResolutionSiemens):
         )
         self.data = self.dcm.pixel_array
         self.res = self.dcm.PixelSpacing
+
+#TODO we shoudl test MTF but since the phantom isnt titled i never impletrmented it 
+class TestMedACRSpatialResolution(unittest.TestCase):
+    DotMatrixResult = {'task': 'ACRSpatialResolution', 'file': 'ACR_AxT1_4_1', 'measurement': {'1.1mm holes': 2524630.81, '1.0mm holes': 1230470.89, '0.9mm holes': 284317.18, '0.8mm holes': 391006.3}}
+
+    def setUp(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+        ge_files = get_dicom_files(ACR_DATA_Med)
+
+        self.acr_spatial_resolution_task = ACRSpatialResolution(
+            input_data=ge_files, report_dir=pathlib.PurePath.joinpath(TEST_REPORT_DIR)
+            ,MediumACRPhantom=True
+            ,UseDotMatrix=True
+        )
+    
+    def test_DotMatrix(self):
+        Res =  self.acr_spatial_resolution_task.run()
+        assert Res == self.DotMatrixResult

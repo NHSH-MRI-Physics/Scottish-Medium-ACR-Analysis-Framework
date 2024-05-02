@@ -61,6 +61,11 @@ class TestACRSlicePositionSiemens(unittest.TestCase):
         print("fixed_value:", self.dL[0])
 
         assert slice_position_val_1 == self.dL[0]
+
+        print("\ntest_slice_position.py::TestSlicePosition::test_slice_position")
+        print("new_release_value:", slice_position_val_11)
+        print("fixed_value:", self.dL[1])
+
         assert slice_position_val_11 == self.dL[1]
 
 
@@ -74,6 +79,21 @@ class TestACRSlicePositionGE(TestACRSlicePositionSiemens):
         ge_files = get_dicom_files(ACR_DATA_GE)
 
         self.acr_slice_position_task = ACRSlicePosition(input_data=ge_files)
+
+        self.dcm_1 = self.acr_slice_position_task.ACR_obj.dcms[0]
+        self.dcm_11 = self.acr_slice_position_task.ACR_obj.dcms[-1]
+
+
+class TestMedACRSlicePosition(TestACRSlicePositionSiemens):
+    x_pts = [(123, 129), (124, 130)]
+    y_pts = [(50, 81), (52, 80)]
+    dL = -1.56, -1.56
+
+    def setUp(self):
+        ACR_DATA_MED = pathlib.Path(TEST_DATA_DIR / "MedACR")
+        ge_files = get_dicom_files(ACR_DATA_MED)
+
+        self.acr_slice_position_task = ACRSlicePosition(input_data=ge_files,MediumACRPhantom=True)
 
         self.dcm_1 = self.acr_slice_position_task.ACR_obj.dcms[0]
         self.dcm_11 = self.acr_slice_position_task.ACR_obj.dcms[-1]

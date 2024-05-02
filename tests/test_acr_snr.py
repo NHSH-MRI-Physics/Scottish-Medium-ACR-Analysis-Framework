@@ -68,3 +68,26 @@ class TestACRSNRSiemens(TestACRSNRGE):
         print("fixed_value:", self.sub_snr)
 
         assert rounded_snr == self.sub_snr
+
+
+class TestMedACRSNR(unittest.TestCase):
+    norm_factor = 11.67
+    snr = 228.53
+
+    def setUp(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+        ge_files = get_dicom_files(ACR_DATA_Med)
+
+        self.acr_snr_task = ACRSNR(
+            input_data=ge_files, report_dir=pathlib.PurePath.joinpath(TEST_REPORT_DIR),MediumACRPhantom=True
+        )
+
+        self.snr_dcm = self.acr_snr_task.ACR_obj.dcms[6]
+
+    def test_normalisation_factor(self):
+        SNR_factor = self.acr_snr_task.get_normalised_snr_factor(self.snr_dcm)
+        assert round(SNR_factor, 2) == self.norm_factor
+
+    def test_snr_by_smoothing(self):
+        snr, _ = self.acr_snr_task.snr_by_smoothing(self.snr_dcm)
+        assert round(snr, 2) == self.snr

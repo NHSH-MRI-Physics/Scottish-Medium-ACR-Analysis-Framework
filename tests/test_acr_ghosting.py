@@ -47,3 +47,16 @@ class TestACRGhostingGE(TestACRGhostingSiemens):
         self.acr_ghosting_task = ACRGhosting(
             input_data=ge_files, report_dir=pathlib.PurePath.joinpath(TEST_REPORT_DIR)
         )
+
+class TestMedACRGhosting(TestACRGhostingSiemens):
+    psg = 0.137 
+
+    def setUp(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "Medacr")
+        ge_files = get_dicom_files(ACR_DATA_Med)
+
+        self.acr_ghosting_task = ACRGhosting(
+            input_data=ge_files, report_dir=pathlib.PurePath.joinpath(TEST_REPORT_DIR)
+            ,MediumACRPhantom=True
+        )
+

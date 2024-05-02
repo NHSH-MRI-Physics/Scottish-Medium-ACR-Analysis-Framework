@@ -349,3 +349,22 @@ class ACRGeometricAccuracy(HazenTask):
         cov_l = 100 * np.std(L) / np.mean(L)
 
         return mean_err, max_err, cov_l
+
+
+    @staticmethod
+    def distortion_metric_MedPhantom(L):
+        """Calculate the distortion metric based on length
+
+        Args:
+            L (tuple): horizontal and vertical distances from slices 1 and 5
+
+        Returns:
+            tuple of floats: mean_err, max_err, cov_l
+        """
+        err = [x - 165 for x in L]
+        mean_err = np.mean(err)
+
+        max_err = np.max(np.absolute(err))
+        cov_l = 100 * np.std(L) / np.mean(L)
+
+        return mean_err, max_err, cov_l

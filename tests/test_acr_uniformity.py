@@ -47,3 +47,15 @@ class TestACRUniformityGE(TestACRUniformitySiemens):
         self.acr_uniformity_task = ACRUniformity(
             input_data=ge_files, report_dir=pathlib.PurePath.joinpath(TEST_REPORT_DIR)
         )
+
+class TestMedACRUniformity(TestACRUniformitySiemens):
+    piu = 75.9
+    
+    def setUp(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+        ge_files = get_dicom_files(ACR_DATA_Med)
+    
+        self.acr_uniformity_task = ACRUniformity(
+            input_data=ge_files, report_dir=pathlib.PurePath.joinpath(TEST_REPORT_DIR)
+            ,MediumACRPhantom=True
+        )

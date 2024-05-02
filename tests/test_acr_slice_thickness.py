@@ -63,3 +63,17 @@ class TestACRSliceThicknessGE(TestACRSliceThicknessSiemens):
         self.acr_slice_thickness_task = ACRSliceThickness(input_data=ge_files)
 
         self.dcm = self.acr_slice_thickness_task.ACR_obj.dcms[0]
+
+
+class TestMedACRSliceThickness(TestACRSliceThicknessSiemens):
+    x_pts = [76, 174]
+    y_pts = [132, 126]
+    dz = 5.07
+
+    def setUp(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR" )
+        ge_files = get_dicom_files(ACR_DATA_Med)
+
+        self.acr_slice_thickness_task = ACRSliceThickness(input_data=ge_files,MediumACRPhantom=True)
+
+        self.dcm = self.acr_slice_thickness_task.ACR_obj.dcms[0]

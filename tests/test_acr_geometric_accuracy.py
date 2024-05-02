@@ -54,7 +54,12 @@ class TestACRGeometricAccuracySiemens(unittest.TestCase):
         metrics = np.array(
             self.acr_geometric_accuracy_task.distortion_metric(self.L1 + self.L5)
         )
+
+        if self.acr_geometric_accuracy_task.ACR_obj.MediumACRPhantom==True:
+                    metrics = np.array(self.acr_geometric_accuracy_task.distortion_metric_MedPhantom(self.L1 + self.L5))
+
         metrics = np.round(metrics, 2)
+        print(metrics)
         assert (metrics == self.distortion_metrics).all() == True
 
 
@@ -72,6 +77,24 @@ class TestACRGeometricAccuracyGE(TestACRGeometricAccuracySiemens):
 
         self.acr_geometric_accuracy_task = ACRGeometricAccuracy(
             input_data=ge_files, report_dir=pathlib.PurePath.joinpath(TEST_REPORT_DIR)
+        )
+
+        self.dcm_1 = self.acr_geometric_accuracy_task.ACR_obj.dcms[0]
+        self.dcm_5 = self.acr_geometric_accuracy_task.ACR_obj.dcms[4]
+
+
+class TestACRGeometricAccuracyGE(TestACRGeometricAccuracySiemens):
+    L1 = 164.07, 164.07
+    L5 = 166.02, 165.05, 166.02, 165.05
+    distortion_metrics = [0.05, 1.02, 0.48]
+
+    def setUp(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+        ge_files = get_dicom_files(ACR_DATA_Med)
+
+        self.acr_geometric_accuracy_task = ACRGeometricAccuracy(
+            input_data=ge_files, report_dir=pathlib.PurePath.joinpath(TEST_REPORT_DIR)
+            ,MediumACRPhantom=True
         )
 
         self.dcm_1 = self.acr_geometric_accuracy_task.ACR_obj.dcms[0]
