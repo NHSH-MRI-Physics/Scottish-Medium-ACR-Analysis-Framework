@@ -32,7 +32,8 @@ Please note this project is currently a work in progress, dervived from the [Haz
 ### Installation
 - Download this repository by clicking [here](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/archive/refs/heads/main.zip).
 - unzip and navigate to where you unzipped it.
-- enter "pip install -r requirements.txt" to install all dependencies. 
+- It is recommended a virtual environment is used to ensure no conflicts, see [here](https://www.freecodecamp.org/news/how-to-setup-virtual-environments-in-python/) for instructions.
+- enter `pip install -r requirements.txt` to install all dependencies. 
 ### Quick Start
-- To run analysis use python RunMedACRAnalysis.py -seq <Sequence Name> <Args>
-- Run python .\RunMedACRAnalysis.py -h to get a description of all arguments.
+- To run analysis use `python RunMedACRAnalysis.py -seq <Sequence Name> <Args>`
+- Run `python .\RunMedACRAnalysis.py -h` to get a description of all arguments.
