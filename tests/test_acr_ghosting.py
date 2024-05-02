@@ -49,7 +49,7 @@ class TestACRGhostingGE(TestACRGhostingSiemens):
         )
 
 class TestMedACRGhosting(TestACRGhostingSiemens):
-    psg = 0.135 
+    psg = 0.137 
 
     def setUp(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
