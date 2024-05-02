@@ -11,7 +11,7 @@ from tests import TEST_DATA_DIR, TEST_REPORT_DIR
 
 class TestACRTools(unittest.TestCase):
     rotation = [-1.0, 0.0]
-    centre = [(129, 130), (253, 255)]
+    centre = [(129, 130), (253, 255)] #Had to change these because of a bug fix with the rounding
     test_point = (-60.98, -45.62)
 
     def setUp(self):

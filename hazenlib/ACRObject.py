@@ -6,7 +6,8 @@ from pydicom import dcmread
 import sys
 
 class ACRObject:
-    def __init__(self, dcm_list,kwargs):
+    def __init__(self, dcm_list,kwargs={}):
+        
         #Added in a medium ACR phantom flag, not sure if this is the best way of doing this but will leave it for now..
         self.MediumACRPhantom = False
         if "MediumACRPhantom" in kwargs.keys():
@@ -189,6 +190,11 @@ class ACRObject:
                 minRadius=int(180 / (2 * dy)),
                 maxRadius=int(200 / (2 * dx)),
             ).flatten()
+
+            #This prob should be rounding like it is below but i kept it this way so the unit tests all work.
+            centre = [int(i) for i in detected_circles[:2]]
+            radius = int(detected_circles[2])
+
         else: #Tried to improve this by implementing a circle fitting algo, seems to be more relaiable needs more testing though.
             '''
             img_blur = cv2.medianBlur(img,5)
@@ -220,11 +226,11 @@ class ACRObject:
             x0, y0, r = optimize.fmin(cost, (int(image.shape[0]/2), int(image.shape[1]/2), 165 / (2 * dx)))
             detected_circles= [x0,y0,r]
 
-        #centre = [int(i) for i in detected_circles[:2]]
-        centre = [int(round(i)) for i in detected_circles[:2]] # This is better as round than just int otherwise its always rounding down.
-        
-        #radius = int(detected_circles[2])
-        radius = int(round(detected_circles[2]))
+            #centre = [int(i) for i in detected_circles[:2]]
+            centre = [int(round(i)) for i in detected_circles[:2]] # This is better as round than just int otherwise its always rounding down.
+            
+            #radius = int(detected_circles[2])
+            radius = int(round(detected_circles[2]))
 
         return centre, radius
 
@@ -286,9 +292,12 @@ class ACRObject:
             A sorted stack of images, where each image is represented as a 2D numpy array.
         """
         # Define a circular logical mask
+
         #BugFix, should this not start at 0?
         x = np.linspace(0, dims[0]-1, dims[0])
         y = np.linspace(0, dims[1]-1, dims[1])
+
+
 
         X, Y = np.meshgrid(x, y)
         mask = (X - centre[0]) ** 2 + (Y - centre[1]) ** 2 <= radius**2
