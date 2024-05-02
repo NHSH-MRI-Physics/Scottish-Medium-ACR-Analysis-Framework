@@ -52,7 +52,7 @@ class TestMedACRGhosting(TestACRGhostingSiemens):
     psg = 0.137 
 
     def setUp(self):
-        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "Medacr")
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
         ge_files = get_dicom_files(ACR_DATA_Med)
 
         self.acr_ghosting_task = ACRGhosting(
