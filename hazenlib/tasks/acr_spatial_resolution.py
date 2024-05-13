@@ -273,7 +273,7 @@ class ACRSpatialResolution(HazenTask):
         )
 
         popt, pcov = scipy.optimize.curve_fit(
-            func, x_data, crop_img.ravel(), p0=[0, 0, bright, dark], maxfev=1000
+            func, x_data, crop_img.ravel(), p0=[0, 0, bright, dark], maxfev=1500
         )
         surface = func(x_data, popt[0], popt[1], popt[2], popt[3]).reshape(
             crop_img.shape
