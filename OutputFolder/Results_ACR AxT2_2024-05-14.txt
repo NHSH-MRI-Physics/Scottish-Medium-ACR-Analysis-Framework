@@ -1,0 +1,36 @@
+Date Analysed: 2024-05-14
+Sequence Analysed: ACR AxT2
+
+SNR Module
+	SNR: 170.83      Result: No Tolerance Set
+
+Geometric Accuracy Module
+	Slice 1:
+		Hor Dist (mm):             164.07      Result: Pass      Tolerance: >163.0 and <167.0
+		Vert Dist (mm):            164.07      Result: Pass      Tolerance: >163.0 and <167.0
+	Slice 5:
+		Hor Dist (mm):             166.02      Result: Pass      Tolerance: >163.0 and <167.0
+		Vert Dist (mm):            165.05      Result: Pass      Tolerance: >163.0 and <167.0
+		Diagonal distance SW (mm): 166.02      Result: Pass      Tolerance: >163.0 and <167.0
+		Diagonal distance SE (mm): 166.02      Result: Pass      Tolerance: >163.0 and <167.0
+
+Spatial Resoloution Module
+	1.1mm Holes Score: 1192718.92  Result: No Tolerance Set
+	1.0mm Holes Score: 564987.3    Result: No Tolerance Set
+	0.9mm Holes Score: 130915.49   Result: No Tolerance Set
+	0.8mm Holes Score: 186165.38   Result: No Tolerance Set
+	Raw MTF50 :        1.47        Result: No Tolerance Set
+	Fitted MTF50:      1.52        Result: No Tolerance Set
+
+Uniformity Module
+	Uniformity:  76.14%      Result: Fail      Tolerance: >90.0
+
+Ghosting Module
+	Ghosting:    0.269%      Result: Pass      Tolerance: <3.0
+
+Slice Position Module
+	Slice 1 Position Error (mm):  -1.37       Result: Pass      Tolerance: <7.0
+	Slice 11 Position Error (mm): -1.37       Result: Pass      Tolerance: <7.0
+
+Slice Thickness Module
+	Slice Width (mm): 5.09        Result: Pass      Tolerance: >4.0 and <6.0
