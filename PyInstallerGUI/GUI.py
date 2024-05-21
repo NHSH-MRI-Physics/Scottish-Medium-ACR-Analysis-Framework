@@ -22,6 +22,7 @@ class TextRedirector(object):
         self.widget.configure(state="disabled")
         self.widget.see("end")
         root.update()
+        
 root = tkinter.Tk()
 root.geometry('1000x500')
 
@@ -41,6 +42,7 @@ def SetDCMPath():
             options.append(data.SeriesDescription)
 
     options= list(set(options))
+    option=options.sort()
     dropdown.set_menu(*options)
     dropdown.config(state="normal")
 
@@ -62,11 +64,16 @@ def AdjustCheckBoxes():
             if keys != "RunAll":
                 CheckBoxes[keys][1].config(state=DISABLED)
 
-def EnableOrDiableEverything():
-    pass
+def EnableOrDisableEverything(Enable):
+    if Enable==True:
+        for widgets in WidgetsToToggle:
+            widgets.config(state="normal")
+    else:
+        for widgets in WidgetsToToggle:
+            widgets.config(state="disabled")
 
 def RunAnalysis():
-
+    
     RunAll=False
     SNR=False
     GeoAcc=False
@@ -98,12 +105,15 @@ def RunAnalysis():
         messagebox.showerror("Error", "No DICOM Path Set")
     if Resultsfolder_path.get()=="Not Set!":
         messagebox.showerror("Error", "No Results Path Set")
-
+    EnableOrDisableEverything(False)
     MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
+    EnableOrDisableEverything(True)
+WidgetsToToggle=[]
 
 PathFrame = ttk.Frame(root)
 DCMPathButton = ttk.Button(text="Set DICOM Path", command=SetDCMPath,width=22)
 DCMPathButton.grid(row=0, column=0,padx=10,pady=2,sticky=W)
+WidgetsToToggle.append(DCMPathButton)
 DCMfolder_path = StringVar()
 DCMfolder_path.set("Not Set!")
 DCMPathLabel = ttk.Label(master=root,textvariable=DCMfolder_path)
@@ -112,6 +122,7 @@ DCMPathLabel.grid(row=0, column=1,padx=10,pady=2,columnspan=2,sticky=W)
 PathFrame = ttk.Frame(root)
 ResultsPathButton = ttk.Button(text="Set Results Output Path", command=SetResultsOutput,width=22)
 ResultsPathButton.grid(row=1, column=0,padx=10,pady=2,sticky=W)
+WidgetsToToggle.append(ResultsPathButton)
 Resultsfolder_path = StringVar()
 Resultsfolder_path.set("Not Set!")
 ResultsPathLabel = ttk.Label(master=root,textvariable=Resultsfolder_path)
@@ -121,7 +132,7 @@ selected_option = StringVar(root)
 options = [] 
 dropdown = ttk.OptionMenu(root, selected_option, *options)
 dropdown.config(width = 20,state="disabled")
-
+WidgetsToToggle.append(dropdown)
 dropdown.grid(row=2, column=0,padx=10,pady=10)
 
 CheckBoxes = {}
@@ -139,22 +150,27 @@ for keys in CheckBoxes:
         CheckBoxes["RunAll"][0] = IntVar(value=1)
         CheckBoxes["RunAll"][1] = ttk.Checkbutton(root, text='Run All',variable=CheckBoxes["RunAll"][0], onvalue=1, offvalue=0,state=NORMAL,command=AdjustCheckBoxes)
         CheckBoxes["RunAll"][1].grid(row=3, column=0,sticky=W)
+        WidgetsToToggle.append(CheckBoxes["RunAll"][1])
     else:
         CheckBoxes[keys][0] = IntVar(value=0)
         CheckBoxes[keys][1] = ttk.Checkbutton(root, text="Run "+keys,variable=CheckBoxes[keys][0], onvalue=1, offvalue=0,state=DISABLED,command=AdjustCheckBoxes)
         CheckBoxes[keys][1].grid(row=StartingRow, column=0,sticky=W)
         StartingRow+=1
+        WidgetsToToggle.append(CheckBoxes[keys][1])
 
 RunAnalysisBtn = ttk.Button(text="Start Analysis",width=22,command=RunAnalysis)
 RunAnalysisBtn.grid(row=StartingRow, column=0,padx=10,pady=10,sticky=W)
+WidgetsToToggle.append(RunAnalysisBtn)
 
 ViewResultsBtn = ttk.Button(text="View Results",width=22,command=None,state=DISABLED)
 ViewResultsBtn.grid(row=StartingRow+2, column=0,padx=10,pady=0,sticky=W)
+WidgetsToToggle.append(ViewResultsBtn)
 
 Result_Selection = StringVar()
 ResultImages = [] 
 dropdownResults = ttk.OptionMenu(root, Result_Selection, *ResultImages)
 dropdownResults.config(width = 20,state="disabled")
+WidgetsToToggle.append(dropdownResults)
 dropdownResults.grid(row=StartingRow+1, column=0,padx=10,pady=0,sticky=W)
 
 
@@ -177,8 +193,8 @@ TextLog.configure(yscrollcommand=scrollLog.set)
 TextLog.pack()
 
 sys.stdout = TextRedirector(TextLog, "stdout")
+sys.stderr = TextRedirector(TextLog, "stderr")
 frame.grid(row=11, column=2,padx=10,pady=10,rowspan=3)
-
 
 sv_ttk.set_theme("dark")
 root.resizable(False,False)
