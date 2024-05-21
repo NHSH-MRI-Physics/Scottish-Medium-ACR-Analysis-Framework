@@ -1,0 +1,6 @@
+#Test Name, Lower Tolerance, Upper Tolerance
+Geometric Acuracy, 163,167
+Slice Thickness, 4, 6
+Slice Position, None, 7
+Uniformity, 90, None
+Ghosting, None, 3

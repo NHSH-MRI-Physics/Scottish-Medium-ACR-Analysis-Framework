@@ -1,0 +1,10 @@
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x86\Debug\ACR Phantom GUI.exe.config
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x86\Debug\ACR Phantom GUI.exe
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\bin\x86\Debug\ACR Phantom GUI.pdb
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x86\Debug\ACR Phantom GUI.csproj.AssemblyReference.cache
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x86\Debug\ACR_Phantom_GUI.Form1.resources
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x86\Debug\ACR_Phantom_GUI.Properties.Resources.resources
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x86\Debug\ACR Phantom GUI.csproj.GenerateResource.cache
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x86\Debug\ACR Phantom GUI.csproj.CoreCompileInputs.cache
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x86\Debug\ACR Phantom GUI.exe
+D:\Hazen-ScottishACR-Fork\ACR Phantom GUI\obj\x86\Debug\ACR Phantom GUI.pdb

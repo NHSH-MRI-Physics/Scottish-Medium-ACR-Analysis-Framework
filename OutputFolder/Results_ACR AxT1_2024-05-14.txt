@@ -1,0 +1,23 @@
+Date Analysed: 2024-05-14
+Sequence Analysed: ACR AxT1
+
+SNR Module
+	SNR: 228.53      Result: No Tolerance Set
+
+Geometric Accuracy Module
+	Not Run
+
+Spatial Resoloution Module
+	Not Run
+
+Uniformity Module
+	Not Run
+
+Ghosting Module
+	Not Run
+
+Slice Position Module
+	Not Run
+
+Slice Thickness Module
+	Not Run
