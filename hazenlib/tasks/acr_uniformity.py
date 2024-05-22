@@ -82,7 +82,7 @@ class ACRUniformity(HazenTask):
         )  # Required pixel radius to produce ~1cm2 ROI
 
         if self.ACR_obj.MediumACRPhantom==True:
-            r_large = np.ceil(np.sqrt(16000*0.95 / np.pi) / res[0]).astype(int) #Making it a 95% smaller than 160cm^2 (16000mm^2) to avoid the bit at the top
+            r_large = np.ceil(np.sqrt(16000*0.80 / np.pi) / res[0]).astype(int) #Making it a 95% smaller than 160cm^2 (16000mm^2) to avoid the bit at the top
 
 
         d_void = np.ceil(5 / res[0]).astype(

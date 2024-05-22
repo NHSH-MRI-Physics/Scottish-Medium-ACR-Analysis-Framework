@@ -12,6 +12,12 @@ import hazenlib.exceptions as exc
 
 matplotlib.use("Agg")
 
+"""
+17.05.2024 Replaced "  iop_round = [round(x) for x in iop]" with iop call to extract orientation from DICOM header
+hamish.richardson@nhs.scot
+ """
+
+
 
 def get_dicom_files(folder: str, sort=False) -> list:
     if sort:
@@ -279,9 +285,13 @@ def get_image_orientation(iop):
 
     Returns:
 
+    Edit[HR 17.05.24]:  Error msg: "TypeError: type DataElement doesn't define __round__ method"
+                        Replaced with iop call to extract orientation from DICOM header
     """
-    iop_round = [round(x) for x in iop]
-    plane = np.cross(iop_round[0:3], iop_round[3:6])
+ #   iop_round = [round(x) for x in iop]
+ #   plane = np.cross(iop_round[0:3], iop_round[3:6])
+    Orient=elem=iop[0x0020,0x0037]
+    plane = np.cross(Orient[0:3], Orient[3:6])
     plane = [abs(x) for x in plane]
     if plane[0] == 1:
         return "Sagittal"

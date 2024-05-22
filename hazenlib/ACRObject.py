@@ -4,10 +4,11 @@ import skimage
 import numpy as np
 from pydicom import dcmread
 import sys
+import matplotlib.pyplot as plt 
+from hazenlib.utils import get_image_orientation
 
 class ACRObject:
-    def __init__(self, dcm_list,kwargs={}):
-        
+    def __init__(self, dcm_list,kwargs):
         #Added in a medium ACR phantom flag, not sure if this is the best way of doing this but will leave it for now..
         self.MediumACRPhantom = False
         if "MediumACRPhantom" in kwargs.keys():
@@ -32,6 +33,7 @@ class ACRObject:
         self.slice7_dcm = self.dcms[6]
         # Find the centre coordinates of the phantom (circle)
         self.centre, self.radius = self.find_phantom_center()
+        #print(f'x,y centre coords are {self.centre}')
         # Store a mask image of slice 7 for reusability
         self.mask_image = self.get_mask_image(self.images[6])
 
@@ -55,11 +57,29 @@ class ACRObject:
 
         # TODO: implement a check if phantom was placed in other than axial position
         # This is to be able to flag to the user the caveat of measurments if deviating from ACR guidance
+        
+        # Edit [HR 27.05.24]    Added re-ordering of stack based on slice-positions for SAG and COR orientations
+        #                       Was only re-ordering for TRA orientation; SAG and COR slices were randomly positioned (?based on filename)
+        #                       Essential for image-pipelines with odd filenaming conventions
+        orientation=get_image_orientation(self.dcm_list[0])
 
-        # x = np.array([dcm.ImagePositionPatient[0] for dcm in self.dcm_list])
-        # y = np.array([dcm.ImagePositionPatient[1] for dcm in self.dcm_list])
+        x = np.array([dcm.ImagePositionPatient[0] for dcm in self.dcm_list])
+        y = np.array([dcm.ImagePositionPatient[1] for dcm in self.dcm_list])
         z = np.array([dcm.ImagePositionPatient[2] for dcm in self.dcm_list])
-        dicom_stack = [self.dcm_list[i] for i in np.argsort(z)]
+#        print(f'x array is {x}')
+        
+        if orientation=='Transverse':
+            dicom_stack = [self.dcm_list[i] for i in np.argsort(z)]
+#            for obj in dicom_stack:
+#                print(f'dicom_stack z-positions are {obj.ImagePositionPatient[2]}')
+        if orientation=='Coronal':
+            dicom_stack = [self.dcm_list[i] for i in np.argsort(y)]
+#            for obj in dicom_stack:
+#                print(f'dicom_stack z-positions are {obj.ImagePositionPatient[1]}')
+        if orientation=='Sagittal':
+            dicom_stack = [self.dcm_list[i] for i in np.argsort(x)]
+#            for obj in dicom_stack:
+#                print(f'dicom_stack z-positions are {obj.ImagePositionPatient[0]}')
         img_stack = [dicom.pixel_array for dicom in dicom_stack]
 
         return img_stack, dicom_stack
@@ -73,6 +93,11 @@ class ACRObject:
         -----------
         This function analyzes the given set of images and their associated DICOM objects to determine if any
         adjustments are needed to restore the correct slice order and view orientation.
+        
+        Edit [ HR30.04.2024] Slight modification to Houghcircles' param2 seems to improve slice-order check
+        Warning: HoughCircles algorithm sometimes detects circles on (true) slice 1 and fails to detect circles on (true) slice 11, thus could incorrectly reverse stack.
+
+
         """
         test_images = (self.images[0], self.images[-1])
         dx = self.pixel_spacing[0]
@@ -89,33 +114,45 @@ class ACRObject:
             for image in test_images
         ]
 
+ #       cv2.imshow("Normalised image 0",normalised_images[0])
+ #       cv2.waitKey(0)
+ #       cv2.imshow("Normalised image 1",normalised_images[1])
+ #       cv2.waitKey(0)
+
         # search for circle in first slice of ACR phantom dataset with radius of ~11mm
         detected_circles = [
             cv2.HoughCircles(
                 norm_image,
                 cv2.HOUGH_GRADIENT,
                 1,
+#                param1=50,
+#                param2=30,
                 param1=50,
-                param2=30,
+                param2=10,                
                 minDist=int(180 / dx),
-                minRadius=int(5 / dx),
-                maxRadius=int(16 / dx),
+#                minRadius=int(5 / dx),
+#                maxRadius=int(16 / dx),
+                minRadius=int(10 / dx),
+                maxRadius=int(15 / dx),
             )
             for norm_image in normalised_images
         ]
+#        print(f'detected_circles is {detected_circles}')
 
         if detected_circles[0] is not None:
+#        if detected_circles[0] is None:            
             true_circle = detected_circles[0].flatten()
         else:
             true_circle = detected_circles[1].flatten()
 
-        if detected_circles[0] is None and detected_circles[1] is not None:
+        if detected_circles[0] is None and detected_circles[1] is not None:           
+#        if detected_circles[0] is not None and detected_circles[1] is None:  
             print("Performing slice order inversion to restore correct slice order.")
             self.images.reverse()
-            self.dcms.reverse()
+            self.dcms.reverse()            
+
         else:
             print("Slice order inversion not required.")
-
         if true_circle[0] > self.images[0].shape[0] // 2:
             print("Performing LR orientation swap to restore correct view.")
             flipped_images = [np.fliplr(image) for image in self.images]
@@ -145,7 +182,7 @@ class ACRObject:
         h, theta, d = skimage.transform.hough_line(diff)
         _, angles, _ = skimage.transform.hough_line_peaks(h, theta, d)
 
-        angle = np.rad2deg(scipy.stats.mode(angles)[0][0])
+        angle = np.rad2deg(scipy.stats.mode(angles)[0])#[0])
         rot_angle = angle + 90 if angle < 0 else angle - 90
         return rot_angle
 
@@ -175,11 +212,11 @@ class ACRObject:
         """
         img = self.images[6]
         dx, dy = self.pixel_spacing
-
+        img_blur = cv2.GaussianBlur(img, (1, 1), 0)
+        img_grad = cv2.Sobel(img_blur, 0, dx=1, dy=1)
 
         if (self.MediumACRPhantom==False):
-            img_blur = cv2.GaussianBlur(img, (1, 1), 0)
-            img_grad = cv2.Sobel(img_blur, 0, dx=1, dy=1)
+
             detected_circles = cv2.HoughCircles(
                 img_grad,
                 cv2.HOUGH_GRADIENT,
@@ -190,13 +227,7 @@ class ACRObject:
                 minRadius=int(180 / (2 * dy)),
                 maxRadius=int(200 / (2 * dx)),
             ).flatten()
-
-            #This prob should be rounding like it is below but i kept it this way so the unit tests all work.
-            centre = [int(i) for i in detected_circles[:2]]
-            radius = int(detected_circles[2])
-
-        else: #Tried to improve this by implementing a circle fitting algo, seems to be more relaiable needs more testing though.
-            '''
+        else: #TODO See if we can improve this further...
             img_blur = cv2.medianBlur(img,5)
             img_grad = cv2.Sobel(img_blur, 0, dx=1, dy=1)
 
@@ -208,30 +239,10 @@ class ACRObject:
                 param2=30,
                 minDist=int(180 / dy),
                 minRadius=int(155 / (2 * dy)),
-                maxRadius=int(175 / (2 * dx)),
+                maxRadius=int(180 / (2 * dx)),
             ).flatten()
-            '''
-
-            values = img[img > np.mean(img)*0.1] 
-            image = img > np.median(values)*0.5
-            from skimage import io, color, measure, draw, img_as_bool
-            from scipy import optimize
-            def cost(params):
-                x0, y0, r = params
-                coords = draw.disk((y0, x0), r, shape=image.shape)
-                template = np.zeros_like(image)
-                template[coords] = 1
-                return -np.sum(template == image)
-            test = image.shape
-            x0, y0, r = optimize.fmin(cost, (int(image.shape[0]/2), int(image.shape[1]/2), 165 / (2 * dx)))
-            detected_circles= [x0,y0,r]
-
-            #centre = [int(i) for i in detected_circles[:2]]
-            centre = [int(round(i)) for i in detected_circles[:2]] # This is better as round than just int otherwise its always rounding down.
-            
-            #radius = int(detected_circles[2])
-            radius = int(round(detected_circles[2]))
-
+        centre = [int(i) for i in detected_circles[:2]]
+        radius = int(detected_circles[2])
         return centre, radius
 
     def get_mask_image(self, image, mag_threshold=0.05, open_threshold=500):
@@ -292,12 +303,8 @@ class ACRObject:
             A sorted stack of images, where each image is represented as a 2D numpy array.
         """
         # Define a circular logical mask
-
-        #BugFix, should this not start at 0?
-        x = np.linspace(0, dims[0]-1, dims[0])
-        y = np.linspace(0, dims[1]-1, dims[1])
-
-
+        x = np.linspace(1, dims[0], dims[0])
+        y = np.linspace(1, dims[1], dims[1])
 
         X, Y = np.meshgrid(x, y)
         mask = (X - centre[0]) ** 2 + (Y - centre[1]) ** 2 <= radius**2

@@ -11,6 +11,12 @@ Created by Yassine Azma
 yassine.azma@rmh.nhs.uk
 
 31/01/2022
+
+
+26.04.2024:
+Find_ramps - x-dir limits of profile fail in sagittal view due to air-bubble. Fix these values as will not vary much 
+hamish.richardson@nhs.scot
+
 """
 
 import os
@@ -79,7 +85,7 @@ class ACRSliceThickness(HazenTask):
         """
         # X
         investigate_region = int(np.ceil(5.5 / res[1]).item())
-
+#        print(f'investigate_region is {investigate_region}')
         if np.mod(investigate_region, 2) == 0:
             investigate_region = investigate_region + 1
 
@@ -103,13 +109,14 @@ class ACRSliceThickness(HazenTask):
 
         x_peaks, _ = self.ACR_obj.find_n_highest_peaks(abs_diff_x_profile, 4)
         x_locs = np.sort(x_peaks) - 1
-
+#        print(f'x_locs is {x_locs}')
         width_pts = [x_locs[1], x_locs[2]]
         width = np.max(width_pts) - np.min(width_pts)
 
         # take rough estimate of x points for later line profiles
-        x = np.round([np.min(width_pts) + 0.2 * width, np.max(width_pts) - 0.2 * width])
-
+        #x = np.round([np.min(width_pts) + 0.2 * width, np.max(width_pts) - 0.2 * width])
+        # x limits of profile fail in sagittal view due to air-bubble. Fix these values as will not vary much (HR 26.04.2024)
+        x = [85,165]
         # Y
         c = skimage.measure.profile_line(
             img,
@@ -187,13 +194,15 @@ class ACRSliceThickness(HazenTask):
         res = dcm.PixelSpacing  # In-plane resolution from metadata
         cxy = self.ACR_obj.centre
         x_pts, y_pts = self.find_ramps(img, cxy, res)
+#        print(f'Ramp x is {x_pts} and Ramp y is {y_pts}')
 
         interp_factor = 5
         sample = np.arange(1, x_pts[1] - x_pts[0] + 2)
         new_sample = np.arange(
             1, x_pts[1] - x_pts[0] + (1 / interp_factor), (1 / interp_factor)
         )
-        offsets = np.arange(-3, 4)
+#        offsets = np.arange(-3, 4)
+        offsets = np.arange(start=-1,stop=4,step=1)
         ramp_length = np.zeros((2, 7))
 
         line_store = []
@@ -222,7 +231,7 @@ class ACRSliceThickness(HazenTask):
             fwhm = [self.FWHM(interp_line) for interp_line in interp_lines]
             ramp_length[0, i] = (1 / interp_factor) * np.diff(fwhm[0]) * res[0]
             ramp_length[1, i] = (1 / interp_factor) * np.diff(fwhm[1]) * res[0]
-
+#            print(f'cycle {i}: fwhm={fwhm}, ramp_length0={ramp_length[0,i]}, ramp_length1={ramp_length[1,i]}')
             line_store.append(interp_lines)
             fwhm_store.append(fwhm)
 
@@ -320,5 +329,5 @@ class ACRSliceThickness(HazenTask):
             )
             fig.savefig(img_path)
             self.report_files.append(img_path)
-
+            print(f'Results file is {img_path}')
         return slice_thickness
