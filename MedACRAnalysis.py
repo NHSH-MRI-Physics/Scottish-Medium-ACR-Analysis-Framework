@@ -120,8 +120,10 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
         acr_snr_task = ACRSNR(input_data=Data, report_dir=OutputPath,report=True,MediumACRPhantom=True)
         snr = acr_snr_task.run()
         print("SNR :" +str(snr["measurement"]["snr by smoothing"]["measured"]))
+        print("Normalised SNR :" +str(snr["measurement"]["snr by smoothing"]["normalised"]))
         
         ReportFile.write( '\tSNR: %-12s%-12s\n' % (str(snr["measurement"]["snr by smoothing"]["measured"]), GetPassResult(snr["measurement"]["snr by smoothing"]["measured"],"SNR")))
+        ReportFile.write( '\tNormalised SNR: %-12s%-12s\n' % (str(snr["measurement"]["snr by smoothing"]["normalised"]), GetPassResult(snr["measurement"]["snr by smoothing"]["normalised"],"SNR")))
         TestCounter+=1
         print("Progress " +str(TestCounter) +"/" +str(TotalTests))
     else:

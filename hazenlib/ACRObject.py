@@ -4,6 +4,8 @@ import skimage
 import numpy as np
 from pydicom import dcmread
 import sys
+import matplotlib.pyplot as plt 
+from hazenlib.utils import get_image_orientation
 
 class ACRObject:
     def __init__(self, dcm_list,kwargs={}):
@@ -53,13 +55,19 @@ class ACRObject:
             A sorted stack of dicoms
         """
 
-        # TODO: implement a check if phantom was placed in other than axial position
-        # This is to be able to flag to the user the caveat of measurments if deviating from ACR guidance
-
-        # x = np.array([dcm.ImagePositionPatient[0] for dcm in self.dcm_list])
-        # y = np.array([dcm.ImagePositionPatient[1] for dcm in self.dcm_list])
+        orientation=get_image_orientation(self.dcm_list[0].ImageOrientationPatient)
+        x = np.array([dcm.ImagePositionPatient[0] for dcm in self.dcm_list])
+        y = np.array([dcm.ImagePositionPatient[1] for dcm in self.dcm_list])
         z = np.array([dcm.ImagePositionPatient[2] for dcm in self.dcm_list])
-        dicom_stack = [self.dcm_list[i] for i in np.argsort(z)]
+
+
+        if orientation=='Transverse':
+            dicom_stack = [self.dcm_list[i] for i in np.argsort(z)]
+        elif orientation=='Coronal':
+            dicom_stack = [self.dcm_list[i] for i in np.argsort(y)]
+        elif orientation=='Sagittal':
+            dicom_stack = [self.dcm_list[i] for i in np.argsort(x)]
+
         img_stack = [dicom.pixel_array for dicom in dicom_stack]
 
         return img_stack, dicom_stack
@@ -96,10 +104,10 @@ class ACRObject:
                 cv2.HOUGH_GRADIENT,
                 1,
                 param1=50,
-                param2=30,
+                param2=10,
                 minDist=int(180 / dx),
-                minRadius=int(5 / dx),
-                maxRadius=int(16 / dx),
+                minRadius=int(10 / dx),
+                maxRadius=int(15 / dx),
             )
             for norm_image in normalised_images
         ]
@@ -145,7 +153,7 @@ class ACRObject:
         h, theta, d = skimage.transform.hough_line(diff)
         _, angles, _ = skimage.transform.hough_line_peaks(h, theta, d)
 
-        angle = np.rad2deg(scipy.stats.mode(angles)[0][0])
+        angle = np.rad2deg(scipy.stats.mode(angles)[0][0]) #This needs as specific version of scipy or you get an error (drop the last [0])
         rot_angle = angle + 90 if angle < 0 else angle - 90
         return rot_angle
 

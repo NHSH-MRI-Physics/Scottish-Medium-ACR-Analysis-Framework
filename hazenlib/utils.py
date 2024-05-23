@@ -282,6 +282,8 @@ def get_image_orientation(iop):
     """
     iop_round = [round(x) for x in iop]
     plane = np.cross(iop_round[0:3], iop_round[3:6])
+    #Orient=elem=iop[0x0020,0x0037]
+    #plane = np.cross(Orient[0:3], Orient[3:6])
     plane = [abs(x) for x in plane]
     if plane[0] == 1:
         return "Sagittal"

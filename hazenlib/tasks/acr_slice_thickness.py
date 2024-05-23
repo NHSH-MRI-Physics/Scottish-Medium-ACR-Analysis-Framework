@@ -109,7 +109,7 @@ class ACRSliceThickness(HazenTask):
 
         # take rough estimate of x points for later line profiles
         x = np.round([np.min(width_pts) + 0.2 * width, np.max(width_pts) - 0.2 * width])
-
+        #x = [85,165]
         # Y
         c = skimage.measure.profile_line(
             img,
@@ -194,6 +194,7 @@ class ACRSliceThickness(HazenTask):
             1, x_pts[1] - x_pts[0] + (1 / interp_factor), (1 / interp_factor)
         )
         offsets = np.arange(-3, 4)
+        offsets = np.arange(start=-1,stop=4,step=1)
         ramp_length = np.zeros((2, 7))
 
         line_store = []
