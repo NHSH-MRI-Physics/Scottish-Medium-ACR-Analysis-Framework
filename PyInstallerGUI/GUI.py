@@ -30,7 +30,11 @@ root.geometry('1200x500')
 root.title('Medium ACR Phantom QA Analysis')
 
 def SetDCMPath():
-    filename = filedialog.askdirectory()
+    if InitalDirDICOM==None:
+        filename = filedialog.askdirectory()
+    else:
+        filename = filedialog.askdirectory(initialdir=InitalDirDICOM)
+        
     if filename=="":
         return
     DCMfolder_path.set(filename)
@@ -50,7 +54,10 @@ def SetDCMPath():
 
 
 def SetResultsOutput():
-    filename = filedialog.askdirectory()
+    if InitalDirOutput==None:
+        filename = filedialog.askdirectory()
+    else:
+        filename = filedialog.askdirectory(initialdir=InitalDirOutput)
     if filename=="":
         return
     Resultsfolder_path.set(filename)
@@ -130,6 +137,8 @@ def RunAnalysis():
 
 
 WidgetsToToggle=[]
+InitalDirDICOM=None
+InitalDirOutput=None
 
 PathFrame = ttk.Frame(root)
 DCMPathButton = ttk.Button(text="Set DICOM Path", command=SetDCMPath,width=22)
