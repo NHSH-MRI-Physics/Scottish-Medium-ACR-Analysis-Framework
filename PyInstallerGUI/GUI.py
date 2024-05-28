@@ -32,9 +32,10 @@ root.title('Medium ACR Phantom QA Analysis')
 def SetDCMPath():
     if InitalDirDICOM==None:
         filename = filedialog.askdirectory()
+        InitalDirDICOM=DCMfolder_path.get()
     else:
         filename = filedialog.askdirectory(initialdir=InitalDirDICOM)
-        
+
     if filename=="":
         return
     DCMfolder_path.set(filename)
@@ -48,7 +49,7 @@ def SetDCMPath():
             options.append(data.SeriesDescription)
 
     options= list(set(options))
-    option=options.sort()
+    options=options.sort()
     dropdown.set_menu(*options)
     dropdown.config(state="normal")
 
@@ -56,6 +57,7 @@ def SetDCMPath():
 def SetResultsOutput():
     if InitalDirOutput==None:
         filename = filedialog.askdirectory()
+        InitalDirOutput=Resultsfolder_path.get()
     else:
         filename = filedialog.askdirectory(initialdir=InitalDirOutput)
     if filename=="":
