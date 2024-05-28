@@ -1,5 +1,5 @@
 import tkinter as tk
-
+import re
 #https://stackoverflow.com/questions/3781670/how-to-highlight-text-in-a-tkinter-text-widget
 
 class CustomText(tk.Text):
