@@ -30,15 +30,16 @@ root.geometry('1200x500')
 root.title('Medium ACR Phantom QA Analysis')
 
 def SetDCMPath():
+    global InitalDirDICOM
     if InitalDirDICOM==None:
         filename = filedialog.askdirectory()
-        InitalDirDICOM=DCMfolder_path.get()
     else:
         filename = filedialog.askdirectory(initialdir=InitalDirDICOM)
 
     if filename=="":
         return
     DCMfolder_path.set(filename)
+    #InitalDirDICOM=DCMfolder_path.get()
 
     options=[]
     files = get_dicom_files(DCMfolder_path.get())
@@ -49,7 +50,7 @@ def SetDCMPath():
             options.append(data.SeriesDescription)
 
     options= list(set(options))
-    options=options.sort()
+    option=options.sort()
     dropdown.set_menu(*options)
     dropdown.config(state="normal")
 
@@ -57,12 +58,12 @@ def SetDCMPath():
 def SetResultsOutput():
     if InitalDirOutput==None:
         filename = filedialog.askdirectory()
-        InitalDirOutput=Resultsfolder_path.get()
     else:
         filename = filedialog.askdirectory(initialdir=InitalDirOutput)
     if filename=="":
         return
     Resultsfolder_path.set(filename)
+    InitalDirOutput=Resultsfolder_path.get()
 
 def AdjustCheckBoxes():
     if CheckBoxes["RunAll"][0].get() == 0:
