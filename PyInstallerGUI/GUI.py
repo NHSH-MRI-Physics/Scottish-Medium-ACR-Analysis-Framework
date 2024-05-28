@@ -39,7 +39,7 @@ def SetDCMPath():
     if filename=="":
         return
     DCMfolder_path.set(filename)
-    #InitalDirDICOM=DCMfolder_path.get()
+    InitalDirDICOM=DCMfolder_path.get()
 
     options=[]
     files = get_dicom_files(DCMfolder_path.get())
@@ -50,12 +50,13 @@ def SetDCMPath():
             options.append(data.SeriesDescription)
 
     options= list(set(options))
-    option=options.sort()
+    options.sort()
     dropdown.set_menu(*options)
     dropdown.config(state="normal")
 
 
 def SetResultsOutput():
+    global InitalDirOutput
     if InitalDirOutput==None:
         filename = filedialog.askdirectory()
     else:
