@@ -14,8 +14,12 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 import os 
 
+ReportText = ""
+
 #This is a file which simply contains a function to run the analysis. It is in a seperate file so i can reuse it for the various implementations.
 def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False):
+    global ReportText
+    
     if RunAll == True:
         TotalTests = 7
     else:
@@ -231,5 +235,8 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
         print("Progress " +str(TestCounter) +"/" +str(TotalTests))
     else:
         ReportFile.write("\tNot Run\n")
+    ReportFile.close()
 
+    ReportFile = open(FileName,"r")
+    ReportText =  ''.join(ReportFile.readlines())
     ReportFile.close()

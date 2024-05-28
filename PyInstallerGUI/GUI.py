@@ -8,8 +8,10 @@ import sys
 sys.path.append(".")
 from hazenlib.utils import get_dicom_files
 import pydicom
-from tkinter import DISABLED, NORMAL, N, S, E, W, LEFT, RIGHT, TOP, BOTTOM, messagebox
+from tkinter import DISABLED, NORMAL, N, S, E, W, LEFT, RIGHT, TOP, BOTTOM, messagebox, END
 import MedACRAnalysis
+import os 
+#import HighlightText
 
 class TextRedirector(object):
     def __init__(self, widget, tag="stdout"):
@@ -24,7 +26,7 @@ class TextRedirector(object):
         root.update()
         
 root = tkinter.Tk()
-root.geometry('1000x500')
+root.geometry('1200x500')
 
 
 def SetDCMPath():
@@ -108,6 +110,16 @@ def RunAnalysis():
     EnableOrDisableEverything(False)
     MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
     EnableOrDisableEverything(True)
+
+    textResults.configure(state="normal")
+    textResults.delete(1.0, END)
+    textResults.insert("end", MedACRAnalysis.ReportText)
+    textResults.configure(state="disabled")
+
+    print ("Done")
+
+
+
 WidgetsToToggle=[]
 
 PathFrame = ttk.Frame(root)
@@ -125,6 +137,7 @@ ResultsPathButton.grid(row=1, column=0,padx=10,pady=2,sticky=W)
 WidgetsToToggle.append(ResultsPathButton)
 Resultsfolder_path = StringVar()
 Resultsfolder_path.set("Not Set!")
+#Resultsfolder_path.set("C:\\Users\John\Desktop\OutputTest") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
 ResultsPathLabel = ttk.Label(master=root,textvariable=Resultsfolder_path)
 ResultsPathLabel.grid(row=1, column=1,padx=10,pady=2,sticky=W,columnspan=2)
 
@@ -178,8 +191,11 @@ dropdownResults.grid(row=StartingRow+1, column=0,padx=10,pady=0,sticky=W)
 frame = ttk.Frame(root)
 ResultsWindowLabel = ttk.Label(master=frame,text="Results")
 ResultsWindowLabel.pack(anchor=W)
-textResults = tkinter.Text(frame, height=15, width=95,state=DISABLED) 
+
 scroll = ttk.Scrollbar(frame) 
+scroll.pack(side="right",fill="y")
+textResults = tkinter.Text(frame, height=15, width=118,state=DISABLED,yscrollcommand = scroll.set) 
+scroll.config(command=textResults.yview)
 textResults.configure(yscrollcommand=scroll.set) 
 textResults.pack()
 frame.grid(row=2, column=2,padx=10,pady=10,rowspan=9)
@@ -187,8 +203,10 @@ frame.grid(row=2, column=2,padx=10,pady=10,rowspan=9)
 frame = ttk.Frame(root)
 LogWindowLabel = ttk.Label(master=frame,text="Log")
 LogWindowLabel.pack(anchor=W)
-TextLog = tkinter.Text(frame, height=7, width=95,state=DISABLED) 
 scrollLog = ttk.Scrollbar(frame) 
+scrollLog.pack(side="right",fill="y")
+TextLog = tkinter.Text(frame, height=7, width=118,state=DISABLED,yscrollcommand = scroll.set) 
+scrollLog.config(command=textResults.yview)
 TextLog.configure(yscrollcommand=scrollLog.set) 
 TextLog.pack()
 

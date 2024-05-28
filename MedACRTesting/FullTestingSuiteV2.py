@@ -7,8 +7,11 @@ import glob
 import shutil
 import os
 
+inputdata = "MedACRTesting/TestData/ACR_Phantom_Data"
+inputdata = "C:/Users/John/Desktop/Hamish Test Data/PhilipsIngenia3.0T/ACR T2 Sag"
+
 #Get a list of all sequences for batch testing
-files = get_dicom_files("MedACRTesting/TestData/ACR_Phantom_Data")
+files = get_dicom_files(inputdata)
 sequences = []
 for file in files:
     data = pydicom.dcmread(file)
@@ -20,7 +23,7 @@ print(sequences)
 OuptutFolder = "OutputFolder"
 
 
-inputdata = "MedACRTesting/TestData/ACR_Phantom_Data"
+
 
 
 
@@ -28,13 +31,5 @@ inputdata = "MedACRTesting/TestData/ACR_Phantom_Data"
 #if os.path.exists(OuptutFolder)==True:
 #    shutil.rmtree(OuptutFolder)
 ChosenSeq = "ACR AxT2"
-MedACRAnalysis.RunAnalysis(ChosenSeq,inputdata,OuptutFolder,RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
-
-ChosenSeq = "ACR Ax T2 PROPELLER"
-#MedACRAnalysis.RunAnalysis(ChosenSeq,inputdata,OuptutFolder,RunAll=False, RunSNR=True, RunGeoAcc=True, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
-
-ChosenSeq = "ACR AxT1"
-#MedACRAnalysis.RunAnalysis(ChosenSeq,inputdata,OuptutFolder,RunAll=False, RunSNR=True, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
-
-ChosenSeq = "ACR Ax T1 SE brain+ gad"
-#MedACRAnalysis.RunAnalysis(ChosenSeq,inputdata,OuptutFolder,RunAll=False, RunSNR=True, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
+ChosenSeq = "HandN_ACR_SE_T1_TRA" #"ACR AxT2"
+MedACRAnalysis.RunAnalysis(ChosenSeq,inputdata,OuptutFolder,RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=True)
