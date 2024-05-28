@@ -126,7 +126,7 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
         print("SNR :" +str(snr["measurement"]["snr by smoothing"]["measured"]))
         print("Normalised SNR :" +str(snr["measurement"]["snr by smoothing"]["normalised"]))
         
-        ReportFile.write( '\tSNR: %-12s%-12s\n' % (str(snr["measurement"]["snr by smoothing"]["measured"]), GetPassResult(snr["measurement"]["snr by smoothing"]["measured"],"SNR")))
+        ReportFile.write( '\tSNR:            %-12s%-12s\n' % (str(snr["measurement"]["snr by smoothing"]["measured"]), GetPassResult(snr["measurement"]["snr by smoothing"]["measured"],"SNR")))
         ReportFile.write( '\tNormalised SNR: %-12s%-12s\n' % (str(snr["measurement"]["snr by smoothing"]["normalised"]), GetPassResult(snr["measurement"]["snr by smoothing"]["normalised"],"SNR")))
         TestCounter+=1
         print("Progress " +str(TestCounter) +"/" +str(TotalTests))

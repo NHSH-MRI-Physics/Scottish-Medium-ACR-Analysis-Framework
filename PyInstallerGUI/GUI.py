@@ -11,7 +11,7 @@ import pydicom
 from tkinter import DISABLED, NORMAL, N, S, E, W, LEFT, RIGHT, TOP, BOTTOM, messagebox, END
 import MedACRAnalysis
 import os 
-#import HighlightText
+import HighlightText
 
 class TextRedirector(object):
     def __init__(self, widget, tag="stdout"):
@@ -27,7 +27,7 @@ class TextRedirector(object):
         
 root = tkinter.Tk()
 root.geometry('1200x500')
-
+root.title('Medium ACR Phantom QA Analysis')
 
 def SetDCMPath():
     filename = filedialog.askdirectory()
@@ -114,6 +114,12 @@ def RunAnalysis():
     textResults.configure(state="normal")
     textResults.delete(1.0, END)
     textResults.insert("end", MedACRAnalysis.ReportText)
+    textResults.tag_config("Pass", foreground="green")
+    textResults.tag_config("Fail", foreground="red")
+    textResults.tag_config("No Tolerance Set", foreground="yellow")
+    textResults.highlight_pattern(r"Pass","Pass")
+    textResults.highlight_pattern(r"Fail","Fail")
+    textResults.highlight_pattern(r"No Tolerance Set","No Tolerance Set")
     textResults.configure(state="disabled")
 
     print ("Done")
@@ -137,7 +143,7 @@ ResultsPathButton.grid(row=1, column=0,padx=10,pady=2,sticky=W)
 WidgetsToToggle.append(ResultsPathButton)
 Resultsfolder_path = StringVar()
 Resultsfolder_path.set("Not Set!")
-#Resultsfolder_path.set("C:\\Users\John\Desktop\OutputTest") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
+Resultsfolder_path.set("C:\\Users\John\Desktop\OutputTest") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
 ResultsPathLabel = ttk.Label(master=root,textvariable=Resultsfolder_path)
 ResultsPathLabel.grid(row=1, column=1,padx=10,pady=2,sticky=W,columnspan=2)
 
@@ -194,7 +200,8 @@ ResultsWindowLabel.pack(anchor=W)
 
 scroll = ttk.Scrollbar(frame) 
 scroll.pack(side="right",fill="y")
-textResults = tkinter.Text(frame, height=15, width=118,state=DISABLED,yscrollcommand = scroll.set) 
+#textResults = tkinter.Text(frame, height=15, width=118,state=DISABLED,yscrollcommand = scroll.set) 
+textResults = HighlightText.CustomText(frame, height=15, width=118,state=DISABLED,yscrollcommand = scroll.set) 
 scroll.config(command=textResults.yview)
 textResults.configure(yscrollcommand=scroll.set) 
 textResults.pack()
