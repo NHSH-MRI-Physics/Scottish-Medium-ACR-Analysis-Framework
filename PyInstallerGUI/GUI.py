@@ -36,7 +36,7 @@ def SetDCMPath():
     DCMfolder_path.set(filename)
 
     options=[]
-    files = get_dicom_files("MedACRTesting/TestData/ACR_Phantom_Data")
+    files = get_dicom_files(DCMfolder_path.get())
     sequences = []
     for file in files:
         data = pydicom.dcmread(file)
@@ -121,6 +121,9 @@ def RunAnalysis():
     textResults.highlight_pattern(r"Fail","Fail")
     textResults.highlight_pattern(r"No Tolerance Set","No Tolerance Set")
     textResults.configure(state="disabled")
+
+    #Find all folders
+    
 
     print ("Done")
 
