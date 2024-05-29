@@ -12,6 +12,7 @@ from tkinter import DISABLED, NORMAL, N, S, E, W, LEFT, RIGHT, TOP, BOTTOM, mess
 import MedACRAnalysis
 import os 
 import HighlightText
+import glob 
 
 class TextRedirector(object):
     def __init__(self, widget, tag="stdout"):
@@ -28,6 +29,7 @@ class TextRedirector(object):
 root = tkinter.Tk()
 root.geometry('1200x500')
 root.title('Medium ACR Phantom QA Analysis')
+root.iconbitmap("PyInstallerGUI\ct-scan.ico")
 
 def SetDCMPath():
     global InitalDirDICOM
@@ -49,8 +51,10 @@ def SetDCMPath():
         if "Loc" not in data.SeriesDescription and "loc" not in data.SeriesDescription:
             options.append(data.SeriesDescription)
 
+    
     options= list(set(options))
     options.sort()
+    options.append(options[0])
     dropdown.set_menu(*options)
     dropdown.config(state="normal")
 
@@ -119,7 +123,7 @@ def RunAnalysis():
     if Resultsfolder_path.get()=="Not Set!":
         messagebox.showerror("Error", "No Results Path Set")
     EnableOrDisableEverything(False)
-    MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
+    #MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
     EnableOrDisableEverything(True)
 
     textResults.configure(state="normal")
@@ -134,11 +138,33 @@ def RunAnalysis():
     textResults.configure(state="disabled")
 
     #Find all folders
+    Folders = [x[0] for x in os.walk(Resultsfolder_path.get())]
+    Indexofroot = Folders.index(Resultsfolder_path.get())
+    del Folders[Indexofroot]
+    DropDownOptions = []
+    for folder in Folders:
+        DropDownOptions.append(folder.split(os.sep)[-1])
     
-
+    DropDownOptions.sort()
+    DropDownOptions.append(DropDownOptions[0])
+    dropdownResults.set_menu(*DropDownOptions)
+    dropdownResults.config(state="normal")
     print ("Done")
 
+def ViewResult():
+    ChosenResult = Result_Selection.get()
+    Path = Resultsfolder_path.get()
+    ChosenFolder = os.path.join(ChosenResult, Path)
+    Files = glob.glob(os.path.join(ChosenFolder,ChosenResult,"*.png"))
+    UnderScrolledSeq = selected_option.get().replace(' ','_')
 
+    FilesToOpen = []
+    for file in Files:
+        if UnderScrolledSeq in file:
+            os.startfile(file)
+
+    x = 0
+    
 
 WidgetsToToggle=[]
 InitalDirDICOM=None
@@ -197,7 +223,7 @@ RunAnalysisBtn = ttk.Button(text="Start Analysis",width=22,command=RunAnalysis)
 RunAnalysisBtn.grid(row=StartingRow, column=0,padx=10,pady=10,sticky=W)
 WidgetsToToggle.append(RunAnalysisBtn)
 
-ViewResultsBtn = ttk.Button(text="View Results",width=22,command=None,state=DISABLED)
+ViewResultsBtn = ttk.Button(text="View Results",width=22,command=ViewResult,state=DISABLED)
 ViewResultsBtn.grid(row=StartingRow+2, column=0,padx=10,pady=0,sticky=W)
 WidgetsToToggle.append(ViewResultsBtn)
 
@@ -207,8 +233,6 @@ dropdownResults = ttk.OptionMenu(root, Result_Selection, *ResultImages)
 dropdownResults.config(width = 20,state="disabled")
 WidgetsToToggle.append(dropdownResults)
 dropdownResults.grid(row=StartingRow+1, column=0,padx=10,pady=0,sticky=W)
-
-
 
 frame = ttk.Frame(root)
 ResultsWindowLabel = ttk.Label(master=frame,text="Results")
