@@ -13,6 +13,8 @@ import MedACRAnalysis
 import os 
 import HighlightText
 import glob 
+import subprocess
+import platform
 
 class TextRedirector(object):
     def __init__(self, widget, tag="stdout"):
@@ -161,8 +163,12 @@ def ViewResult():
     FilesToOpen = []
     for file in Files:
         if UnderScrolledSeq in file:
-            os.startfile(file)
-    
+            #os.startfile(file)
+            if platform.system() == "Windows":
+                os.startfile(file)
+            else:
+                opener = "open" if sys.platform == "darwin" else "xdg-open"
+                subprocess.call([opener, file])
 
 WidgetsToToggle=[]
 InitalDirDICOM=None
