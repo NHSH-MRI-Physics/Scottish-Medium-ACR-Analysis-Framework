@@ -123,7 +123,7 @@ def RunAnalysis():
     if Resultsfolder_path.get()=="Not Set!":
         messagebox.showerror("Error", "No Results Path Set")
     EnableOrDisableEverything(False)
-    #MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
+    MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
     EnableOrDisableEverything(True)
 
     textResults.configure(state="normal")
@@ -162,8 +162,6 @@ def ViewResult():
     for file in Files:
         if UnderScrolledSeq in file:
             os.startfile(file)
-
-    x = 0
     
 
 WidgetsToToggle=[]
