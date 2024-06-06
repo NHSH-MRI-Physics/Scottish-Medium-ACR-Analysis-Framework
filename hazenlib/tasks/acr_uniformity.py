@@ -56,6 +56,7 @@ class ACRUniformity(HazenTask):
                 f"{self.img_desc(self.ACR_obj.slice7_dcm)} because of : {e}"
             )
             traceback.print_exc(file=sys.stdout)
+            raise Exception(e)
 
         # only return reports if requested
         if self.report:

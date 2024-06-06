@@ -59,6 +59,7 @@ class ACRSliceThickness(HazenTask):
                 f"Could not calculate the slice thickness for {self.img_desc(slice_thickness_dcm)} because of : {e}"
             )
             traceback.print_exc(file=sys.stdout)
+            raise Exception(e)
 
         # only return reports if requested
         if self.report:

@@ -74,7 +74,7 @@ class ACRSlicePosition(HazenTask):
                     f"Could not calculate the bar length difference for {self.img_desc(dcm)} because of : {e}"
                 )
                 traceback.print_exc(file=sys.stdout)
-                continue
+                raise Exception(e)
 
         # only return reports if requested
         if self.report:
@@ -212,11 +212,13 @@ class ACRSlicePosition(HazenTask):
         plt.axhline(y=y_investigate_region, color='r', linestyle='-')
         plt.axhline(y=end_point, color='r', linestyle='-')
 
+
         plt.axhline(y=y_pts[0], color='b', linestyle='-')
         plt.axhline(y=y_pts[1], color='b', linestyle='-')
 
-        plt.axhline(y=44, color='g', linestyle='--')
-        plt.axhline(y=80, color='g', linestyle='--')
+        #plt.axhline(y=44, color='g', linestyle='--')
+        #plt.axhline(y=80, color='g', linestyle='--')
+        plt.savefig("test.png")
 
         return x_pts, y_pts
 
@@ -258,6 +260,13 @@ class ACRSlicePosition(HazenTask):
         peaks, _ = ACRObject.find_n_highest_peaks(
             abs(delta), 2, 0.5 * np.max(abs(delta))
         )  # find two highest peaks
+
+        import matplotlib.pyplot as plt
+        #plt.close()
+        #plt.imshow(img)
+        #plt.plot([x_pts[0], x_pts[0]], [y_pts[0], y_pts[1]], "b")
+        #plt.plot([x_pts[1], x_pts[1]], [y_pts[0], y_pts[1]], "r")
+        #plt.savefig("test.png")
 
         # if only one peak, set dummy range
         if len(peaks) == 1:

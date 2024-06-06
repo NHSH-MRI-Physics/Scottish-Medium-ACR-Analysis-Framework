@@ -79,6 +79,7 @@ class ACRSNR(HazenTask):
                     f"Could not calculate the SNR for {self.img_desc(snr_dcm)} because of : {e}"
                 )
                 traceback.print_exc(file=sys.stdout)
+                raise Exception(e)
         # SUBTRACTION METHOD
         else:
             # Get the absolute path to all FILES found in the directory provided
@@ -105,6 +106,7 @@ class ACRSNR(HazenTask):
                     f"{self.img_desc(snr_dcm2)} because of : {e}"
                 )
                 traceback.print_exc(file=sys.stdout)
+                raise Exception(e)
 
         # only return reports if requested
         if self.report:

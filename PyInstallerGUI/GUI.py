@@ -267,4 +267,7 @@ frame.grid(row=11, column=2,padx=10,pady=10,rowspan=3)
 
 sv_ttk.set_theme("dark")
 root.resizable(False,False)
+
+import hazenlib.logger
+hazenlib.logger.ConfigureLoggerForGUI()
 root.mainloop()

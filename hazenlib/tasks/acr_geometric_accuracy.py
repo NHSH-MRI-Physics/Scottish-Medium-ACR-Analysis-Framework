@@ -69,6 +69,7 @@ class ACRGeometricAccuracy(HazenTask):
                 f"Could not calculate the geometric accuracy for {self.img_desc(slice1_dcm)} because of : {e}"
             )
             traceback.print_exc(file=sys.stdout)
+            raise Exception(e)
 
         try:
             lengths_5 = self.get_geometric_accuracy_slice5(slice5_dcm)
@@ -83,6 +84,7 @@ class ACRGeometricAccuracy(HazenTask):
                 f"Could not calculate the geometric accuracy for {self.img_desc(slice5_dcm)} because of : {e}"
             )
             traceback.print_exc(file=sys.stdout)
+            raise Exception(e)
 
         L = lengths_1 + lengths_5
 
@@ -97,6 +99,7 @@ class ACRGeometricAccuracy(HazenTask):
                     f"Could not calculate the geometric accuracy for sag direction because of : {e}"
                 )
                 traceback.print_exc(file=sys.stdout)
+                raise Exception(e)
 
         results["measurement"]["distortion"] = {
             "Mean relative measurement error": round(mean_err, 2),
