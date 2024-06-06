@@ -1,0 +1,15 @@
+pyinstaller .\PyInstallerGUI\GUI.py --distpath .\PyInstallerGUI -n "ACR QA Analysis" --icon=PyInstallerGUI\ct-scan.ico ^
+--hidden-import=docopt ^
+--hidden-import=cv2 ^
+--hidden-import=pydicom.encoders.gdcm ^
+--hidden-import=pydicom.encoders.pylibjpeg ^
+--hidden-import=imutils ^
+--hidden-import=skimage ^
+--hidden-import=skimage.filters ^
+--hidden-import=colorlog ^
+--hidden-import=skimage.segmentation ^
+--collect-data sv_ttk ^
+--collect-submodules hazenlib ^
+--paths . ^
+--add-data "PyInstallerGUI\ct-scan.ico;PyInstallerGUI" ^
+--add-data "ToleranceTable/ToleranceTable.txt;ToleranceTable"
