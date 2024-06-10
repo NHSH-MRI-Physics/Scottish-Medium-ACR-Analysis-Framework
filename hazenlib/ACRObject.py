@@ -57,10 +57,7 @@ class ACRObject:
 
         # TODO: implement a check if phantom was placed in other than axial position
         # This is to be able to flag to the user the caveat of measurments if deviating from ACR guidance
-        
-        # Edit [HR 27.05.24]    Added re-ordering of stack based on slice-positions for SAG and COR orientations
-        #                       Was only re-ordering for TRA orientation; SAG and COR slices were randomly positioned (?based on filename)
-        #                       Essential for image-pipelines with odd filenaming conventions
+        #  -- Implemented below (HR 26.04.2024)
         orientation=get_image_orientation(self.dcm_list[0])
 
         x = np.array([dcm.ImagePositionPatient[0] for dcm in self.dcm_list])
@@ -70,16 +67,16 @@ class ACRObject:
         
         if orientation=='Transverse':
             dicom_stack = [self.dcm_list[i] for i in np.argsort(z)]
-#            for obj in dicom_stack:
-#                print(f'dicom_stack z-positions are {obj.ImagePositionPatient[2]}')
+            #for obj in dicom_stack:
+            #    print(f'dicom_stack z-positions are {obj.ImagePositionPatient[2]}')
         if orientation=='Coronal':
             dicom_stack = [self.dcm_list[i] for i in np.argsort(y)]
-#            for obj in dicom_stack:
-#                print(f'dicom_stack z-positions are {obj.ImagePositionPatient[1]}')
+            #for obj in dicom_stack:
+            #    print(f'dicom_stack z-positions are {obj.ImagePositionPatient[1]}')
         if orientation=='Sagittal':
             dicom_stack = [self.dcm_list[i] for i in np.argsort(x)]
-#            for obj in dicom_stack:
-#                print(f'dicom_stack z-positions are {obj.ImagePositionPatient[0]}')
+            #for obj in dicom_stack:
+            #    print(f'dicom_stack z-positions are {obj.ImagePositionPatient[0]}')
         img_stack = [dicom.pixel_array for dicom in dicom_stack]
 
         return img_stack, dicom_stack
@@ -94,9 +91,9 @@ class ACRObject:
         This function analyzes the given set of images and their associated DICOM objects to determine if any
         adjustments are needed to restore the correct slice order and view orientation.
         
-        Edit [ HR30.04.2024] Slight modification to Houghcircles' param2 seems to improve slice-order check
+        HR comments:
         Warning: HoughCircles algorithm sometimes detects circles on (true) slice 1 and fails to detect circles on (true) slice 11, thus could incorrectly reverse stack.
-
+        [HR30.04.2024]
 
         """
         test_images = (self.images[0], self.images[-1])
@@ -137,7 +134,7 @@ class ACRObject:
             )
             for norm_image in normalised_images
         ]
-#        print(f'detected_circles is {detected_circles}')
+        #print(f'detected_circles is {detected_circles}')
 
         if detected_circles[0] is not None:
 #        if detected_circles[0] is None:            
