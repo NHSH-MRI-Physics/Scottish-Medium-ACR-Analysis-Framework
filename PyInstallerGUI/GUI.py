@@ -34,6 +34,8 @@ root.title('Medium ACR Phantom QA Analysis')
 #root.iconbitmap("PyInstallerGUI\ct-scan.ico")
 
 def SetDCMPath():
+    dropdownResults.config(state="disabled")
+    ViewResultsBtn.config(state="disabled")
     global InitalDirDICOM
     if InitalDirDICOM==None:
         filename = filedialog.askdirectory()
