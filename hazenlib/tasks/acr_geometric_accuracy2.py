@@ -437,10 +437,10 @@ class ACRGeometricAccuracy2(HazenTask):
         # calculate the horizontal and vertical distances
         horz_dist = np.asarray(horz_dist, dtype='float64')
         vert_dist = np.asarray(vert_dist, dtype='float64')
-        Pixel_Size = float(self.pixel_size)
-        horz_dist_mm = np.multiply(Pixel_Size, horz_dist)
-        vert_dist_mm = np.multiply(Pixel_Size, vert_dist)
-        return horz_dist, vert_dist, horz_dist_mm, vert_dist_mm,
+        #Pixel_Size = float(self.pixel_size)
+        #horz_dist_mm = np.multiply(Pixel_Size, horz_dist)
+        #vert_dist_mm = np.multiply(Pixel_Size, vert_dist)
+        return horz_dist, vert_dist #, horz_dist_mm, vert_dist_mm,
 
     def get_rod_distortion_correction_coefficients(self, horizontal_distances) -> dict:
         """

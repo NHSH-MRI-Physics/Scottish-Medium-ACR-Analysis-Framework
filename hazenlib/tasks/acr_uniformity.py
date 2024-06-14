@@ -23,6 +23,7 @@ import numpy as np
 
 from hazenlib.HazenTask import HazenTask
 from hazenlib.ACRObject import ACRObject
+from pydicom.pixel_data_handlers.util import apply_modality_lut
 
 
 class ACRUniformity(HazenTask):
@@ -48,8 +49,13 @@ class ACRUniformity(HazenTask):
         results["file"] = self.img_desc(self.ACR_obj.slice7_dcm)
 
         try:
-            result = self.get_integral_uniformity(self.ACR_obj.slice7_dcm)
-            results["measurement"] = {"integral uniformity %": round(result, 2)}
+            unif, max_roi, min_roi = self.get_integral_uniformity(self.ACR_obj.slice7_dcm)
+            results["measurement"] = {
+                "integral uniformity %": round(unif, 2),
+                "max roi": round(max_roi,1),
+                "min roi": round(min_roi,1)
+                }
+
         except Exception as e:
             print(
                 f"Could not calculate the percent integral uniformity for"
@@ -72,7 +78,7 @@ class ACRUniformity(HazenTask):
         Returns:
             int or float: value of integral unformity
         """
-        img = dcm.pixel_array
+        img = apply_modality_lut(dcm.pixel_array, dcm).astype('uint16')
         res = dcm.PixelSpacing  # In-plane resolution from metadata
         r_large = np.ceil(80 / res[0]).astype(
             int
@@ -210,4 +216,4 @@ class ACRUniformity(HazenTask):
             fig.savefig(img_path)
             self.report_files.append(img_path)
 
-        return piu
+        return piu, sig_max, sig_min
