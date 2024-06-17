@@ -240,3 +240,17 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
     ReportFile = open(FileName,"r")
     ReportText =  ''.join(ReportFile.readlines())
     ReportFile.close()
+
+
+#This could be done better by making the whole thing a class, that way it only needs loaded in once. 
+def GetROIFigs(Seq,DICOMPath):
+    files = get_dicom_files(DICOMPath)
+    ACRDICOMSFiles = {}
+    for file in files:
+        data = pydicom.dcmread(file)
+        if (data.SeriesDescription not in ACRDICOMSFiles.keys()):
+            ACRDICOMSFiles[data.SeriesDescription]=[]
+        ACRDICOMSFiles[data.SeriesDescription].append(file)
+    Data = ACRDICOMSFiles[Seq]
+    acr_spatial_resolution_task = ACRSpatialResolution(input_data=Data,MediumACRPhantom=True)
+    return acr_spatial_resolution_task.GetROICrops()

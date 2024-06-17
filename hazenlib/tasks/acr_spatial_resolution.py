@@ -61,6 +61,17 @@ class ACRSpatialResolution(HazenTask):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.ACR_obj = ACRObject(self.dcm_list,kwargs)
+        
+    
+    def GetROICrops(self):
+        ResSquare,CropsLoc,ROIS = self.GetResSquares(self.ACR_obj.dcms[0])
+        ROI_Plots= {
+            "1.1mm holes": ROIS[0],
+            "1.0mm holes": ROIS[1],
+            "0.9mm holes": ROIS[2],
+            "0.8mm holes": ROIS[3]
+        }
+        return ROI_Plots
 
     def run(self) -> dict:
         """Main function for performing spatial resolution measurement

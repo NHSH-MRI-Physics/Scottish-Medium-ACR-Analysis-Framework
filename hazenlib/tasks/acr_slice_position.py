@@ -207,19 +207,6 @@ class ACRSlicePosition(HazenTask):
         if (self.ACR_obj.MediumACRPhantom == True):
             y_pts = np.append(y, np.round(y[0] + (35 - dist_to_y) / res[1])).astype(int)  # place 2nd y point 47mm from top of phantom
 
-        
-        plt.imshow(img)
-        plt.axhline(y=y_investigate_region, color='r', linestyle='-')
-        plt.axhline(y=end_point, color='r', linestyle='-')
-
-
-        plt.axhline(y=y_pts[0], color='b', linestyle='-')
-        plt.axhline(y=y_pts[1], color='b', linestyle='-')
-
-        #plt.axhline(y=44, color='g', linestyle='--')
-        #plt.axhline(y=80, color='g', linestyle='--')
-        plt.savefig("test.png")
-
         return x_pts, y_pts
 
     def get_slice_position(self, dcm):

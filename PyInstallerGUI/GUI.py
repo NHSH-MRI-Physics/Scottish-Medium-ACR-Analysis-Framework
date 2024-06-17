@@ -15,6 +15,9 @@ import HighlightText
 import glob 
 import subprocess
 import platform
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,NavigationToolbar2Tk) 
+from hazenlib.tasks.acr_spatial_resolution import ACRSpatialResolution
 
 class TextRedirector(object):
     def __init__(self, widget, tag="stdout"):
@@ -29,9 +32,9 @@ class TextRedirector(object):
         root.update()
         
 root = tkinter.Tk()
+sv_ttk.set_theme("dark")
 root.geometry('1200x500')
 root.title('Medium ACR Phantom QA Analysis')
-#root.iconbitmap("PyInstallerGUI\ct-scan.ico")
 root.iconbitmap("_internal\ct-scan.ico")
 
 def SetDCMPath():
@@ -128,7 +131,31 @@ def RunAnalysis():
     if Resultsfolder_path.get()=="Not Set!":
         messagebox.showerror("Error", "No Results Path Set")
     EnableOrDisableEverything(False)
-    MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
+    #MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
+
+
+    ROIS = MedACRAnalysis.GetROIFigs(selected_option.get(),DCMfolder_path.get())
+    plt.close()#Making sure no rogue plots are sitting in the background...
+    
+    for key in ROIS:
+        print ("Displaying Res Pattern: " +key)
+        newWindow =  tkinter.Toplevel(root)
+        newWindow.iconbitmap("_internal\ct-scan.ico")
+        newWindow.geometry("500x500")
+        #newWindow.resizable(False,False)
+        y = [I**2 for I in range(101)] 
+        plt.title(key)
+        plt.imshow(ROIS[key])
+        canvas = FigureCanvasTkAgg(plt.gcf(), master = newWindow)   
+        canvas.draw() 
+        canvas.get_tk_widget().pack() 
+        toolbar = NavigationToolbar2Tk(canvas, newWindow) 
+        toolbar.update() 
+        canvas.get_tk_widget().pack() 
+        
+        root.wait_window(newWindow)
+        plt.close()
+    
     EnableOrDisableEverything(True)
 
     textResults.configure(state="normal")
@@ -268,7 +295,7 @@ sys.stdout = TextRedirector(TextLog, "stdout")
 sys.stderr = TextRedirector(TextLog, "stderr")
 frame.grid(row=11, column=2,padx=10,pady=10,rowspan=3)
 
-sv_ttk.set_theme("dark")
+
 root.resizable(False,False)
 
 import hazenlib.logger
