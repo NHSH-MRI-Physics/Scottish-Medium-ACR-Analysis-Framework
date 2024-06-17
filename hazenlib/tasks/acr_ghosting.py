@@ -47,8 +47,15 @@ class ACRGhosting(HazenTask):
         results["file"] = self.img_desc(self.ACR_obj.slice7_dcm)
 
         try:
-            result = self.get_signal_ghosting(self.ACR_obj.slice7_dcm)
-            results["measurement"] = {"signal ghosting %": round(result, 3)}
+            result, N_roi, S_roi, E_roi, W_roi, L_roi = self.get_signal_ghosting(self.ACR_obj.slice7_dcm)
+            results["measurement"] = {
+                "signal ghosting %": round(result, 3),
+                "n roi" : round(N_roi,3),
+                "s roi" : round(S_roi,3),
+                "e roi" : round(E_roi,3),
+                "w roi" : round(W_roi,3),
+                "large roi" : round(L_roi,0),
+                }
         except Exception as e:
             print(
                 f"Could not calculate the percent-signal ghosting for {self.img_desc(self.ACR_obj.slice7_dcm)} because of : {e}"
@@ -298,4 +305,4 @@ class ACRGhosting(HazenTask):
             fig.savefig(img_path)
             self.report_files.append(img_path)
 
-        return psg
+        return psg, n_ellipse_val,s_ellipse_val, w_ellipse_val, e_ellipse_val, large_roi_val
