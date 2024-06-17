@@ -15,24 +15,19 @@ Please note this project is currently a work in progress, dervived from the [Haz
 ## Instalation, Set up and Quickstart
 
 ## GUI 
-### Requirements 
-- [Docker](https://www.docker.com/products/docker-desktop/)
-### Installation 
-1. Download the [GUI Package](https://scottish-my.sharepoint.com/:u:/g/personal/john_tracey_nhsh_nhs_scot/EX5Y-Kya6olArn-rsOz0x4AB7nc_5kFH1e2-tw-V3Nl2yQ?e=x7VDTT) (click download at the top left). You will need a NHS Scotland email address to access this. In the future we will explore other hosting options.
-2. unzip the folder somewhere convienant
-3. Ensure Docker Desktop is [installed](https://docs.docker.com/desktop/install/windows-install/).
-### Quick Start
-1. Before each use ensure Docker Desktop is [running](https://docs.docker.com/desktop/install/windows-install/).
-2. Run the ACR Phantom GUI file.
-3. Refer to the image below for instructions on how to use the GUI.
-![Quickstart Image](https://i.imgur.com/MqiAZBT.png)
-
+### Requiremenets 
+- None
+### Installation
+- Download the latest [release](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/releases/latest).
+- Unzip the file and navigate to where it was downloaded.
+- Double click and start ACR QA Analysis.exe.
+- TO BE FINISHED LATER
 
 ## Python 
 ### Requirements 
 - Python 3
 ### Installation
-- Download this repository by clicking [here](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/archive/refs/heads/main.zip).
+- Download this repository by clicking [here](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/archive/refs/heads/main.zip) or clone the repository.
 - unzip and navigate to where you unzipped it.
 - It is recommended a virtual environment is used to ensure no conflicts, see [here](https://www.freecodecamp.org/news/how-to-setup-virtual-environments-in-python/) for instructions.
 - enter `pip install -r requirements.txt` to install all dependencies. 
