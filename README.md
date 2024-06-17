@@ -20,6 +20,7 @@ Please note this project is currently a work in progress, dervived from the [Haz
 ### Installation
 - Download the latest [release](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/releases/latest).
 - Unzip the file and navigate to where it was downloaded.
+### Quick Start
 - Double click and start ACR QA Analysis.exe.
 - Select the location of the DICOM folder using the "Set DICOM Path" button.
 - Select where the results will be outputted to usign the "Set Results Output Path" button.
