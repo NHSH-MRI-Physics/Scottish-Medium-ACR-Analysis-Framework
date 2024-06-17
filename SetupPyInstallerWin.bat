@@ -1,4 +1,4 @@
-pyinstaller .\PyInstallerGUI\GUI.py --distpath .\PyInstallerGUI -n "ACR QA Analysis" --icon=PyInstallerGUI\ct-scan.ico ^
+pyinstaller .\PyInstallerGUI\GUI.py --distpath ".\PyInstallerGUI" -n "ACR QA Analysis" --icon=_internal\ct-scan.ico ^
 --hidden-import=docopt ^
 --hidden-import=cv2 ^
 --hidden-import=pydicom.encoders.gdcm ^
@@ -11,5 +11,9 @@ pyinstaller .\PyInstallerGUI\GUI.py --distpath .\PyInstallerGUI -n "ACR QA Analy
 --collect-data sv_ttk ^
 --collect-submodules hazenlib ^
 --paths . ^
---add-data "PyInstallerGUI\ct-scan.ico;PyInstallerGUI" ^
---add-data "ToleranceTable/ToleranceTable.txt;ToleranceTable"
+--add-data "_internal\ct-scan.ico;ct-scan.ico" 
+
+xcopy "ToleranceTable" "PyInstallerGUI\ACR QA Analysis\ToleranceTable\*" /E /Y
+cd ".\PyInstallerGUI\"
+tar -a -cf ACR_QA_Analysis_Package.zip  "ACR QA Analysis"
+cd ..

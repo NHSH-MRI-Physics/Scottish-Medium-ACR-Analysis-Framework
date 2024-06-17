@@ -32,6 +32,7 @@ root = tkinter.Tk()
 root.geometry('1200x500')
 root.title('Medium ACR Phantom QA Analysis')
 #root.iconbitmap("PyInstallerGUI\ct-scan.ico")
+root.iconbitmap("_internal\ct-scan.ico")
 
 def SetDCMPath():
     dropdownResults.config(state="disabled")
