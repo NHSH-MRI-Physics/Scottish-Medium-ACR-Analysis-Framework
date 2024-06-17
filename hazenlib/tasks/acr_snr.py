@@ -24,6 +24,7 @@ from scipy import ndimage
 import hazenlib.utils
 from hazenlib.HazenTask import HazenTask
 from hazenlib.ACRObject import ACRObject
+from pydicom.pixel_data_handlers.util import apply_modality_lut
 
 
 class ACRSNR(HazenTask):
@@ -159,11 +160,12 @@ class ACRSNR(HazenTask):
         Returns:
             np.array: pixel array of the filtered image
         """
-        a = dcm.pixel_array.astype("int")
+        a = apply_modality_lut(dcm.pixel_array,dcm).astype('int') #dcm.pixel_array.astype("int")
 
         # filter size = 9, following MATLAB code and McCann 2013 paper for head coil, although note McCann 2013
         # recommends 25x25 for body coil.
-        filtered_array = ndimage.uniform_filter(a, 25, mode="constant")
+        # Was set to 25 which is too high; causing +15%higher SNR wrt manual measurement. FilterSize=9 causes <1% difference HR 17.06.24
+        filtered_array = ndimage.uniform_filter(a, 9, mode="constant")
         return filtered_array
 
     def get_noise_image(self, dcm: pydicom.Dataset) -> np.array:
@@ -178,7 +180,7 @@ class ACRSNR(HazenTask):
         Returns:
             np.array: pixel array representing the image noise
         """
-        a = dcm.pixel_array.astype("int")
+        a = apply_modality_lut(dcm.pixel_array,dcm).astype('int') #dcm.pixel_array.astype("int")
 
         # Convolve image with boxcar/uniform kernel
         imsmoothed = self.filtered_image(dcm)
@@ -205,7 +207,7 @@ class ACRSNR(HazenTask):
         if type(dcm) == np.ndarray:
             data = dcm
         else:
-            data = dcm.pixel_array
+            data = apply_modality_lut(dcm.pixel_array,dcm).astype('int') #dcm.pixel_array
 
         sample = [None] * 5
         # for array indexing: [row, column] format
@@ -327,7 +329,7 @@ class ACRSNR(HazenTask):
         col, row = centre
 
         difference = np.subtract(
-            dcm1.pixel_array.astype("int"), dcm2.pixel_array.astype("int")
+            apply_modality_lut(dcm1.pixel_array,dcm1).astype('int'), apply_modality_lut(dcm2.pixel_array,dcm2).astype('int') #dcm1.pixel_array.astype("int"), dcm2.pixel_array.astype("int")
         )
 
         signal = [
