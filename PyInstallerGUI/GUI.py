@@ -10,6 +10,7 @@ from hazenlib.utils import get_dicom_files
 import pydicom
 from tkinter import DISABLED, NORMAL, N, S, E, W, LEFT, RIGHT, TOP, BOTTOM, messagebox
 import MedACRAnalysis
+import MedACRAnalysis_FullReport
 
 class TextRedirector(object):
     def __init__(self, widget, tag="stdout"):
@@ -33,7 +34,8 @@ def SetDCMPath():
     DCMfolder_path.set(filename)
 
     options=[]
-    files = get_dicom_files("MedACRTesting/TestData/ACR_Phantom_Data")
+#    files = get_dicom_files("MedACRTesting/TestData/ACR_Phantom_Data")
+    files = get_dicom_files(filename)
     sequences = []
     for file in files:
         data = pydicom.dcmread(file)
@@ -69,7 +71,8 @@ def RunAnalysis():
 
     RunAll=False
     SNR=False
-    GeoAcc=False
+    GeoAccEdges=False
+    GeoAccRods=False
     SpatialRes=False
     Uniformity=False
     Ghosting=False
@@ -81,8 +84,10 @@ def RunAnalysis():
     else:
         if CheckBoxes["SNR"][0].get() == 1 and str(CheckBoxes["SNR"][1]['state'])=="normal":
             SNR=True
-        if CheckBoxes["Geometric Accuracy"][0].get() == 1 and str(CheckBoxes["Geometric Accuracy"][1]['state'])=="normal":
-            GeoAcc=True
+        if CheckBoxes["Geometric Accuracy(Edges)"][0].get() == 1 and str(CheckBoxes["Geometric Accuracy(Edges)"][1]['state'])=="normal":
+            GeoAccEdges=True
+        if CheckBoxes["Geometric Accuracy(Rods)"][0].get() == 1 and str(CheckBoxes["Geometric Accuracy(Rods)"][1]['state'])=="normal":
+            GeoAccRods=True
         if CheckBoxes["Spatial Resolution"][0].get() == 1 and str(CheckBoxes["Spatial Resolution"][1]['state'])=="normal":
             SpatialRes=True
         if CheckBoxes["Uniformity"][0].get() == 1 and str(CheckBoxes["Uniformity"][1]['state'])=="normal":
@@ -99,7 +104,7 @@ def RunAnalysis():
     if Resultsfolder_path.get()=="Not Set!":
         messagebox.showerror("Error", "No Results Path Set")
 
-    MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
+    MedACRAnalysis_FullReport.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAccEdges=GeoAccEdges, RunGeoAccRods=GeoAccRods, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
 
 PathFrame = ttk.Frame(root)
 DCMPathButton = ttk.Button(text="Set DICOM Path", command=SetDCMPath,width=22)
@@ -131,7 +136,8 @@ CheckBoxes["Slice Position"] = [None,None]
 CheckBoxes["Spatial Resolution"] = [None,None]
 CheckBoxes["Slice Thickness"] = [None,None]
 CheckBoxes["SNR"] = [None,None]
-CheckBoxes["Geometric Accuracy"] = [None,None]
+CheckBoxes["Geometric Accuracy(Edges)"] = [None,None]
+CheckBoxes["Geometric Accuracy(Rods)"] = [None,None]
 CheckBoxes["Ghosting"] = [None,None]
 StartingRow = 4
 for keys in CheckBoxes:
