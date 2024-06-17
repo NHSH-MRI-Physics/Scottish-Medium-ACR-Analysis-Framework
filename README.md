@@ -21,8 +21,12 @@ Please note this project is currently a work in progress, dervived from the [Haz
 - Download the latest [release](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/releases/latest).
 - Unzip the file and navigate to where it was downloaded.
 - Double click and start ACR QA Analysis.exe.
-- TO BE FINISHED LATER
-
+- Select the location of the DICOM folder using the "Set DICOM Path" button.
+- Select where the results will be outputted to usign the "Set Results Output Path" button.
+- Select what sequence to analyse using the dropdown.
+- Select whats tests you want to run from the checkboxes.
+- Click "Start Analysis"
+- On completion the results are displaeyd and you can view individual results by selecting the dropdown (below the "Start Analysis" button) following the "View Results" button.
 ## Python 
 ### Requirements 
 - Python 3
