@@ -49,11 +49,13 @@ class ACRUniformity(HazenTask):
         results["file"] = self.img_desc(self.ACR_obj.slice7_dcm)
 
         try:
-            unif, max_roi, min_roi = self.get_integral_uniformity(self.ACR_obj.slice7_dcm)
+            unif, max_roi, min_roi, max_loc, min_loc  = self.get_integral_uniformity(self.ACR_obj.slice7_dcm)
             results["measurement"] = {
                 "integral uniformity %": round(unif, 2),
                 "max roi": round(max_roi,1),
-                "min roi": round(min_roi,1)
+                "min roi": round(min_roi,1),
+                "max pos": max_loc,
+                "min pos": min_loc
                 }
 
         except Exception as e:
@@ -79,6 +81,19 @@ class ACRUniformity(HazenTask):
             int or float: value of integral unformity
         """
         img = apply_modality_lut(dcm.pixel_array, dcm).astype('uint16')
+        #img=dcm.pixel_array
+        #for idx,(y,x) in enumerate(zip(img[0],img[1])
+        print(f'Pix[66,66]= {img[66][66]}')        
+        print(f'Pix[67,67]= {img[67][67]}')
+        print(f'Pix[68,68]= {img[68][68]}')
+        print(f'Pix[69,69]= {img[69][69]}')
+        print(f'Pix[70,70]= {img[70][70]}')
+        print(f'Pix[80,80]= {img[80][80]}')
+        print(f'Pix[90,90]= {img[90][90]}')
+        print(f'Pix[100,100]= {img[100][100]}')
+        print(f'Pix[110,110]= {img[110][110]}')
+        print(f'Pix[120,120]= {img[120][120]}')
+        print(f'Pix[130,130]= {img[130][130]}')
         res = dcm.PixelSpacing  # In-plane resolution from metadata
         r_large = np.ceil(80 / res[0]).astype(
             int
@@ -88,7 +103,7 @@ class ACRUniformity(HazenTask):
         )  # Required pixel radius to produce ~1cm2 ROI
 
         if self.ACR_obj.MediumACRPhantom==True:
-            r_large = np.ceil(np.sqrt(16000*0.80 / np.pi) / res[0]).astype(int) #Making it a 95% smaller than 160cm^2 (16000mm^2) to avoid the bit at the top
+            r_large = np.ceil(np.sqrt(16000*0.90 / np.pi) / res[0]).astype(int) #Making it a 95% smaller than 160cm^2 (16000mm^2) to avoid the bit at the top
 
 
         d_void = np.ceil(5 / res[0]).astype(
@@ -216,4 +231,4 @@ class ACRUniformity(HazenTask):
             fig.savefig(img_path)
             self.report_files.append(img_path)
 
-        return piu, sig_max, sig_min
+        return piu, sig_max, sig_min, max_loc, min_loc
