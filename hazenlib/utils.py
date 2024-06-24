@@ -10,8 +10,8 @@ from skimage import filters
 
 import hazenlib.exceptions as exc
 
-matplotlib.use("Agg")
-
+#matplotlib.use("Agg")
+matplotlib.use("TkAgg") #Updated from "Agg" to fix 'FigureCanvasAgg is non-interactive' error (HR Apr24)
 """
 17.05.2024 Replaced "  iop_round = [round(x) for x in iop]" with iop call to extract orientation from DICOM header
 hamish.richardson@nhs.scot

@@ -49,11 +49,13 @@ class ACRUniformity(HazenTask):
         results["file"] = self.img_desc(self.ACR_obj.slice7_dcm)
 
         try:
-            unif, max_roi, min_roi = self.get_integral_uniformity(self.ACR_obj.slice7_dcm)
+            unif, max_roi, min_roi, max_pos, min_pos = self.get_integral_uniformity(self.ACR_obj.slice7_dcm)
             results["measurement"] = {
                 "integral uniformity %": round(unif, 2),
                 "max roi": round(max_roi,1),
-                "min roi": round(min_roi,1)
+                "min roi": round(min_roi,1),
+                "max pos": max_pos,
+                "min pos": min_pos
                 }
 
         except Exception as e:
@@ -78,7 +80,8 @@ class ACRUniformity(HazenTask):
         Returns:
             int or float: value of integral unformity
         """
-        img = apply_modality_lut(dcm.pixel_array, dcm).astype('uint16')
+        img = apply_modality_lut(dcm.pixel_array, dcm).astype('uint16') #Must apply_modality_lut here since it's not applied to slice7_dcm in ACRObject
+#        img = dcm.pixel_array 
         res = dcm.PixelSpacing  # In-plane resolution from metadata
         r_large = np.ceil(80 / res[0]).astype(
             int
@@ -216,4 +219,4 @@ class ACRUniformity(HazenTask):
             fig.savefig(img_path)
             self.report_files.append(img_path)
 
-        return piu, sig_max, sig_min
+        return piu, sig_max, sig_min, max_loc, min_loc

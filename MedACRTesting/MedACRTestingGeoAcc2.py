@@ -2,7 +2,7 @@
 import pydicom
 #import pydicom.data
 import sys
-sys.path.insert(0,"F:\\Medical Physics\\DMP\\RPIP\\Imaging\\MRI\\QA\\Hazen-MediumACRPhantom")
+sys.path.insert(0,"F:\\Medical Physics\\DMP\\RPIP\\Imaging\\MRI\\QA\\Hazen-ScottishACR-Fork")
 from hazenlib.utils import get_dicom_files
 from hazenlib.tasks.acr_geometric_accuracy2 import ACRGeometricAccuracy2
 from hazenlib.tasks.slice_width import SliceWidth

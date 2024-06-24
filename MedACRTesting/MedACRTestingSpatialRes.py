@@ -1,6 +1,6 @@
 import pydicom
 import sys
-sys.path.insert(0,"C:\\Users\\Johnt\\Documents\\GitHub\\Hazen-ScottishACR-Fork")
+sys.path.insert(0,"F:\\Medical Physics\\DMP\\RPIP\\Imaging\\MRI\\QA\\Hazen-ScottishACR-Fork")
 sys.path.insert(0,"D:\\Hazen-ScottishACR-Fork")
 from hazenlib.utils import get_dicom_files
 from hazenlib.tasks.acr_snr import ACRSNR

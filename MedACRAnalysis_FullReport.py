@@ -127,6 +127,7 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAccEdg
         
         ReportFile.write( '\tSNR: %-12s%-12s\n' % (str(snr["measurement"]["snr by smoothing"]["measured"]), GetPassResult(snr["measurement"]["snr by smoothing"]["measured"],"SNR")))
         ReportFile.write( '\tNormalised SNR: %-12s%-12s\n' % (str(snr["measurement"]["snr by smoothing"]["normalised"]), GetPassResult(snr["measurement"]["snr by smoothing"]["normalised"],"SNR")))
+        ReportFile.write( '\tCentre of phantom at (x,,y): %-12s%-12s\n' % (str(snr["measurement"]["snr by smoothing"]["centre x"]), str(snr["measurement"]["snr by smoothing"]["centre y"])))        
         ReportFile.write( '\tSignal(Means of image ROIs): Centre=%-6s' % str(snr["measurement"]["snr by smoothing"]["signal"][0]))
         ReportFile.write(', BL= %-6s ' % (str(snr["measurement"]["snr by smoothing"]["signal"][1])))
         ReportFile.write(', LR= %-6s ' % (str(snr["measurement"]["snr by smoothing"]["signal"][2])))
@@ -224,6 +225,8 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAccEdg
         ReportFile.write( '\tUniformity:  %-12s%-12s\n' % (str(UniformityResult["measurement"]["integral uniformity %"])+"%",GetPassResult(UniformityResult["measurement"]["integral uniformity %"],"Uniformity") ))
         ReportFile.write( '\tMean of the Max ROI:  %-6s\n' % (str(UniformityResult["measurement"]["max roi"])))
         ReportFile.write( '\tMean of the Min ROI:  %-6s\n' % (str(UniformityResult["measurement"]["min roi"])))
+        ReportFile.write( '\tPosition of the Max ROI:  %-6s\n' % (str(UniformityResult["measurement"]["max pos"])))
+        ReportFile.write( '\tPosition of the Min ROI:  %-6s\n' % (str(UniformityResult["measurement"]["min pos"])))
         TestCounter+=1
         print("Progress " +str(TestCounter) +"/" +str(TotalTests))
     else:

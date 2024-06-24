@@ -202,10 +202,10 @@ class ACRGeometricAccuracy2(HazenTask):
         arr_inv[:,mask_high:self.img_size]=0
 
         #Check data:
-        #plt.imshow(arr, cmap=plt.cm.bone)  # set the color map to bone 
-        #plt.show() 
-        #plt.imshow(arr_inv, cmap=plt.cm.bone)  # set the color map to bone 
-        #plt.show() 
+#        plt.imshow(arr, cmap=plt.cm.bone)  # set the color map to bone 
+#        plt.show() 
+#        plt.imshow(arr_inv, cmap=plt.cm.bone)  # set the color map to bone 
+#        plt.show() 
 
         # threshold and binaries the image in order to locate the rods.
         img_max = np.max(arr_inv)  #arr # maximum number of img intensity
@@ -232,8 +232,8 @@ class ACRGeometricAccuracy2(HazenTask):
         #print(f'Indices of 10-labels images are {index}')
         #print(f'Indices of 10-labels images with gaps removed are {new_index}')
         #thres_ind=index[round(len(index)/2)]
-        thres_ind=index[len(new_index)-1] #Changed threshold to max rather than median as median occasionally failed. Max seems robust. [HR June 2024]
-        #thres_ind = np.median(new_index).astype(int)
+        #thres_ind=index[len(new_index)-1]              #Changed threshold to max rather than median as median occasionally failed[HR June 2024]
+        thres_ind = np.median(new_index).astype(int)    #Not clear whether median or max value is best. Max sometimes gives wrong positions for some rods.
         #print(f'Max index of 10-labels images is {thres_ind}')
 
         # Generate the labelled array with the threshold chosen
@@ -437,10 +437,10 @@ class ACRGeometricAccuracy2(HazenTask):
         # calculate the horizontal and vertical distances
         horz_dist = np.asarray(horz_dist, dtype='float64')
         vert_dist = np.asarray(vert_dist, dtype='float64')
-        #Pixel_Size = float(self.pixel_size)
-        #horz_dist_mm = np.multiply(Pixel_Size, horz_dist)
-        #vert_dist_mm = np.multiply(Pixel_Size, vert_dist)
-        return horz_dist, vert_dist #, horz_dist_mm, vert_dist_mm,
+        Pixel_Size = float(self.pixel_size)
+        horz_dist_mm = np.multiply(Pixel_Size, horz_dist)
+        vert_dist_mm = np.multiply(Pixel_Size, vert_dist)
+        return horz_dist, vert_dist#, horz_dist_mm, vert_dist_mm
 
     def get_rod_distortion_correction_coefficients(self, horizontal_distances) -> dict:
         """
