@@ -14,3 +14,4 @@ sphinxcontrib-bibtex==2.4.2
 sphinx-rtd-theme==1.0.0
 opencv-python==4.5.5.64
 sv_ttk==2.6.0
+
