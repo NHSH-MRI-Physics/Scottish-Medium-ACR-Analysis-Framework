@@ -37,6 +37,7 @@ root.geometry('1200x500')
 root.title('Medium ACR Phantom QA Analysis')
 root.iconbitmap("_internal\ct-scan.ico")
 
+
 def SetDCMPath():
     dropdownResults.config(state="disabled")
     ViewResultsBtn.config(state="disabled")
@@ -97,8 +98,18 @@ def EnableOrDisableEverything(Enable):
         for widgets in WidgetsToToggle:
             widgets.config(state="disabled")
 
+def ImageResolvable(newwindow):
+    global CurrentROI
+    print(CurrentROI)
+    newwindow.destroy()
+
+def ImageNotResolvable(newwindow):
+    global CurrentROI
+    print(CurrentROI)
+    newwindow.destroy()
+
 def RunAnalysis():
-    
+    global CurrentROI
     RunAll=False
     SNR=False
     GeoAcc=False
@@ -138,21 +149,30 @@ def RunAnalysis():
     plt.close()#Making sure no rogue plots are sitting in the background...
     
     for key in ROIS:
+        CurrentROI=key
         print ("Displaying Res Pattern: " +key)
         newWindow =  tkinter.Toplevel(root)
         newWindow.iconbitmap("_internal\ct-scan.ico")
-        newWindow.geometry("500x500")
-        #newWindow.resizable(False,False)
-        y = [I**2 for I in range(101)] 
+        newWindow.geometry("500x540")
+        newWindow.configure(background='white')
         plt.title(key)
         plt.imshow(ROIS[key])
         canvas = FigureCanvasTkAgg(plt.gcf(), master = newWindow)   
         canvas.draw() 
-        canvas.get_tk_widget().pack() 
+        canvas.get_tk_widget().pack(side=TOP)
         toolbar = NavigationToolbar2Tk(canvas, newWindow) 
         toolbar.update() 
         canvas.get_tk_widget().pack() 
-        
+
+        Pattern_label = ttk.Label(newWindow, text="Is the Above Pattern Resolvable?", background="white", foreground="black")
+        Pattern_label.place(relx=0.5, rely=0.85,anchor="center")
+
+        Yes_button = ttk.Button(newWindow, text="Yes",width=3, command =lambda: ImageResolvable(newWindow))
+        Yes_button.place(relx=0.45, rely=0.89, anchor="center")
+
+        No_button = ttk.Button(newWindow, text="No",width=3, command = lambda: ImageNotResolvable(newWindow))
+        No_button.place(relx=0.55, rely=0.89, anchor="center")
+
         root.wait_window(newWindow)
         plt.close()
     
@@ -203,6 +223,8 @@ def ViewResult():
 WidgetsToToggle=[]
 InitalDirDICOM=None
 InitalDirOutput=None
+CurrentROI=None
+ROI_Results_ResResults = []
 
 PathFrame = ttk.Frame(root)
 DCMPathButton = ttk.Button(text="Set DICOM Path", command=SetDCMPath,width=22)
