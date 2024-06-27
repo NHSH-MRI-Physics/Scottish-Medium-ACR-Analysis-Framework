@@ -8,7 +8,7 @@ import sys
 sys.path.append(".")
 from hazenlib.utils import get_dicom_files
 import pydicom
-from tkinter import DISABLED, NORMAL, N, S, E, W, LEFT, RIGHT, TOP, BOTTOM, messagebox, END
+from tkinter import DISABLED, NORMAL, N, S, E, W, LEFT, RIGHT, TOP, BOTTOM, messagebox, END, NW
 import MedACRAnalysis
 import os 
 import HighlightText
@@ -100,16 +100,19 @@ def EnableOrDisableEverything(Enable):
 
 def ImageResolvable(newwindow):
     global CurrentROI
-    print(CurrentROI)
+    global ROI_Results_ResResults
+    ROI_Results_ResResults[CurrentROI] = True
     newwindow.destroy()
 
 def ImageNotResolvable(newwindow):
     global CurrentROI
-    print(CurrentROI)
+    global ROI_Results_ResResults
+    ROI_Results_ResResults[CurrentROI] = False
     newwindow.destroy()
 
 def RunAnalysis():
     global CurrentROI
+    global ROI_Results_ResResults
     RunAll=False
     SNR=False
     GeoAcc=False
@@ -142,40 +145,41 @@ def RunAnalysis():
     if Resultsfolder_path.get()=="Not Set!":
         messagebox.showerror("Error", "No Results Path Set")
     EnableOrDisableEverything(False)
-    #MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
 
+    if ManualResCheck.get()==1:
+        ROIS = MedACRAnalysis.GetROIFigs(selected_option.get(),DCMfolder_path.get())
+        plt.close('all')#Making sure no rogue plots are sitting in the background...
+        
+        for key in ROIS:
+            ROI_Results_ResResults[key]=None
+            CurrentROI=key
+            print ("Displaying Res Pattern: " +key)
+            newWindow =  tkinter.Toplevel(root)
+            newWindow.iconbitmap("_internal\ct-scan.ico")
+            newWindow.geometry("500x540")
+            newWindow.configure(background='white')
+            plt.title(key)
+            plt.imshow(ROIS[key])
+            canvas = FigureCanvasTkAgg(plt.gcf(), master = newWindow)   
+            canvas.draw() 
+            canvas.get_tk_widget().pack(side=TOP)
+            toolbar = NavigationToolbar2Tk(canvas, newWindow) 
+            toolbar.update() 
+            canvas.get_tk_widget().pack() 
 
-    ROIS = MedACRAnalysis.GetROIFigs(selected_option.get(),DCMfolder_path.get())
-    plt.close()#Making sure no rogue plots are sitting in the background...
-    
-    for key in ROIS:
-        CurrentROI=key
-        print ("Displaying Res Pattern: " +key)
-        newWindow =  tkinter.Toplevel(root)
-        newWindow.iconbitmap("_internal\ct-scan.ico")
-        newWindow.geometry("500x540")
-        newWindow.configure(background='white')
-        plt.title(key)
-        plt.imshow(ROIS[key])
-        canvas = FigureCanvasTkAgg(plt.gcf(), master = newWindow)   
-        canvas.draw() 
-        canvas.get_tk_widget().pack(side=TOP)
-        toolbar = NavigationToolbar2Tk(canvas, newWindow) 
-        toolbar.update() 
-        canvas.get_tk_widget().pack() 
+            Pattern_label = ttk.Label(newWindow, text="Is the Above Pattern Resolvable?", background="white", foreground="black")
+            Pattern_label.place(relx=0.5, rely=0.85,anchor="center")
 
-        Pattern_label = ttk.Label(newWindow, text="Is the Above Pattern Resolvable?", background="white", foreground="black")
-        Pattern_label.place(relx=0.5, rely=0.85,anchor="center")
+            Yes_button = ttk.Button(newWindow, text="Yes",width=3, command =lambda: ImageResolvable(newWindow))
+            Yes_button.place(relx=0.45, rely=0.89, anchor="center")
 
-        Yes_button = ttk.Button(newWindow, text="Yes",width=3, command =lambda: ImageResolvable(newWindow))
-        Yes_button.place(relx=0.45, rely=0.89, anchor="center")
+            No_button = ttk.Button(newWindow, text="No",width=3, command = lambda: ImageNotResolvable(newWindow))
+            No_button.place(relx=0.55, rely=0.89, anchor="center")
 
-        No_button = ttk.Button(newWindow, text="No",width=3, command = lambda: ImageNotResolvable(newWindow))
-        No_button.place(relx=0.55, rely=0.89, anchor="center")
-
-        root.wait_window(newWindow)
-        plt.close()
-    
+            root.wait_window(newWindow)
+            plt.close()
+        MedACRAnalysis.ManualResTestText = ROI_Results_ResResults
+    MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
     EnableOrDisableEverything(True)
 
     textResults.configure(state="normal")
@@ -213,7 +217,6 @@ def ViewResult():
     FilesToOpen = []
     for file in Files:
         if UnderScrolledSeq in file:
-            #os.startfile(file)
             if platform.system() == "Windows":
                 os.startfile(file)
             else:
@@ -224,7 +227,7 @@ WidgetsToToggle=[]
 InitalDirDICOM=None
 InitalDirOutput=None
 CurrentROI=None
-ROI_Results_ResResults = []
+ROI_Results_ResResults = {}
 
 PathFrame = ttk.Frame(root)
 DCMPathButton = ttk.Button(text="Set DICOM Path", command=SetDCMPath,width=22)
@@ -290,35 +293,42 @@ dropdownResults.config(width = 20,state="disabled")
 WidgetsToToggle.append(dropdownResults)
 dropdownResults.grid(row=StartingRow+1, column=0,padx=10,pady=0,sticky=W)
 
-frame = ttk.Frame(root)
-ResultsWindowLabel = ttk.Label(master=frame,text="Results")
+frameResults = ttk.Frame(root)
+ResultsWindowLabel = ttk.Label(master=frameResults,text="Results")
 ResultsWindowLabel.pack(anchor=W)
 
-scroll = ttk.Scrollbar(frame) 
+scroll = ttk.Scrollbar(frameResults) 
 scroll.pack(side="right",fill="y")
-#textResults = tkinter.Text(frame, height=15, width=118,state=DISABLED,yscrollcommand = scroll.set) 
-textResults = HighlightText.CustomText(frame, height=15, width=118,state=DISABLED,yscrollcommand = scroll.set) 
+textResults = HighlightText.CustomText(frameResults, height=15, width=118,state=DISABLED,yscrollcommand = scroll.set) 
 scroll.config(command=textResults.yview)
 textResults.configure(yscrollcommand=scroll.set) 
 textResults.pack()
-frame.grid(row=2, column=2,padx=10,pady=10,rowspan=9)
+frameResults.grid(row=2, column=1,padx=10,pady=10,rowspan=9,columnspan=3)
 
-frame = ttk.Frame(root)
-LogWindowLabel = ttk.Label(master=frame,text="Log")
+frameLog = ttk.Frame(root)
+LogWindowLabel = ttk.Label(master=frameLog,text="Log")
 LogWindowLabel.pack(anchor=W)
-scrollLog = ttk.Scrollbar(frame) 
+scrollLog = ttk.Scrollbar(frameLog) 
 scrollLog.pack(side="right",fill="y")
-TextLog = tkinter.Text(frame, height=7, width=118,state=DISABLED,yscrollcommand = scroll.set) 
+#TextLog = tkinter.Text(frame, height=7, width=118,state=DISABLED,yscrollcommand = scroll.set) 
+TextLog = tkinter.Text(frameLog, height=7, width=80,state=DISABLED,yscrollcommand = scroll.set) 
 scrollLog.config(command=textResults.yview)
 TextLog.configure(yscrollcommand=scrollLog.set) 
-TextLog.pack()
+TextLog.pack(anchor=W)
 
 sys.stdout = TextRedirector(TextLog, "stdout")
 sys.stderr = TextRedirector(TextLog, "stderr")
-frame.grid(row=11, column=2,padx=10,pady=10,rowspan=3)
+frameLog.grid(row=11, column=1,padx=10,pady=10,rowspan=3,sticky=W,columnspan=2)
 
+Optionsframe = ttk.Frame(root)
+OptionsLabel = ttk.Label(master=Optionsframe,text="Options")
+OptionsLabel.pack(anchor=W)
+ManualResCheck = IntVar(value=0)
+ManualResBox = ttk.Checkbutton(Optionsframe, text='Use Manual Resolution Check',variable=ManualResCheck, onvalue=1, offvalue=0,state=NORMAL,command=None)
+ManualResBox.pack(anchor=W)
+Optionsframe.grid(row=11, column=3,padx=10,pady=10,rowspan=3,sticky=NW)
 
-root.resizable(False,False)
+#root.resizable(False,False)
 
 import hazenlib.logger
 hazenlib.logger.ConfigureLoggerForGUI()

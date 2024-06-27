@@ -15,6 +15,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 import os 
 
 ReportText = ""
+ManualResTestText=None
 
 #This is a file which simply contains a function to run the analysis. It is in a seperate file so i can reuse it for the various implementations.
 def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False):
@@ -64,24 +65,30 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
     ToleranceTable["Spatial Resolution 0.8mm"]=[None,None]
     ToleranceTable["Spatial Resolution MTF50 Raw"]=[None,None]
     ToleranceTable["Spatial Resolution MTF50 Fitted"]=[None,None]
+    ToleranceTable["Manual Resolution"]=None
 
     f = open("ToleranceTable/ToleranceTable.txt")
     for line in f: 
         if line[0]!="#":
-            Name = line.split(",")[0].strip()
-            Lower = line.split(",")[1].strip()
-            Upper = line.split(",")[2].strip()
-            if Lower == "None" or Lower=="none":
-                Lower = None
+            if "==" not in line:
+                Name = line.split(",")[0].strip()
+                Lower = line.split(",")[1].strip()
+                Upper = line.split(",")[2].strip()
+                if Lower == "None" or Lower=="none":
+                    Lower = None
+                else:
+                    Lower=float(Lower)
+                if Upper == "None" or Upper=="none":
+                    Upper = None
+                else:
+                    Upper=float(Upper)
+                if Name not in ToleranceTable.keys():
+                    logger.error("Unknown test name in the tolerance table")
+                ToleranceTable[Name] = [Lower,Upper]
             else:
-                Lower=float(Lower)
-            if Upper == "None" or Upper=="none":
-                Upper = None
-            else:
-                Upper=float(Upper)
-            if Name not in ToleranceTable.keys():
-                logger.error("Unknown test name in the tolerance table")
-            ToleranceTable[Name] = [Lower,Upper]
+                Name  = line.split("==")[0]
+                Value = line.split("==")[1]
+                ToleranceTable[Name] = Value
 
 
     if os.path.exists(OutputPath)==False:
@@ -94,23 +101,29 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
 
 
     def GetPassResult(Value,TestName):
-        if ToleranceTable[TestName]==[None,None]:
+        if ToleranceTable[TestName]==[None,None] or ToleranceTable[TestName]==None:
             return "Result: No Tolerance Set"
         Pass=True
         Appendix = []
-        if ToleranceTable[TestName][1]!=None:
-            if Value > ToleranceTable[TestName][1]:
-                Pass=False
-            Appendix.append("<"+str(ToleranceTable[TestName][1]))
-        if ToleranceTable[TestName][0]!=None:
-            if Value < ToleranceTable[TestName][0]:
-                Pass=False
-            Appendix.append(">"+str(ToleranceTable[TestName][0]))
         AppendixTxt=""
-        if len(Appendix) == 1 :
-            AppendixTxt = Appendix[0]
-        if len(Appendix) == 2 :
-            AppendixTxt = Appendix[1] +" and " + Appendix[0]
+        if type(ToleranceTable[TestName])==list and len(ToleranceTable[TestName])==2:
+            if ToleranceTable[TestName][1]!=None:
+                if Value > ToleranceTable[TestName][1]:
+                    Pass=False
+                Appendix.append("<"+str(ToleranceTable[TestName][1]))
+            if ToleranceTable[TestName][0]!=None:
+                if Value < ToleranceTable[TestName][0]:
+                    Pass=False
+                Appendix.append(">"+str(ToleranceTable[TestName][0]))
+            
+            if len(Appendix) == 1 :
+                AppendixTxt = Appendix[0]
+            if len(Appendix) == 2 :
+                AppendixTxt = Appendix[1] +" and " + Appendix[0]
+        else:
+            if (ToleranceTable[TestName]!=Value):
+                Pass = False
+            AppendixTxt = ToleranceTable[TestName]
 
         if Pass ==True:
             return ("Result: Pass      Tolerance: " + AppendixTxt)
@@ -174,6 +187,15 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
         ReportFile.write( '\tRaw MTF50 :        %-12s%-12s\n' % (str(Res["measurement"]["raw mtf50"]),GetPassResult(Res["measurement"]["raw mtf50"],"Spatial Resolution MTF50 Raw") ))
         ReportFile.write( '\tFitted MTF50:      %-12s%-12s\n' % (str(Res["measurement"]["fitted mtf50"]),GetPassResult(Res["measurement"]["fitted mtf50"],"Spatial Resolution MTF50 Fitted") ))
 
+        #Add in Manual Res Test
+        if ManualResTestText != None:
+            for key in ManualResTestText:
+                Result = "Not Tested"
+                if ManualResTestText[key]==True:
+                    Result="Resolved"
+                else:
+                    Result="Not Resolved"
+                ReportFile.write( '\tManual '+key+' Resolution : %-15s%-12s\n' % (str(Result),GetPassResult(Result,"Manual Resolution")))
         TestCounter+=1
 
 
