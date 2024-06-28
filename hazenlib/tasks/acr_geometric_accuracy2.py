@@ -202,8 +202,8 @@ class ACRGeometricAccuracy2(HazenTask):
         arr_inv[:,mask_high:self.img_size]=0
 
         #Check data:
-#        plt.imshow(arr, cmap=plt.cm.bone)  # set the color map to bone 
-#        plt.show() 
+        plt.imshow(arr, cmap=plt.cm.bone)  # set the color map to bone 
+        plt.show() 
 #        plt.imshow(arr_inv, cmap=plt.cm.bone)  # set the color map to bone 
 #        plt.show() 
 
