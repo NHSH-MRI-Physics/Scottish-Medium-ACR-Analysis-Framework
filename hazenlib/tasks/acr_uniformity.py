@@ -20,9 +20,11 @@ import os
 import sys
 import traceback
 import numpy as np
+import math as math
 
 from hazenlib.HazenTask import HazenTask
 from hazenlib.ACRObject import ACRObject
+import matplotlib.pyplot as plot #Didn't like 'plt' with error: "cannot access local variable 'plt' where it is not associated with a value"
 from pydicom.pixel_data_handlers.util import apply_modality_lut
 
 
@@ -73,7 +75,7 @@ class ACRUniformity(HazenTask):
 
     def get_integral_uniformity(self, dcm):
         """Calculate the integral uniformity in accordance with ACR guidance.
-
+        global plt
         Args:
             dcm (pydicom.Dataset): DICOM image object to calculate uniformity from
 
@@ -82,6 +84,7 @@ class ACRUniformity(HazenTask):
         """
         img = apply_modality_lut(dcm.pixel_array, dcm).astype('uint16') #Must apply_modality_lut here since it's not applied to slice7_dcm in ACRObject
 #        img = dcm.pixel_array 
+
         res = dcm.PixelSpacing  # In-plane resolution from metadata
         r_large = np.ceil(80 / res[0]).astype(
             int
@@ -91,7 +94,7 @@ class ACRUniformity(HazenTask):
         )  # Required pixel radius to produce ~1cm2 ROI
 
         if self.ACR_obj.MediumACRPhantom==True:
-            r_large = np.ceil(np.sqrt(16000*0.90 / np.pi) / res[0]).astype(int) #Making it a 95% smaller than 160cm^2 (16000mm^2) to avoid the bit at the top
+            r_large = np.ceil(np.sqrt(16000*0.90 / np.pi) / res[0]).astype(int) #Making it a 90% smaller than 160cm^2 (16000mm^2) to avoid the bit at the top
 
 
         d_void = np.ceil(5 / res[0]).astype(
@@ -113,7 +116,12 @@ class ACRUniformity(HazenTask):
 
         min_image = img_masked * (img_masked < half_max)
         max_image = img_masked * (img_masked > half_max)
-
+        #Check data:
+#        plot.imshow(min_image, cmap=plot.cm.bone)  # set the color map to bone 
+#        plot.show() 
+#        plot.imshow(max_image, cmap=plot.cm.bone)  # set the color map to bone 
+#        plot.show()         
+        
         min_rows, min_cols = np.nonzero(min_image)[0], np.nonzero(min_image)[1]
         max_rows, max_cols = np.nonzero(max_image)[0], np.nonzero(max_image)[1]
 
@@ -149,13 +157,27 @@ class ACRUniformity(HazenTask):
             return mean_array
 
         min_data = uniformity_iterator(min_image, base_mask, min_rows, min_cols)
-        max_data = uniformity_iterator(max_image, base_mask, max_rows, max_cols)
+        max_data = uniformity_iterator(max_image, base_mask, max_rows, max_cols)      
 
-        sig_max = np.max(max_data)
-        sig_min = np.min(min_data[np.nonzero(min_data)])
+#        sig_max = np.max(max_data) #This is a single pixel. ACR standard requires a 1cm2 ROI [HR 27.06.24]
+#        sig_min = np.min(min_data[np.nonzero(min_data)]) #   -similarly, this is a single-pixel value, therefore more liable to noise [HR 27.06.24]
 
-        max_loc = np.where(max_data == sig_max)
-        min_loc = np.where(min_data == sig_min)
+#        max_loc = np.where(max_data == sig_max)
+#        min_loc = np.where(min_data == sig_min)
+        max_locs = np.where(max_data == np.max(max_data))
+        max_loc = round(np.mean(max_locs[0])),round(np.mean(max_locs[1]))
+#        print(f'Max value(s) {max_data[max_locs[0],max_locs[1]]} at voxel [x,y] {max_locs[1], max_locs[0]}; Max voxel is [x,y] {max_loc[1], max_loc[0]}]')
+        min_locs = np.where(min_data == np.min(min_data[np.nonzero(min_data)]))
+        min_loc = round(np.mean(min_locs[0])),round(np.mean(min_locs[1]))
+#        print(f'Min value(s) {min_data[min_locs[0],min_locs[1]]} at voxel [x,y] {min_loc[1], min_loc[0]}; Min voxel is [x,y] {min_loc[1], min_loc[0]}]')
+        max_roi = img_masked[int(max_loc[0])-5:int(max_loc[0])+5,int(max_loc[1])-5:int(max_loc[1])+5]
+#        plot.imshow(max_roi, cmap=plot.cm.bone)  # set the color map to bone 
+#        plot.show() 
+        sig_max = np.mean(max_roi)
+        min_roi = img_masked[int(min_loc[0])-5:int(min_loc[0])+5,int(min_loc[1])-5:int(min_loc[1])+5]
+#        plot.imshow(min_roi, cmap=plot.cm.bone)  # set the color map to bone 
+#        plot.show() 
+        sig_min = np.mean(min_roi)
 
         piu = 100 * (1 - (sig_max - sig_min) / (sig_max + sig_min))
 

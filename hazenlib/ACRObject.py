@@ -152,13 +152,13 @@ class ACRObject:
 
         else:
             print("Slice order inversion not required.")
-#        if true_circle[0] > self.images[0].shape[0] // 2:
-#            print("Performing LR orientation swap to restore correct view.")
-#            flipped_images = [np.fliplr(image) for image in self.images]
-#            for index, dcm in enumerate(self.dcms):
-#                dcm.PixelData = flipped_images[index].tobytes()
-#        else:
-#            print("LR orientation swap not required.")
+        if true_circle[0] > self.images[0].shape[0] // 2:
+            print("Performing LR orientation swap to restore correct view.")
+            flipped_images = [np.fliplr(image) for image in self.images]
+            for index, dcm in enumerate(self.dcms):
+                dcm.PixelData = flipped_images[index].tobytes()
+        else:
+            print("LR orientation swap not required.")
 
     def determine_rotation(self):
         """
