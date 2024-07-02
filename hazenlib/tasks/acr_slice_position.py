@@ -255,13 +255,15 @@ class ACRSlicePosition(HazenTask):
 
         # difference of line profiles
         delta = interp_line_prof_L - interp_line_prof_R
+        #print(f"delta contains {len(delta)} elements: {delta}")
         peaks, _ = ACRObject.find_n_highest_peaks(
-            abs(delta), 2, 0.5 * np.max(abs(delta))
+            abs(delta), 1, 0.5 * np.max(abs(delta))  #Changed number of peaks (n) from 2 to 1. This seems to return true peak any avoids local maxima [HR 02.07.24]
         )  # find two highest peaks
+        #print(f"For image {self.img_desc(dcm)}, peaks = {peaks}")
 
         # if only one peak, set dummy range
-        if len(peaks) == 1:
-            peaks = [peaks[0] - 50, peaks[0] + 50]
+        #if len(peaks) == 1: # Removed this; ACRObject.find_n_highest_peaks will now only return 1 peak (see above)
+        peaks = [peaks[0] - 10, peaks[0] + 10] #Start/stop previously +/-50 from peak. Changed to +/-10 since 50 may overshoot [HR 02.07.24]
 
         # set multiplier for right or left shift based on sign of peak
         pos = (
@@ -328,6 +330,7 @@ class ACRSlicePosition(HazenTask):
                 * res[1],
                 interp_line_prof_L,
                 "b",
+                label=f"Left wedge",
             )
             axes[2].plot(
                 (1 / interp_factor)
@@ -335,9 +338,20 @@ class ACRSlicePosition(HazenTask):
                 * res[1],
                 interp_line_prof_R,
                 "r",
+                label=f"Right wedge",
+            )
+            axes[2].plot( #Added difference-line to check that the maximum is correctly located [HR 02.07.24]
+              (1 / interp_factor)
+#                * np.linspace(1, len(interp_line_prof_R), len(interp_line_prof_R))
+                * np.linspace(peaks[0],peaks[1],peaks[1]-peaks[0])
+                * res[1],
+                delta[peaks[0] : peaks[1]],
+                "g--", 
+                label=f"Difference",
             )
             axes[2].set_title("Original Line Profiles")
             axes[2].set_xlabel("Relative Pixel Position (mm)")
+            axes[2].legend(loc="best")
 
             axes[3].plot(
                 (1 / interp_factor)
