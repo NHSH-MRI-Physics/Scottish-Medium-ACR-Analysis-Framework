@@ -225,8 +225,8 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAccEdg
         ReportFile.write( '\tUniformity:  %-12s%-12s\n' % (str(UniformityResult["measurement"]["integral uniformity %"])+"%",GetPassResult(UniformityResult["measurement"]["integral uniformity %"],"Uniformity") ))
         ReportFile.write( '\tMean of the Max ROI:  %-6s\n' % (str(UniformityResult["measurement"]["max roi"])))
         ReportFile.write( '\tMean of the Min ROI:  %-6s\n' % (str(UniformityResult["measurement"]["min roi"])))
-        ReportFile.write( '\tPosition of the Max ROI:  %-6s\n' % (str(UniformityResult["measurement"]["max pos"])))
-        ReportFile.write( '\tPosition of the Min ROI:  %-6s\n' % (str(UniformityResult["measurement"]["min pos"])))
+        ReportFile.write( '\tPosition of the Max ROI (x,y) = ( %-3i%-1s%-3i%-1s\n' % (UniformityResult["measurement"]["max pos"][1],",",UniformityResult["measurement"]["max pos"][0],")"))
+        ReportFile.write( '\tPosition of the Min ROI (x,y) = ( %-3i%-1s%-3i%-1s\n' % (UniformityResult["measurement"]["min pos"][1],",",UniformityResult["measurement"]["min pos"][0],")"))
         TestCounter+=1
         print("Progress " +str(TestCounter) +"/" +str(TotalTests))
     else:
