@@ -1,0 +1,23 @@
+<ToleranceTable>
+    <Module name = "Uniformity">
+        <Test Min="90"/>
+    </Module>
+    <Module name = "Manual Resolution">
+        <Test name="1.1mm holes" Equal="Resolved"/>
+        <Test name="1.0mm holes" Equal="Resolved"/>
+        <Test name="0.9mm holes" Equal="Resolved"/>
+        <Test name="0.8mm holes" Equal="Resolved"/>
+    </Module>
+    <Module name = "Geometric Accuracy">
+        <Test name = "ACRMethod" Min="163" Max="167"/>
+    </Module>
+    <Module name = "Slice Thickness">
+        <Test Min="4" Max="6"/>
+    </Module>
+    <Module name = "Slice Position">
+        <Test Max="7"/>
+    </Module>
+    <Module name = "Ghosting">
+        <Test Max="3"/>
+    </Module>
+</ToleranceTable>

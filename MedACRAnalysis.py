@@ -2,6 +2,7 @@ from hazenlib.utils import get_dicom_files
 from hazenlib.tasks.acr_snr import ACRSNR
 from hazenlib.tasks.acr_uniformity import ACRUniformity
 from hazenlib.tasks.acr_geometric_accuracy import ACRGeometricAccuracy
+from hazenlib.tasks.acr_geometric_accuracy_MagNetMethod import ACRGeometricAccuracyMagNetMethod
 from hazenlib.tasks.acr_spatial_resolution import ACRSpatialResolution
 from hazenlib.tasks.acr_ghosting import ACRGhosting
 from hazenlib.tasks.acr_slice_position import ACRSlicePosition
@@ -13,9 +14,14 @@ from hazenlib.logger import logger
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 import os 
+from MedACROptions import *
+import MedACR_ToleranceTableCheckerV2 as MedACR_ToleranceTableChecker
 
 ReportText = ""
 ManualResTestText=None
+
+#Default options
+GeoMethod = GeometryOptions.ACRMETHOD
 
 #This is a file which simply contains a function to run the analysis. It is in a seperate file so i can reuse it for the various implementations.
 def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False):
@@ -52,44 +58,7 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
         ACRDICOMSFiles[data.SeriesDescription].append(file)
     Data = ACRDICOMSFiles[Seq]
 
-    ToleranceTable = {}
-    ToleranceTable["SNR"]=[None,None]
-    ToleranceTable["Geometric Accuracy"]=[None,None]
-    ToleranceTable["Uniformity"]=[None,None]
-    ToleranceTable["Ghosting"]=[None,None]
-    ToleranceTable["Slice Position"]=[None,None]
-    ToleranceTable["Slice Thickness"]=[None,None]
-    ToleranceTable["Spatial Resolution 1.1mm"]=[None,None]
-    ToleranceTable["Spatial Resolution 1.0mm"]=[None,None]
-    ToleranceTable["Spatial Resolution 0.9mm"]=[None,None]
-    ToleranceTable["Spatial Resolution 0.8mm"]=[None,None]
-    ToleranceTable["Spatial Resolution MTF50 Raw"]=[None,None]
-    ToleranceTable["Spatial Resolution MTF50 Fitted"]=[None,None]
-    ToleranceTable["Manual Resolution"]=None
-
-    f = open("ToleranceTable/ToleranceTable.txt")
-    for line in f: 
-        if line[0]!="#":
-            if "==" not in line:
-                Name = line.split(",")[0].strip()
-                Lower = line.split(",")[1].strip()
-                Upper = line.split(",")[2].strip()
-                if Lower == "None" or Lower=="none":
-                    Lower = None
-                else:
-                    Lower=float(Lower)
-                if Upper == "None" or Upper=="none":
-                    Upper = None
-                else:
-                    Upper=float(Upper)
-                if Name not in ToleranceTable.keys():
-                    logger.error("Unknown test name in the tolerance table")
-                ToleranceTable[Name] = [Lower,Upper]
-            else:
-                Name  = line.split("==")[0]
-                Value = line.split("==")[1]
-                ToleranceTable[Name] = Value
-
+        
 
     if os.path.exists(OutputPath)==False:
         os.mkdir(OutputPath)
@@ -99,37 +68,6 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
     ReportFile.write("Date Analysed: " + str(date.today()) + "\n")
     ReportFile.write("Sequence Analysed: " + Seq + "\n")
 
-
-    def GetPassResult(Value,TestName):
-        if ToleranceTable[TestName]==[None,None] or ToleranceTable[TestName]==None:
-            return "Result: No Tolerance Set"
-        Pass=True
-        Appendix = []
-        AppendixTxt=""
-        if type(ToleranceTable[TestName])==list and len(ToleranceTable[TestName])==2:
-            if ToleranceTable[TestName][1]!=None:
-                if Value > ToleranceTable[TestName][1]:
-                    Pass=False
-                Appendix.append("<"+str(ToleranceTable[TestName][1]))
-            if ToleranceTable[TestName][0]!=None:
-                if Value < ToleranceTable[TestName][0]:
-                    Pass=False
-                Appendix.append(">"+str(ToleranceTable[TestName][0]))
-            
-            if len(Appendix) == 1 :
-                AppendixTxt = Appendix[0]
-            if len(Appendix) == 2 :
-                AppendixTxt = Appendix[1] +" and " + Appendix[0]
-        else:
-            if (ToleranceTable[TestName]!=Value):
-                Pass = False
-            AppendixTxt = ToleranceTable[TestName]
-
-        if Pass ==True:
-            return ("Result: Pass      Tolerance: " + AppendixTxt)
-        else:
-            return ("Result: Fail      Tolerance: " + AppendixTxt) 
-        
     TestCounter=0
     ReportFile.write("\nSNR Module\n")
     if RunAll==True or RunSNR == True:
@@ -139,31 +77,47 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
         print("SNR :" +str(snr["measurement"]["snr by smoothing"]["measured"]))
         print("Normalised SNR :" +str(snr["measurement"]["snr by smoothing"]["normalised"]))
         
-        ReportFile.write( '\tSNR:            %-12s%-12s\n' % (str(snr["measurement"]["snr by smoothing"]["measured"]), GetPassResult(snr["measurement"]["snr by smoothing"]["measured"],"SNR")))
-        ReportFile.write( '\tNormalised SNR: %-12s%-12s\n' % (str(snr["measurement"]["snr by smoothing"]["normalised"]), GetPassResult(snr["measurement"]["snr by smoothing"]["normalised"],"SNR")))
+        ReportFile.write( '\tSNR:            %-12s%-12s\n' % (str(snr["measurement"]["snr by smoothing"]["measured"]), MedACR_ToleranceTableChecker.GetPassResult(snr["measurement"]["snr by smoothing"]["measured"],"SNR")))
+        ReportFile.write( '\tNormalised SNR: %-12s%-12s\n' % (str(snr["measurement"]["snr by smoothing"]["normalised"]), MedACR_ToleranceTableChecker.GetPassResult(snr["measurement"]["snr by smoothing"]["normalised"],"SNR")))
         TestCounter+=1
         print("Progress " +str(TestCounter) +"/" +str(TotalTests))
     else:
         ReportFile.write("\tNot Run\n")
 
     ReportFile.write("\nGeometric Accuracy Module\n")
+
     if RunAll==True or RunGeoAcc == True:
         print("Running Geometric Accuracy")
-        acr_geometric_accuracy_task = ACRGeometricAccuracy(input_data=Data,report_dir=OutputPath,MediumACRPhantom=True,report=True)
-        GeoDist = acr_geometric_accuracy_task.run()
-        print("Slice 1 Hor Dist: "+str(GeoDist["measurement"][GeoDist["file"][0]]["Horizontal distance"]) + "   "+ " Vert Dist: "+str(GeoDist["measurement"][GeoDist["file"][0]]["Vertical distance"]))
-        print("Slice 5 Hor Dist:"+str(GeoDist["measurement"][GeoDist["file"][1]]["Horizontal distance"]) + "   "+ " Vert Dist:"+str(GeoDist["measurement"][GeoDist["file"][1]]["Vertical distance"])+ "   "+ " Diag SW Dist:"+str(GeoDist["measurement"][GeoDist["file"][1]]["Diagonal distance SW"])+ "   "+ "Diag SE Dist:"+str(GeoDist["measurement"][GeoDist["file"][1]]["Diagonal distance SE"]))
-        
-        
-        ReportFile.write("\tSlice 1:\n")
-        ReportFile.write( '\t\tHor Dist (mm):             %-12s%-12s\n' % (str(GeoDist["measurement"][GeoDist["file"][0]]["Horizontal distance"]),GetPassResult(GeoDist["measurement"][GeoDist["file"][0]]["Horizontal distance"],"Geometric Accuracy") ))
-        ReportFile.write( '\t\tVert Dist (mm):            %-12s%-12s\n' % (str(GeoDist["measurement"][GeoDist["file"][0]]["Vertical distance"]),GetPassResult(GeoDist["measurement"][GeoDist["file"][0]]["Vertical distance"],"Geometric Accuracy") ))
 
-        ReportFile.write("\tSlice 5:\n")
-        ReportFile.write( '\t\tHor Dist (mm):             %-12s%-12s\n' % (str(GeoDist["measurement"][GeoDist["file"][1]]["Horizontal distance"]),GetPassResult(GeoDist["measurement"][GeoDist["file"][1]]["Horizontal distance"],"Geometric Accuracy") ))
-        ReportFile.write( '\t\tVert Dist (mm):            %-12s%-12s\n' % (str(GeoDist["measurement"][GeoDist["file"][1]]["Vertical distance"]),GetPassResult(GeoDist["measurement"][GeoDist["file"][1]]["Horizontal distance"],"Geometric Accuracy") ))
-        ReportFile.write( '\t\tDiagonal distance SW (mm): %-12s%-12s\n' % (str(GeoDist["measurement"][GeoDist["file"][1]]["Diagonal distance SW"]),GetPassResult(GeoDist["measurement"][GeoDist["file"][1]]["Diagonal distance SW"],"Geometric Accuracy") ))
-        ReportFile.write( '\t\tDiagonal distance SE (mm): %-12s%-12s\n' % (str(GeoDist["measurement"][GeoDist["file"][1]]["Diagonal distance SE"]),GetPassResult(GeoDist["measurement"][GeoDist["file"][1]]["Diagonal distance SE"],"Geometric Accuracy") ))
+        if (GeoMethod == GeometryOptions.ACRMETHOD):
+            acr_geometric_accuracy_task = ACRGeometricAccuracy(input_data=Data,report_dir=OutputPath,MediumACRPhantom=True,report=True)
+            GeoDist = acr_geometric_accuracy_task.run()
+            print("Slice 1 Hor Dist: "+str(GeoDist["measurement"][GeoDist["file"][0]]["Horizontal distance"]) + "   "+ " Vert Dist: "+str(GeoDist["measurement"][GeoDist["file"][0]]["Vertical distance"]))
+            print("Slice 5 Hor Dist:"+str(GeoDist["measurement"][GeoDist["file"][1]]["Horizontal distance"]) + "   "+ " Vert Dist:"+str(GeoDist["measurement"][GeoDist["file"][1]]["Vertical distance"])+ "   "+ " Diag SW Dist:"+str(GeoDist["measurement"][GeoDist["file"][1]]["Diagonal distance SW"])+ "   "+ "Diag SE Dist:"+str(GeoDist["measurement"][GeoDist["file"][1]]["Diagonal distance SE"]))
+            ReportFile.write("\tSlice 1:\n")
+            ReportFile.write( '\t\tHor Dist (mm):             %-12s%-12s\n' % (str(GeoDist["measurement"][GeoDist["file"][0]]["Horizontal distance"]),MedACR_ToleranceTableChecker.GetPassResult(GeoDist["measurement"][GeoDist["file"][0]]["Horizontal distance"],"Geometric Accuracy","ACRMethod") ))
+            ReportFile.write( '\t\tVert Dist (mm):            %-12s%-12s\n' % (str(GeoDist["measurement"][GeoDist["file"][0]]["Vertical distance"]),MedACR_ToleranceTableChecker.GetPassResult(GeoDist["measurement"][GeoDist["file"][0]]["Vertical distance"],"Geometric Accuracy","ACRMethod") ))
+
+            ReportFile.write("\tSlice 5:\n")
+            ReportFile.write( '\t\tHor Dist (mm):             %-12s%-12s\n' % (str(GeoDist["measurement"][GeoDist["file"][1]]["Horizontal distance"]),MedACR_ToleranceTableChecker.GetPassResult(GeoDist["measurement"][GeoDist["file"][1]]["Horizontal distance"],"Geometric Accuracy","ACRMethod") ))
+            ReportFile.write( '\t\tVert Dist (mm):            %-12s%-12s\n' % (str(GeoDist["measurement"][GeoDist["file"][1]]["Vertical distance"]),MedACR_ToleranceTableChecker.GetPassResult(GeoDist["measurement"][GeoDist["file"][1]]["Horizontal distance"],"Geometric Accuracy","ACRMethod") ))
+            ReportFile.write( '\t\tDiagonal distance SW (mm): %-12s%-12s\n' % (str(GeoDist["measurement"][GeoDist["file"][1]]["Diagonal distance SW"]),MedACR_ToleranceTableChecker.GetPassResult(GeoDist["measurement"][GeoDist["file"][1]]["Diagonal distance SW"],"Geometric Accuracy","ACRMethod") ))
+            ReportFile.write( '\t\tDiagonal distance SE (mm): %-12s%-12s\n' % (str(GeoDist["measurement"][GeoDist["file"][1]]["Diagonal distance SE"]),MedACR_ToleranceTableChecker.GetPassResult(GeoDist["measurement"][GeoDist["file"][1]]["Diagonal distance SE"],"Geometric Accuracy","ACRMethod") ))
+        if (GeoMethod == GeometryOptions.MAGNETMETHOD):
+            acr_geometric_accuracy_MagNetMethod = ACRGeometricAccuracyMagNetMethod(input_data=Data,report_dir=OutputPath,MediumACRPhantom=True,report=True)
+            GeoDist = acr_geometric_accuracy_MagNetMethod.run()
+            print("Horizontal CoV(%):        "+str(GeoDist["measurement"]["distortion"]["distortion values"]["horizontal CoV"]))
+            print("Vertical CoV(%):          "+str(GeoDist["measurement"]["distortion"]["distortion values"]["vertical CoV"]))
+                
+            ReportFile.write( '\t\tHorizontal CoV:     %-12s%-12s\n' % (str(GeoDist["measurement"]["distortion"]["distortion values"]["horizontal CoV"]),MedACR_ToleranceTableChecker.GetPassResult(GeoDist["measurement"]["distortion"]["distortion values"]["horizontal CoV"],"Geometric Accuracy")))
+            ReportFile.write( '\t\tVertical CoV:       %-12s%-12s\n' % (str(GeoDist["measurement"]["distortion"]["distortion values"]["vertical CoV"]),MedACR_ToleranceTableChecker.GetPassResult(GeoDist["measurement"]["distortion"]["distortion values"]["vertical CoV"],"Geometric Accuracy")))
+            ReportFile.write( '\t\tRow Top (mm):       %-12s%-12s\n' % (str(GeoDist["measurement"]["distortion"]["horizontal distances mm"][0]),MedACR_ToleranceTableChecker.GetPassResult(GeoDist["measurement"]["distortion"]["horizontal distances mm"][0],"Geometric Accuracy")))
+            ReportFile.write( '\t\tRow Middle (mm):    %-12s%-12s\n' % (str(GeoDist["measurement"]["distortion"]["horizontal distances mm"][1]),MedACR_ToleranceTableChecker.GetPassResult(GeoDist["measurement"]["distortion"]["horizontal distances mm"][1],"Geometric Accuracy")))
+            ReportFile.write( '\t\tRow Bottom (mm):    %-12s%-12s\n' % (str(GeoDist["measurement"]["distortion"]["horizontal distances mm"][2]),MedACR_ToleranceTableChecker.GetPassResult(GeoDist["measurement"]["distortion"]["horizontal distances mm"][2],"Geometric Accuracy")))
+            ReportFile.write( '\t\tCol Top (mm):       %-12s%-12s\n' % (str(GeoDist["measurement"]["distortion"]["vertical distances mm"][0]),MedACR_ToleranceTableChecker.GetPassResult(GeoDist["measurement"]["distortion"]["vertical distances mm"][0],"Geometric Accuracy")))
+            ReportFile.write( '\t\tCol Middle (mm):    %-12s%-12s\n' % (str(GeoDist["measurement"]["distortion"]["vertical distances mm"][1]),MedACR_ToleranceTableChecker.GetPassResult(GeoDist["measurement"]["distortion"]["vertical distances mm"][1],"Geometric Accuracy")))
+            ReportFile.write( '\t\tCol Bottom (mm):    %-12s%-12s\n' % (str(GeoDist["measurement"]["distortion"]["vertical distances mm"][2]),MedACR_ToleranceTableChecker.GetPassResult(GeoDist["measurement"]["distortion"]["vertical distances mm"][2],"Geometric Accuracy")))        
+
         TestCounter+=1
         print("Progress " +str(TestCounter) +"/" +str(TotalTests))
     else:
@@ -176,16 +130,16 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
         acr_spatial_resolution_task = ACRSpatialResolution(input_data=Data,report_dir=OutputPath,report=True,MediumACRPhantom=True,UseDotMatrix=True)
         Res = acr_spatial_resolution_task.run()
 
-        ReportFile.write( '\t1.1mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["1.1mm holes"]),GetPassResult(Res["measurement"]["1.1mm holes"],"Spatial Resolution 1.1mm") ))
-        ReportFile.write( '\t1.0mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["1.0mm holes"]),GetPassResult(Res["measurement"]["1.0mm holes"],"Spatial Resolution 1.0mm") ))
-        ReportFile.write( '\t0.9mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["0.9mm holes"]),GetPassResult(Res["measurement"]["0.9mm holes"],"Spatial Resolution 0.9mm") ))
-        ReportFile.write( '\t0.8mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["0.8mm holes"]),GetPassResult(Res["measurement"]["0.8mm holes"],"Spatial Resolution 0.8mm") ))
+        ReportFile.write( '\t1.1mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["1.1mm holes"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["1.1mm holes"],"Spatial Resolution 1.1mm") ))
+        ReportFile.write( '\t1.0mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["1.0mm holes"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["1.0mm holes"],"Spatial Resolution 1.0mm") ))
+        ReportFile.write( '\t0.9mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["0.9mm holes"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["0.9mm holes"],"Spatial Resolution 0.9mm") ))
+        ReportFile.write( '\t0.8mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["0.8mm holes"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["0.8mm holes"],"Spatial Resolution 0.8mm") ))
         
         #Run the MTF
         acr_spatial_resolution_task = ACRSpatialResolution(input_data=Data,report_dir=OutputPath,report=True,MediumACRPhantom=True,UseDotMatrix=False)
         Res = acr_spatial_resolution_task.run()
-        ReportFile.write( '\tRaw MTF50 :        %-12s%-12s\n' % (str(Res["measurement"]["raw mtf50"]),GetPassResult(Res["measurement"]["raw mtf50"],"Spatial Resolution MTF50 Raw") ))
-        ReportFile.write( '\tFitted MTF50:      %-12s%-12s\n' % (str(Res["measurement"]["fitted mtf50"]),GetPassResult(Res["measurement"]["fitted mtf50"],"Spatial Resolution MTF50 Fitted") ))
+        ReportFile.write( '\tRaw MTF50 :        %-12s%-12s\n' % (str(Res["measurement"]["raw mtf50"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["raw mtf50"],"Spatial Resolution MTF50 Raw") ))
+        ReportFile.write( '\tFitted MTF50:      %-12s%-12s\n' % (str(Res["measurement"]["fitted mtf50"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["fitted mtf50"],"Spatial Resolution MTF50 Fitted") ))
 
         #Add in Manual Res Test
         if ManualResTestText != None:
@@ -195,7 +149,7 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
                     Result="Resolved"
                 else:
                     Result="Not Resolved"
-                ReportFile.write( '\tManual '+key+' Resolution : %-15s%-12s\n' % (str(Result),GetPassResult(Result,"Manual Resolution")))
+                ReportFile.write( '\tManual '+key+' Resolution : %-15s%-12s\n' % (str(Result),MedACR_ToleranceTableChecker.GetPassResult(Result,"Manual Resolution",key)))
         TestCounter+=1
 
 
@@ -209,7 +163,7 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
         acr_uniformity_task = ACRUniformity(input_data=Data,report_dir=OutputPath,MediumACRPhantom=True,report=True)
         UniformityResult=acr_uniformity_task.run()
         print(" Uniformity :" + str(UniformityResult["measurement"]["integral uniformity %"]))
-        ReportFile.write( '\tUniformity:  %-12s%-12s\n' % (str(UniformityResult["measurement"]["integral uniformity %"])+"%",GetPassResult(UniformityResult["measurement"]["integral uniformity %"],"Uniformity") ))
+        ReportFile.write( '\tUniformity:  %-12s%-12s\n' % (str(UniformityResult["measurement"]["integral uniformity %"])+"%",MedACR_ToleranceTableChecker.GetPassResult(UniformityResult["measurement"]["integral uniformity %"],"Uniformity") ))
         TestCounter+=1
         print("Progress " +str(TestCounter) +"/" +str(TotalTests))
     else:
@@ -222,7 +176,7 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
         ghosting = acr_ghosting_task.run()
         print("Ghosting :" + str(ghosting["measurement"]["signal ghosting %"]))
 
-        ReportFile.write( '\tGhosting:    %-12s%-12s\n' % (str(ghosting["measurement"]["signal ghosting %"])+"%",GetPassResult(ghosting["measurement"]["signal ghosting %"],"Ghosting") ))
+        ReportFile.write( '\tGhosting:    %-12s%-12s\n' % (str(ghosting["measurement"]["signal ghosting %"])+"%",MedACR_ToleranceTableChecker.GetPassResult(ghosting["measurement"]["signal ghosting %"],"Ghosting") ))
 
         TestCounter+=1
         print("Progress " +str(TestCounter) +"/" +str(TotalTests))
@@ -236,8 +190,8 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
         SlicePos = acr_slice_position_task.run()
         print("Slice Pos difference " + SlicePos['file'][0] + " :" + str(SlicePos['measurement'][SlicePos['file'][0]]['length difference']) + "mm    " + SlicePos['file'][1] + " :" + str(SlicePos['measurement'][SlicePos['file'][1]]['length difference'])+"mm")
 
-        ReportFile.write( '\tSlice 1 Position Error (mm):  %-12s%-12s\n' % (str(SlicePos['measurement'][SlicePos['file'][0]]['length difference']),GetPassResult(SlicePos['measurement'][SlicePos['file'][0]]['length difference'],"Slice Position") ))
-        ReportFile.write( '\tSlice 11 Position Error (mm): %-12s%-12s\n' % (str(SlicePos['measurement'][SlicePos['file'][1]]['length difference']),GetPassResult(SlicePos['measurement'][SlicePos['file'][1]]['length difference'],"Slice Position") ))
+        ReportFile.write( '\tSlice 1 Position Error (mm):  %-12s%-12s\n' % (str(SlicePos['measurement'][SlicePos['file'][0]]['length difference']),MedACR_ToleranceTableChecker.GetPassResult(SlicePos['measurement'][SlicePos['file'][0]]['length difference'],"Slice Position") ))
+        ReportFile.write( '\tSlice 11 Position Error (mm): %-12s%-12s\n' % (str(SlicePos['measurement'][SlicePos['file'][1]]['length difference']),MedACR_ToleranceTableChecker.GetPassResult(SlicePos['measurement'][SlicePos['file'][1]]['length difference'],"Slice Position") ))
 
         TestCounter+=1
         print("Progress " +str(TestCounter) +"/" +str(TotalTests))
@@ -250,8 +204,8 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
         acr_slice_thickness_task = ACRSliceThickness(input_data=Data,report_dir=OutputPath,report=True,MediumACRPhantom=True)
         SliceThick = acr_slice_thickness_task.run()
         print("Slice Width (mm): " + str(SliceThick['measurement']['slice width mm']))
-        #ReportFile.write("\tSlice Width (mm): " + str(SliceThick['measurement']['slice width mm'])+"\t" + GetPassResult(SliceThick['measurement']['slice width mm'],"Slice Thickness") +"\n")
-        ReportFile.write( '\tSlice Width (mm): %-12s%-12s\n' % (str(SliceThick['measurement']['slice width mm']),GetPassResult(SliceThick['measurement']['slice width mm'],"Slice Thickness") ))
+        #ReportFile.write("\tSlice Width (mm): " + str(SliceThick['measurement']['slice width mm'])+"\t" + MedACR_ToleranceTableChecker.GetPassResult(SliceThick['measurement']['slice width mm'],"Slice Thickness") +"\n")
+        ReportFile.write( '\tSlice Width (mm): %-12s%-12s\n' % (str(SliceThick['measurement']['slice width mm']),MedACR_ToleranceTableChecker.GetPassResult(SliceThick['measurement']['slice width mm'],"Slice Thickness") ))
 
         TestCounter+=1
         print("Progress " +str(TestCounter) +"/" +str(TotalTests))

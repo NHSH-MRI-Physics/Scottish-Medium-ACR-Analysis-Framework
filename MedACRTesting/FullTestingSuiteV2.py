@@ -22,11 +22,6 @@ sequences= list(set(sequences))
 print(sequences)
 OuptutFolder = "OutputFolder"
 
-
-
-
-
-
 #CLear the output folder so i dont need to do it everytime
 #if os.path.exists(OuptutFolder)==True:
 #    shutil.rmtree(OuptutFolder)

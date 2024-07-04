@@ -1,0 +1,25 @@
+import pydicom
+import sys
+sys.path.insert(0,"C:\\Users\\Johnt\\Documents\\GitHub\\Hazen-ScottishACR-Fork")
+sys.path.insert(0,"D:\\Hazen-ScottishACR-Fork")
+from hazenlib.utils import get_dicom_files
+from hazenlib.tasks.acr_geometric_accuracy_MagNetMethod import ACRGeometricAccuracyMagNetMethod
+from hazenlib.ACRObject import ACRObject
+import pathlib
+from tests import TEST_DATA_DIR, TEST_REPORT_DIR
+
+ReportDirPath = "MedACRTests"
+
+files = get_dicom_files("C:\\Users\John\Desktop\ACR Blair T1\\")
+ACRDICOMSFiles = {}
+for file in files:
+    data = pydicom.dcmread(file)
+    if (data.SeriesDescription not in ACRDICOMSFiles.keys()):
+        ACRDICOMSFiles[data.SeriesDescription]=[]
+    ACRDICOMSFiles[data.SeriesDescription].append(file)
+
+ChosenData = ACRDICOMSFiles["ACR_Axial_T1"]
+
+acr_geometric_accuracy_MagNetMethod = ACRGeometricAccuracyMagNetMethod(input_data=ChosenData,report_dir=ReportDirPath,MediumACRPhantom=True,report=True)
+result = acr_geometric_accuracy_MagNetMethod.run()
+print(result)
