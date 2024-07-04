@@ -61,6 +61,17 @@ class ACRSpatialResolution(HazenTask):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.ACR_obj = ACRObject(self.dcm_list,kwargs)
+        
+    
+    def GetROICrops(self):
+        ResSquare,CropsLoc,ROIS = self.GetResSquares(self.ACR_obj.dcms[0])
+        ROI_Plots= {
+            "1.1mm holes": ROIS[0],
+            "1.0mm holes": ROIS[1],
+            "0.9mm holes": ROIS[2],
+            "0.8mm holes": ROIS[3]
+        }
+        return ROI_Plots
 
     def run(self) -> dict:
         """Main function for performing spatial resolution measurement
@@ -95,7 +106,7 @@ class ACRSpatialResolution(HazenTask):
             else:
                 raw_res, fitted_res = self.get_mtf50(mtf_dcm)
                 results["measurement"] = {
-                    "estimated rotation angle": round(rot_ang, 2),
+                    "estimated rotation angle": np.round(rot_ang, 2),
                     "raw mtf50": round(raw_res, 2),
                     "fitted mtf50": round(fitted_res, 2),
                 }
@@ -105,6 +116,7 @@ class ACRSpatialResolution(HazenTask):
                 f"Could not calculate the spatial resolution for {self.img_desc(mtf_dcm)} because of : {e}"
             )
             traceback.print_exc(file=sys.stdout)
+            raise Exception(e)
 
         # only return reports if requested
         if self.report:
@@ -562,6 +574,7 @@ class ACRSpatialResolution(HazenTask):
     def GetResSquares(self,dcm):
         PixelArray = dcm.pixel_array
         res = dcm.PixelSpacing
+        
         Centre = self.ACR_obj.centre
         radius = self.ACR_obj.radius
         BottomPoint = [Centre[0],Centre[1]+radius]
@@ -579,6 +592,7 @@ class ACRSpatialResolution(HazenTask):
         Binary_Crop=skimage.morphology.binary_closing(Binary_Crop,skimage.morphology.square(3))
 
         label_image = skimage.morphology.label(Binary_Crop)
+
         ResSquares=[]
         Xpos=[]
         CropsBB = []
@@ -593,10 +607,26 @@ class ACRSpatialResolution(HazenTask):
                 ROIS.append(ROI)
 
         #This is to remove the left most object we dont care about...
-        del ResSquares[Xpos.index(min(Xpos))]
-        del CropsBB[Xpos.index(min(Xpos))]
-        del ROIS[Xpos.index(min(Xpos))]
+        #del ResSquares[Xpos.index(min(Xpos))]
+        #del CropsBB[Xpos.index(min(Xpos))]
+        #del ROIS[Xpos.index(min(Xpos))]
 
+        #take the 4 most right objects, ignoring anything after that. If the blocks on the left get seperated then this can cause issues which is solved by this appraoch.
+        OrderedXpos = sorted(Xpos, reverse=True)
+        OrderedXIdx= []
+        for x in OrderedXpos:
+            OrderedXIdx.append(Xpos.index(x))
+        IndexsToRemove = OrderedXIdx[4:]
+
+        for idx in IndexsToRemove:
+            ResSquares[idx]=None
+            CropsBB[idx]=None
+            ROIS[idx]=None
+
+        ResSquares=[x for x in ResSquares if x is not None]
+        CropsBB=[x for x in CropsBB if x is not None]
+        ROIS=[x for x in ROIS if x is not None]
+        
         if (len(ROIS)!=4):
             raise Exception("Error: The number of found resolution square does not equal exactly 4.")
 

@@ -166,7 +166,7 @@ class ACRSNR(HazenTask):
 
         # filter size = 9, following MATLAB code and McCann 2013 paper for head coil, although note McCann 2013
         # recommends 25x25 for body coil.
-        # Was set to 25 which is too high; causing +15%higher SNR wrt manual measurement. FilterSize=9 causes <1% difference HR 17.06.24
+        # Was set to 25 which is too high; causing +15%higher SNR wrt manual measurement. FilterSize=9 causes <1% difference [HR 17.06.24]
         filtered_array = ndimage.uniform_filter(a, 9, mode="constant")
         return filtered_array
 

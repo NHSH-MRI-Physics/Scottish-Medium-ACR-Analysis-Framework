@@ -53,6 +53,8 @@ class ACRGeometricAccuracy2(HazenTask):
             dict: results are returned in a standardised dictionary structure specifying the task name, input DICOM Series Description + SeriesNumber + InstanceNumber, task measurement key-value pairs, optionally path to the generated images for visualisation
         """
 
+        print(f"Got to acr_geometric_accuracy2 run")
+
         # Identify relevant slices
 #        slice1_dcm = self.ACR_obj.dcms[0]
         slice5_dcm = self.ACR_obj.dcms[4]
@@ -84,6 +86,8 @@ class ACRGeometricAccuracy2(HazenTask):
 
         if self.report:
             import matplotlib.pyplot as plt
+
+            print(f"Got to acr_geometric_accuracy2 run if self.report")
 
             fig, axes = plt.subplots(
                 6, 1, gridspec_kw={"height_ratios": [3, 1, 1, 1, 1, 1]}
@@ -181,6 +185,8 @@ class ACRGeometricAccuracy2(HazenTask):
                 678
         """
 
+        print(f"Got to acr_geometric_accuracy2 get_rods")
+
         # inverted image for fitting (maximisation)
  #       arr_inv = np.invert(arr)
         arr_inv = np.invert(arr)-65346+np.max(arr) # np.invert is just (65346-img) so adjust to give a normalised, inverted image
@@ -202,8 +208,8 @@ class ACRGeometricAccuracy2(HazenTask):
         arr_inv[:,mask_high:self.img_size]=0
 
         #Check data:
-        plt.imshow(arr, cmap=plt.cm.bone)  # set the color map to bone 
-        plt.show() 
+#        plt.imshow(arr, cmap=plt.cm.bone)  # set the color map to bone 
+#        plt.show() 
 #        plt.imshow(arr_inv, cmap=plt.cm.bone)  # set the color map to bone 
 #        plt.show() 
 
@@ -231,10 +237,10 @@ class ACRGeometricAccuracy2(HazenTask):
 
         #print(f'Indices of 10-labels images are {index}')
         #print(f'Indices of 10-labels images with gaps removed are {new_index}')
-        #thres_ind=index[round(len(index)/2)]
-        #thres_ind=index[len(new_index)-1]              #Changed threshold to max rather than median as median occasionally failed[HR June 2024]
-        thres_ind = np.median(new_index).astype(int)    #Not clear whether median or max value is best. Max sometimes gives wrong positions for some rods.
-        #print(f'Max index of 10-labels images is {thres_ind}')
+        #thres_ind=index[round(len(index)/2)]                                       #Not clear whether max or median value is best.
+        #thres_ind=index[len(new_index)-1]                                          #Max sometimes gives wrong positions, median sometimes fails  
+        thres_ind = np.median(new_index).astype(int)                                #Median seems most successful, but keep an eye on this.[HR 04.07.24]
+        #print(f'Max index of 10-labels images is {thres_ind}')                     
 
         # Generate the labelled array with the threshold chosen
         img_threshold = img_tmp <= thres_ind
@@ -402,6 +408,9 @@ class ACRGeometricAccuracy2(HazenTask):
 
         """
         # TODO: move to be a function of the Rod class
+
+        print(f"Got to acr_geometric_accuracy2 get_rod_distances")
+
         horz_dist = [
             float(rods[2].x - rods[0].x),
             float(rods[5].x - rods[3].x),
@@ -476,6 +485,7 @@ class ACRGeometricAccuracy2(HazenTask):
         Returns:
             tuple of float: horizontal and vertical distortion values, in mm
         """
+        print(f"Got to acr_geometric_accuracy2 get_rod_distortions")
 
         horz_distortion = (
             100 * np.std(horz_dist_mm, ddof=1) / np.mean(horz_dist_mm)
