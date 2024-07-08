@@ -147,8 +147,9 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
                 Result = "Not Tested"
                 if ManualResTestText[key]==True:
                     Result="Resolved"
-                else:
+                elif ManualResTestText[key]==False:
                     Result="Not Resolved"
+                
                 ReportFile.write( '\tManual '+key+' Resolution : %-15s%-12s\n' % (str(Result),MedACR_ToleranceTableChecker.GetPassResult(Result,"Manual Resolution",key)))
         TestCounter+=1
 
