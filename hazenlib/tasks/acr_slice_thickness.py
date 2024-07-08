@@ -107,10 +107,16 @@ class ACRSliceThickness(HazenTask):
 
         width_pts = [x_locs[1], x_locs[2]]
         width = np.max(width_pts) - np.min(width_pts)
-
         # take rough estimate of x points for later line profiles
         x = np.round([np.min(width_pts) + 0.2 * width, np.max(width_pts) - 0.2 * width])
-        #x = [85,165]
+
+        #In some instances there can be a bubble or something that messes up the detection. If this happens nad we end up ith a wrong width then revert to a hardcoded region
+        ExpectedWidth = [190*0.8,190*1.2]
+        if self.ACR_obj.MediumACRPhantom==True:
+            ExpectedWidth=[165*0.8,165*1.2]
+        if width*res[0] <= ExpectedWidth[0] or width*res[0] >= ExpectedWidth[1]:
+            x = np.array([75,175]) # This value was hardcoded and tested but should maybe rethink it at some stage.
+
         # Y
         c = skimage.measure.profile_line(
             img,
