@@ -166,15 +166,15 @@ class ACRUniformity(HazenTask):
 #        min_loc = np.where(min_data == sig_min)
         max_locs = np.where(max_data == np.max(max_data))
         max_loc = round(np.mean(max_locs[0])),round(np.mean(max_locs[1]))
-#        print(f'Max value(s) {max_data[max_locs[0],max_locs[1]]} at voxel [x,y] {max_locs[1], max_locs[0]}; Max voxel is [x,y] {max_loc[1], max_loc[0]}]')
+        print(f'Max value(s) {max_data[max_locs[0],max_locs[1]]} at voxel [x,y] {max_locs[1], max_locs[0]}')
         min_locs = np.where(min_data == np.min(min_data[np.nonzero(min_data)]))
         min_loc = round(np.mean(min_locs[0])),round(np.mean(min_locs[1]))
-#        print(f'Min value(s) {min_data[min_locs[0],min_locs[1]]} at voxel [x,y] {min_loc[1], min_loc[0]}; Min voxel is [x,y] {min_loc[1], min_loc[0]}]')
-        max_roi = img_masked[int(max_loc[0])-5:int(max_loc[0])+5,int(max_loc[1])-5:int(max_loc[1])+5]
+        print(f'Min value(s) {min_data[min_locs[0],min_locs[1]]} at voxel [x,y] {min_loc[1], min_loc[0]}')
+        max_roi = img_masked[int(max_loc[0])-round(5/res[0]):int(max_loc[0])+round(5/res[0]),int(max_loc[1])-round(5/res[0]):int(max_loc[1])+round(5/res[0])]
 #        plot.imshow(max_roi, cmap=plot.cm.bone)  # set the color map to bone 
 #        plot.show() 
         sig_max = np.mean(max_roi)
-        min_roi = img_masked[int(min_loc[0])-5:int(min_loc[0])+5,int(min_loc[1])-5:int(min_loc[1])+5]
+        min_roi = img_masked[int(min_loc[0])-round(5/res[0]):int(min_loc[0])+round(5/res[0]),int(min_loc[1])-round(5/res[0]):int(min_loc[1])+round(5/res[0])]
 #        plot.imshow(min_roi, cmap=plot.cm.bone)  # set the color map to bone 
 #        plot.show() 
         sig_min = np.mean(min_roi)
@@ -202,22 +202,27 @@ class ACRUniformity(HazenTask):
             axes[1].scatter(
                 [max_loc[1], min_loc[1]], [max_loc[0], min_loc[0]], c="red", marker="x"
             )
-            axes[1].plot(
+            ROI_min=plt.Rectangle((min_loc[1]-round(5/res[0]),min_loc[0]-round(5/res[0])),10/res[0],10/res[0],color='y',fill=False)
+            axes[1].add_patch(ROI_min)
+            ROI_max=plt.Rectangle((max_loc[1]-round(5/res[0]),max_loc[0]-round(5/res[0])),10/res[0],10/res[0],color='y',fill=False)
+            axes[1].add_patch(ROI_max)
+
+            '''axes[1].plot(
                 r_small * np.cos(theta) + max_loc[1],
                 r_small * np.sin(theta) + max_loc[0],
                 c="yellow",
-            )
+            )'''
             axes[1].annotate(
                 "Min = " + str(np.round(sig_min, 1)),
                 [min_loc[1], min_loc[0] + 10 / res[0]],
                 c="white",
             )
 
-            axes[1].plot(
+            '''axes[1].plot(
                 r_small * np.cos(theta) + min_loc[1],
                 r_small * np.sin(theta) + min_loc[0],
                 c="yellow",
-            )
+            )'''
             axes[1].annotate(
                 "Max = " + str(np.round(sig_max, 1)),
                 [max_loc[1], max_loc[0] + 10 / res[0]],
