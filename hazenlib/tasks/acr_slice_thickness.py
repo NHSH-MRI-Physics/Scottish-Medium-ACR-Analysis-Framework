@@ -115,7 +115,7 @@ class ACRSliceThickness(HazenTask):
         if self.ACR_obj.MediumACRPhantom==True:
             ExpectedWidth=[165*0.8,165*1.2]
         if width*res[0] <= ExpectedWidth[0] or width*res[0] >= ExpectedWidth[1]:
-            x = np.array([75,175]) # This value was hardcoded and tested but should maybe rethink it at some stage.
+            x = [round(50/res[1]),round(200/res[1])] # This value was hardcoded and tested but should maybe rethink it at some stage.
 
         # Y
         c = skimage.measure.profile_line(

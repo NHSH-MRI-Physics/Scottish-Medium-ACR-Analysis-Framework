@@ -6,6 +6,7 @@ from pydicom import dcmread
 import sys
 import matplotlib.pyplot as plt 
 from hazenlib.utils import get_image_orientation
+from pydicom.pixel_data_handlers.util import apply_modality_lut
 
 class ACRObject:
     def __init__(self, dcm_list,kwargs={}):
@@ -69,7 +70,7 @@ class ACRObject:
             dicom_stack = [self.dcm_list[i] for i in np.argsort(x)]
 
         img_stack = [dicom.pixel_array for dicom in dicom_stack]
-
+        img_stack = [apply_modality_lut(dicom.pixel_array,dicom).astype('uint16') for dicom in dicom_stack]
         return img_stack, dicom_stack
 
     def orientation_checks(self):

@@ -48,8 +48,17 @@ class ACRUniformity(HazenTask):
         results["file"] = self.img_desc(self.ACR_obj.slice7_dcm)
 
         try:
-            result = self.get_integral_uniformity(self.ACR_obj.slice7_dcm)
-            results["measurement"] = {"integral uniformity %": round(result, 2)}
+            #result = self.get_integral_uniformity(self.ACR_obj.slice7_dcm)
+            #results["measurement"] = {"integral uniformity %": round(result, 2)}
+            unif, max_roi, min_roi, max_pos, min_pos = self.get_integral_uniformity(self.ACR_obj.slice7_dcm)
+            results["measurement"] = {
+                "integral uniformity %": round(unif, 2),
+                "max roi": round(max_roi,1),
+                "min roi": round(min_roi,1),
+                "max pos": max_pos,
+                "min pos": min_pos
+                }
+        
         except Exception as e:
             print(
                 f"Could not calculate the percent integral uniformity for"
@@ -74,6 +83,8 @@ class ACRUniformity(HazenTask):
             int or float: value of integral unformity
         """
         img = dcm.pixel_array
+        from pydicom.pixel_data_handlers.util import apply_modality_lut
+        img = apply_modality_lut(dcm.pixel_array, dcm).astype('uint16')
         res = dcm.PixelSpacing  # In-plane resolution from metadata
         r_large = np.ceil(80 / res[0]).astype(
             int
@@ -83,7 +94,7 @@ class ACRUniformity(HazenTask):
         )  # Required pixel radius to produce ~1cm2 ROI
 
         if self.ACR_obj.MediumACRPhantom==True:
-            r_large = np.ceil(np.sqrt(16000*0.95 / np.pi) / res[0]).astype(int) #Making it a 95% smaller than 160cm^2 (16000mm^2) to avoid the bit at the top
+            r_large = np.ceil(np.sqrt(16000*0.9 / np.pi) / res[0]).astype(int) #Making it a 90% smaller than 160cm^2 (16000mm^2) to avoid the bit at the top
 
 
         d_void = np.ceil(5 / res[0]).astype(
@@ -140,7 +151,9 @@ class ACRUniformity(HazenTask):
 
             return mean_array
 
-        min_data = uniformity_iterator(min_image, base_mask, min_rows, min_cols)
+        
+
+        '''
         max_data = uniformity_iterator(max_image, base_mask, max_rows, max_cols)
 
         sig_max = np.max(max_data)
@@ -148,6 +161,25 @@ class ACRUniformity(HazenTask):
 
         max_loc = np.where(max_data == sig_max)
         min_loc = np.where(min_data == sig_min)
+        '''
+        
+        min_data = uniformity_iterator(min_image, base_mask, min_rows, min_cols)
+        max_data = uniformity_iterator(max_image, base_mask, max_rows, max_cols)      
+
+        max_locs = np.where(max_data == np.max(max_data))
+        max_loc = round(np.mean(max_locs[0])),round(np.mean(max_locs[1]))
+
+        min_locs = np.where(min_data == np.min(min_data[np.nonzero(min_data)]))
+        min_loc = round(np.mean(min_locs[0])),round(np.mean(min_locs[1]))
+
+        #max_roi = img_masked[int(max_loc[0])-5:int(max_loc[0])+5,int(max_loc[1])-5:int(max_loc[1])+5]
+        max_roi = img_masked[int(max_loc[0])-round(5/res[0]):int(max_loc[0])+round(5/res[0]),int(max_loc[1])-round(5/res[0]):int(max_loc[1])+round(5/res[0])]
+        sig_max = np.mean(max_roi)
+
+        #min_roi = img_masked[int(min_loc[0])-5:int(min_loc[0])+5,int(min_loc[1])-5:int(min_loc[1])+5]
+        min_roi = img_masked[int(min_loc[0])-round(5/res[0]):int(min_loc[0])+round(5/res[0]),int(min_loc[1])-round(5/res[0]):int(min_loc[1])+round(5/res[0])]
+        sig_min = np.mean(min_roi)
+
 
         piu = 100 * (1 - (sig_max - sig_min) / (sig_max + sig_min))
 
@@ -172,22 +204,28 @@ class ACRUniformity(HazenTask):
             axes[1].scatter(
                 [max_loc[1], min_loc[1]], [max_loc[0], min_loc[0]], c="red", marker="x"
             )
-            axes[1].plot(
+
+            ROI_min=plt.Rectangle((min_loc[1]-round(5/res[0]),min_loc[0]-round(5/res[0])),10/res[0],10/res[0],color='y',fill=False)
+            axes[1].add_patch(ROI_min)
+            ROI_max=plt.Rectangle((max_loc[1]-round(5/res[0]),max_loc[0]-round(5/res[0])),10/res[0],10/res[0],color='y',fill=False)
+            axes[1].add_patch(ROI_max)
+
+            '''axes[1].plot(
                 r_small * np.cos(theta) + max_loc[1],
                 r_small * np.sin(theta) + max_loc[0],
                 c="yellow",
-            )
+            )'''
             axes[1].annotate(
                 "Min = " + str(np.round(sig_min, 1)),
                 [min_loc[1], min_loc[0] + 10 / res[0]],
                 c="white",
             )
 
-            axes[1].plot(
+            '''axes[1].plot(
                 r_small * np.cos(theta) + min_loc[1],
                 r_small * np.sin(theta) + min_loc[0],
                 c="yellow",
-            )
+            )'''
             axes[1].annotate(
                 "Max = " + str(np.round(sig_max, 1)),
                 [max_loc[1], max_loc[0] + 10 / res[0]],
@@ -211,4 +249,4 @@ class ACRUniformity(HazenTask):
             fig.savefig(img_path)
             self.report_files.append(img_path)
 
-        return piu
+        return piu, sig_max, sig_min, max_loc, min_loc

@@ -22,7 +22,7 @@ class TestACRUniformitySiemens(unittest.TestCase):
         )
 
     def test_uniformity(self):
-        results = self.acr_uniformity_task.get_integral_uniformity(
+        results, _, _, _, _ = self.acr_uniformity_task.get_integral_uniformity(
             self.acr_uniformity_task.ACR_obj.slice7_dcm
         )
         rounded_results = round(results, 2)
@@ -49,8 +49,8 @@ class TestACRUniformityGE(TestACRUniformitySiemens):
         )
 
 class TestMedACRUniformity(TestACRUniformitySiemens):
-    piu = 75.9
-    
+    #piu = 75.9
+    piu = 76.33
     def setUp(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
         ge_files = get_dicom_files(ACR_DATA_Med)

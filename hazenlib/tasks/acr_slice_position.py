@@ -245,19 +245,22 @@ class ACRSlicePosition(HazenTask):
         # difference of line profiles
         delta = interp_line_prof_L - interp_line_prof_R
         peaks, _ = ACRObject.find_n_highest_peaks(
-            abs(delta), 2, 0.5 * np.max(abs(delta))
+            abs(delta), 1, 0.5 * np.max(abs(delta))
         )  # find two highest peaks
 
         import matplotlib.pyplot as plt
         #plt.close()
+        #plt.plot(abs(delta))
+        #plt.axvline(x=peaks[0])
+        #plt.axvline(x=peaks[1])
         #plt.imshow(img)
         #plt.plot([x_pts[0], x_pts[0]], [y_pts[0], y_pts[1]], "b")
         #plt.plot([x_pts[1], x_pts[1]], [y_pts[0], y_pts[1]], "r")
         #plt.savefig("test.png")
 
         # if only one peak, set dummy range
-        if len(peaks) == 1:
-            peaks = [peaks[0] - 50, peaks[0] + 50]
+        #if len(peaks) == 1:
+        peaks = [peaks[0] - 10, peaks[0] + 10]
 
         # set multiplier for right or left shift based on sign of peak
         pos = (
@@ -331,10 +334,20 @@ class ACRSlicePosition(HazenTask):
                 * res[1],
                 interp_line_prof_R,
                 "r",
+                label=f"Right wedge",
+            )
+            axes[2].plot( #Added difference-line to check that the maximum is correctly located [HR 02.07.24]
+              (1 / interp_factor)
+#                * np.linspace(1, len(interp_line_prof_R), len(interp_line_prof_R))
+                * np.linspace(peaks[0],peaks[1],peaks[1]-peaks[0])
+                * res[1],
+                delta[peaks[0] : peaks[1]],
+                "g--", 
+                label=f"Difference",
             )
             axes[2].set_title("Original Line Profiles")
             axes[2].set_xlabel("Relative Pixel Position (mm)")
-
+            axes[2].legend(loc="best")
             axes[3].plot(
                 (1 / interp_factor)
                 * np.linspace(1, len(interp_line_prof_L), len(interp_line_prof_L))

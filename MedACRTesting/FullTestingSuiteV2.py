@@ -8,7 +8,7 @@ import shutil
 import os
 
 inputdata = "MedACRTesting/TestData/ACR_Phantom_Data"
-inputdata = "C:\\Users\Johnt\Desktop\IM_0043"
+#inputdata = "C:\\Users\Johnt\Desktop\IM_0043"
 
 #Get a list of all sequences for batch testing
 files = get_dicom_files(inputdata)
@@ -26,5 +26,5 @@ OuptutFolder = "OutputFolder"
 #if os.path.exists(OuptutFolder)==True:
 #    shutil.rmtree(OuptutFolder)
 ChosenSeq = "ACR AxT2"
-ChosenSeq = "ACR_ax_T1" #"ACR AxT2"
-MedACRAnalysis.RunAnalysis(ChosenSeq,inputdata,OuptutFolder,RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=True, RunSliceThickness=False)
+#ChosenSeq = "ACR_ax_T1" #"ACR AxT2"
+MedACRAnalysis.RunAnalysis(ChosenSeq,inputdata,OuptutFolder,RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=True, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)

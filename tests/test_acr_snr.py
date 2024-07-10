@@ -29,7 +29,7 @@ class TestACRSNRGE(unittest.TestCase):
         assert SNR_factor == self.norm_factor
 
     def test_snr_by_smoothing(self):
-        snr, _ = self.acr_snr_task.snr_by_smoothing(self.snr_dcm)
+        snr, _, _, _, _, _  = self.acr_snr_task.snr_by_smoothing(self.snr_dcm)
         assert round(snr, 2) == self.snr
 
 
@@ -58,7 +58,7 @@ class TestACRSNRSiemens(TestACRSNRGE):
         ).dcms[6]
 
     def test_snr_by_subtraction(self):
-        snr, _ = self.acr_snr_task.snr_by_subtraction(self.snr_dcm, self.snr_dcm2)
+        snr, _, = self.acr_snr_task.snr_by_subtraction(self.snr_dcm, self.snr_dcm2)
         rounded_snr = round(snr, 2)
 
         print(
@@ -89,5 +89,5 @@ class TestMedACRSNR(unittest.TestCase):
         assert round(SNR_factor, 2) == self.norm_factor
 
     def test_snr_by_smoothing(self):
-        snr, _ = self.acr_snr_task.snr_by_smoothing(self.snr_dcm)
+        snr, _, _, _, _, _ = self.acr_snr_task.snr_by_smoothing(self.snr_dcm)
         assert round(snr, 2) == self.snr
