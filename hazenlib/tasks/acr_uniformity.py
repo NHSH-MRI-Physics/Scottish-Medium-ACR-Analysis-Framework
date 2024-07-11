@@ -153,18 +153,17 @@ class ACRUniformity(HazenTask):
 
         
 
-        '''
-        max_data = uniformity_iterator(max_image, base_mask, max_rows, max_cols)
+        
+        min_data = uniformity_iterator(min_image, base_mask, min_rows, min_cols)
+        max_data = uniformity_iterator(max_image, base_mask, max_rows, max_cols)      
 
         sig_max = np.max(max_data)
         sig_min = np.min(min_data[np.nonzero(min_data)])
 
         max_loc = np.where(max_data == sig_max)
         min_loc = np.where(min_data == sig_min)
-        '''
         
-        min_data = uniformity_iterator(min_image, base_mask, min_rows, min_cols)
-        max_data = uniformity_iterator(max_image, base_mask, max_rows, max_cols)      
+        '''
 
         max_locs = np.where(max_data == np.max(max_data))
         max_loc = round(np.mean(max_locs[0])),round(np.mean(max_locs[1]))
@@ -179,7 +178,7 @@ class ACRUniformity(HazenTask):
         #min_roi = img_masked[int(min_loc[0])-5:int(min_loc[0])+5,int(min_loc[1])-5:int(min_loc[1])+5]
         min_roi = img_masked[int(min_loc[0])-round(5/res[0]):int(min_loc[0])+round(5/res[0]),int(min_loc[1])-round(5/res[0]):int(min_loc[1])+round(5/res[0])]
         sig_min = np.mean(min_roi)
-
+        '''
 
         piu = 100 * (1 - (sig_max - sig_min) / (sig_max + sig_min))
 
