@@ -36,64 +36,126 @@ for I in range(1):
     PixelSteps = HoleSize[I]/0.4883
     StepSize = PixelSteps
     colors = ['r','g','b','y']
+
     yCutoff = None
     xCutoff = None
-    y= -PixelSteps*0.5
-    yCutoff = y + (PixelSteps*2)*3
 
+    y= -PixelSteps*0.5
     x = img.shape[0]-PixelSteps*1.5
+
+    yCutoff = y + (PixelSteps*2)*3
+    xCutoff = (x- PixelSteps*6) + (PixelSteps*2)
+
     for i in range(4):
         rect = patches.Rectangle((x, yCutoff), PixelSteps*2, img.shape[1]-2-yCutoff, linewidth=1, edgecolor=colors[i], facecolor='none', linestyle="--")
-        #plt.gca().add_patch(rect)
-        xCutoff = x+PixelSteps*2
+        plt.gca().add_patch(rect)
+        #xCutoff = x+PixelSteps*2
         x -= PixelSteps*2
 
-    for i in range(1):
+    plt.imshow(img)
+    plt.ylim(img.shape[1]+2,-4)
+    plt.xlim(-2,img.shape[0]+4)
+    plt.show()
+
+    #sys.exit()
+
+    #Reset x,y values
+    #y= -PixelSteps*0.5
+    #x = img.shape[0]-PixelSteps*1.5
+
+    for i in range(4):
+
+        #Horizontal Lines
+        ContrastResponseResultsHor = []
         if y < 0:
             Box = img[0:int(round(y+PixelSteps*2))+1,0:int(round(xCutoff))]
         else:
             Box = img[int(round(y)):int(round(y+PixelSteps*2))+1,0:int(round(xCutoff))]
-        
+
+
         Lines = np.array(Box[0,:])
         for Y in range(1,Box.shape[0]):
             Lines+=np.array(Box[Y,:])
-
+        
+        #All this below should be in a fuunction
         Peaks, PeakProperties = scipy.signal.find_peaks(Lines,distance=PixelSteps)
         Troughs, TroughsProperties = scipy.signal.find_peaks(-Lines,distance=PixelSteps)
 
+        #Peaks=list(np.delete(Peaks,[1]))
+        #Troughs=list(np.delete(Troughs,[1]))
 
-    
-        Peaks = sorted(Peaks)
-        Troughs = sorted(Troughs)
+        PeaksandTroughs = list(Peaks)+list(Troughs)        
+        from scipy.optimize import curve_fit
+        def Sin(x, phase):
+            return np.sin(2*np.pi*x * 1/(PixelSteps*2) + phase) * np.max(Lines)/2 + np.mean(Lines)
+        p0=[0]
+        fit = curve_fit(Sin, PeaksandTroughs, Lines[PeaksandTroughs], p0=p0)
 
-        Peaks=list(np.delete(Peaks,[0,1,2]))
+        x=np.arange(0,xCutoff,0.0001)
+        data_fit = Sin(x,*fit[0])
 
-        DataToFit = Peaks+Troughs
+        PreicatedPeaks=[]
+        PreicatedTroughs=[]
+        for i in range (0,4):
+            PreicatedPeaks.append (((np.pi/2+i*2*np.pi) - fit[0][0] )/(2*np.pi*(1/(PixelSteps*2))))
+            PreicatedTroughs.append (((3*np.pi/2+i*2*np.pi) - fit[0][0] )/(2*np.pi*(1/(PixelSteps*2))))
 
-        #iF > 4 peaks take the 4 highest?
-        #if < 4 peaks fit a sin and fill in the gaps
-        #Have a special case where 0 peaks are computed (just whack a sin wave down with some guess of phase)
+        #Organise the peaks to check for any gaps or false peaks
+        PeakOrgArray = [ None,None,None,None]
+        for peak in Peaks:
+            diff = np.abs(np.array(PreicatedPeaks)-peak)
+            Idx = np.argmin(diff)
+            if PeakOrgArray[Idx]==None:
+                PeakOrgArray[Idx] = peak
+            else:
+                if diff[Idx] < PeakOrgArray[Idx]: #If two peaks get slotted into the same region then take the one that best matches the expected position. 
+                    PeakOrgArray[Idx] = peak
+
+        FinalPeaks = [None,None,None,None]
+        for OrgIdx in range(0,len(PeakOrgArray)):
+            if PeakOrgArray[OrgIdx]!=None:
+                FinalPeaks[OrgIdx] = PeakOrgArray[OrgIdx]
+            else:
+                FinalPeaks[OrgIdx] = PreicatedPeaks[OrgIdx]
         
+        #Maybe this should be treated the same way as above but al leave it as it is for now
+        TrothOrgArray = [None,None,None]
+        for trough in Troughs:
+            for I in range(3):
+                if trough >= FinalPeaks[I] and trough < FinalPeaks[I+1]:
+                    TrothOrgArray[I] = trough
         
-        if len(Peaks)<4:
-            from scipy.optimize import curve_fit
-            def Sin(x, phase):
-                return np.sin(2*np.pi*x * 1/(PixelSteps*2) + phase) * np.max(Lines)/2 + np.mean(Lines)
-            p0=[0]
-            fit = curve_fit(Sin, DataToFit, Lines[DataToFit], p0=p0)
-            data_fit = Sin(np.arange(0,xCutoff),*fit[0])
-        
+        FinalTroughs=[None,None,None]
+        for OrgIdx in range(0,len(FinalTroughs)):
+            if TrothOrgArray[OrgIdx]!=None:
+                FinalTroughs[OrgIdx] = TrothOrgArray[OrgIdx]
+            else:
+                FinalTroughs[OrgIdx] = PreicatedTroughs[OrgIdx]
+
+        import scipy.interpolate
+        y_interp = scipy.interpolate.interp1d(np.arange(len(Lines)), Lines)
+
+        MeanPeak = 0
+        for peak in FinalPeaks:
+            MeanPeak+=y_interp(peak)
+        MeanPeak/=4
+
+        MeanTrough=0
+        for Troughs in FinalTroughs:
+            MeanTrough+=y_interp(Troughs)
+        MeanTrough/=4
+        Amplitude = MeanPeak-MeanTrough
+
+        ContrastResponseResultsHor.append(Amplitude/MeanPeak)
 
         plt.plot(Lines)
-        plt.plot(data_fit)
-        plt.plot(DataToFit,Lines[DataToFit],"x")
+        plt.plot(x,data_fit)
+        plt.axhline(y=MeanPeak, color='r', linestyle='-')
+        plt.axhline(y=MeanTrough, color='b', linestyle='-')
         plt.show() 
 
         rect = patches.Rectangle((0, y), xCutoff, PixelSteps*2, linewidth=1, edgecolor=colors[i], facecolor='none')
         #plt.gca().add_patch(rect)
         y += PixelSteps*2
-        
-    #plt.imshow(img)
-    #plt.ylim(img.shape[1]+2,-4)
-    #plt.xlim(-2,img.shape[0]+4)
-    #plt.show()
+    
+    print(max(ContrastResponseResultsHor))
