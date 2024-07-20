@@ -333,7 +333,6 @@ class ACRSlicePosition(HazenTask):
                 interp_line_prof_L,
                 "b",
                 label=f"Left wedge",
-                label=f"Left wedge",
             )
             axes[2].plot(
                 (1 / interp_factor)

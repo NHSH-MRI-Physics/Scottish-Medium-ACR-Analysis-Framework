@@ -185,9 +185,9 @@ class ACRGeometricAccuracy2(HazenTask):
                 678
         """
 
-        print(f"Got to acr_geometric_accuracy2 get_rods")
+        #print(f"Got to acr_geometric_accuracy2 get_rods")
 
-        print(f"Got to acr_geometric_accuracy2 get_rods")
+  
 
         # inverted image for fitting (maximisation)
  #       arr_inv = np.invert(arr)
@@ -244,8 +244,8 @@ class ACRGeometricAccuracy2(HazenTask):
         #print(f'Indices of 10-labels images are {index}')
         #print(f'Indices of 10-labels images with gaps removed are {new_index}')
         #thres_ind=index[round(len(index)/2)]                                       #Not clear whether max or median value is best.
-        thres_ind=index[len(new_index)-1]                                          #Max sometimes gives wrong positions, median sometimes fails  
-        #thres_ind = np.median(new_index).astype(int)                                #Median seems most successful, but keep an eye on this.[HR 04.07.24]
+        #thres_ind=index[len(new_index)-1]                                          #Max sometimes gives wrong positions, median sometimes fails  
+        thres_ind = np.median(new_index).astype(int)                                #Median seems most successful, but keep an eye on this.[HR 04.07.24]
         #print(f'Max index of 10-labels images is {thres_ind}')                     
 
         # Generate the labelled array with the threshold chosen

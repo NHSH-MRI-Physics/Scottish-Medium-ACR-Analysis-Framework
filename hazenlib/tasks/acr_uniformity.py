@@ -60,7 +60,7 @@ class ACRUniformity(HazenTask):
                 "max roi": round(max_roi,1),
                 "min roi": round(min_roi,1),
                 "max pos": max_pos,
-                "min pos": min_pos
+                "min pos": min_pos,
                 "max pos": max_pos,
                 "min pos": min_pos
                 }
@@ -175,11 +175,11 @@ class ACRUniformity(HazenTask):
             return mean_array
 
         min_data = uniformity_iterator(min_image, base_mask, min_rows, min_cols)
-        plot.imshow(min_data, cmap=plot.cm.bone)  # set the color map to bone 
-        plot.show()
+        #plot.imshow(min_data, cmap=plot.cm.bone)  # set the color map to bone 
+        #plot.show()
         max_data = uniformity_iterator(max_image, base_mask, max_rows, max_cols)      
-        plot.imshow(max_data, cmap=plot.cm.bone)  # set the color map to bone 
-        plot.show()
+        #plot.imshow(max_data, cmap=plot.cm.bone)  # set the color map to bone 
+        #plot.show()
         sig_max = np.max(max_data) #This is a single pixel. ACR standard requires a 1cm2 ROI [HR 27.06.24]
         sig_min = np.min(min_data[np.nonzero(min_data)]) #   -similarly, this is a single-pixel value, therefore more liable to noise [HR 27.06.24]
 
@@ -282,18 +282,17 @@ class ACRUniformity(HazenTask):
                 r_small * np.cos(theta) + max_loc[1],
                 r_small * np.sin(theta) + max_loc[0],
                 c="yellow",
-            )'''
+            )
             axes[1].annotate(
                 "Min = " + str(np.round(sig_min, 1)),
                 [min_loc[1], min_loc[0] + 10 / res[0]],
                 c="white",
             )
-
-            '''axes[1].plot(
+            axes[1].plot(
                 r_small * np.cos(theta) + min_loc[1],
                 r_small * np.sin(theta) + min_loc[0],
                 c="yellow",
-            )'''
+            )
             axes[1].annotate(
                 "Max = " + str(np.round(sig_max, 1)),
                 [max_loc[1], max_loc[0] + 10 / res[0]],
