@@ -257,9 +257,11 @@ class ACRSlicePosition(HazenTask):
 
         # difference of line profiles
         delta = interp_line_prof_L - interp_line_prof_R
+        #print(f"delta contains {len(delta)} elements: {delta}")
         peaks, _ = ACRObject.find_n_highest_peaks(
             abs(delta), 1, 0.5 * np.max(abs(delta))  #Changed number of peaks (n) from 2 to 1. This seems to return true peak and avoids local maxima [HR 02.07.24]
         )  # find two highest peaks
+        #print(f"For image {self.img_desc(dcm)}, peaks = {peaks}")
 
         # if only one peak, set dummy range
         if len(peaks) == 1: # Removed this; ACRObject.find_n_highest_peaks will now only return 1 peak (see above)
@@ -331,6 +333,7 @@ class ACRSlicePosition(HazenTask):
                 interp_line_prof_L,
                 "b",
                 label=f"Left wedge",
+                label=f"Left wedge",
             )
             axes[2].plot(
                 (1 / interp_factor)
@@ -351,6 +354,7 @@ class ACRSlicePosition(HazenTask):
 #            )
             axes[2].set_title("Original Line Profiles")
             axes[2].set_xlabel("Relative Pixel Position (mm)")
+            axes[2].legend(loc="best")
             axes[2].legend(loc="best")
 
             axes[3].plot(

@@ -187,6 +187,8 @@ class ACRGeometricAccuracy2(HazenTask):
 
         print(f"Got to acr_geometric_accuracy2 get_rods")
 
+        print(f"Got to acr_geometric_accuracy2 get_rods")
+
         # inverted image for fitting (maximisation)
  #       arr_inv = np.invert(arr)
         arr_inv = np.invert(arr)-65346+np.max(arr) # np.invert is just (65346-img) so adjust to give a normalised, inverted image
@@ -208,6 +210,10 @@ class ACRGeometricAccuracy2(HazenTask):
         arr_inv[:,mask_high:self.img_size]=0
 
         #Check data:
+#        plt.imshow(arr, cmap=plt.cm.bone)  # set the color map to bone 
+#        plt.show() 
+#        plt.imshow(arr_inv, cmap=plt.cm.bone)  # set the color map to bone 
+#        plt.show() 
 #        plt.imshow(arr, cmap=plt.cm.bone)  # set the color map to bone 
 #        plt.show() 
 #        plt.imshow(arr_inv, cmap=plt.cm.bone)  # set the color map to bone 
@@ -446,6 +452,10 @@ class ACRGeometricAccuracy2(HazenTask):
         # calculate the horizontal and vertical distances
         horz_dist = np.asarray(horz_dist, dtype='float64')
         vert_dist = np.asarray(vert_dist, dtype='float64')
+        Pixel_Size = float(self.pixel_size)
+        horz_dist_mm = np.multiply(Pixel_Size, horz_dist)
+        vert_dist_mm = np.multiply(Pixel_Size, vert_dist)
+        return horz_dist, vert_dist#, horz_dist_mm, vert_dist_mm
         Pixel_Size = float(self.pixel_size)
         horz_dist_mm = np.multiply(Pixel_Size, horz_dist)
         vert_dist_mm = np.multiply(Pixel_Size, vert_dist)

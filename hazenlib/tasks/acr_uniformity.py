@@ -21,9 +21,11 @@ import sys
 import traceback
 import numpy as np
 import math as math
+import math as math
 
 from hazenlib.HazenTask import HazenTask
 from hazenlib.ACRObject import ACRObject
+import matplotlib.pyplot as plot #Didn't like 'plt' with error: "cannot access local variable 'plt' where it is not associated with a value"
 import matplotlib.pyplot as plot #Didn't like 'plt' with error: "cannot access local variable 'plt' where it is not associated with a value"
 from pydicom.pixel_data_handlers.util import apply_modality_lut
 
@@ -52,10 +54,13 @@ class ACRUniformity(HazenTask):
 
         try:
             unif, max_roi, min_roi, max_pos, min_pos = self.get_integral_uniformity(self.ACR_obj.slice7_dcm)
+            unif, max_roi, min_roi, max_pos, min_pos = self.get_integral_uniformity(self.ACR_obj.slice7_dcm)
             results["measurement"] = {
                 "integral uniformity %": round(unif, 2),
                 "max roi": round(max_roi,1),
                 "min roi": round(min_roi,1),
+                "max pos": max_pos,
+                "min pos": min_pos
                 "max pos": max_pos,
                 "min pos": min_pos
                 }
@@ -76,12 +81,16 @@ class ACRUniformity(HazenTask):
     def get_integral_uniformity(self, dcm):
         """Calculate the integral uniformity in accordance with ACR guidance.
         global plt
+        global plt
         Args:
             dcm (pydicom.Dataset): DICOM image object to calculate uniformity from
 
         Returns:
             int or float: value of integral unformity
         """
+        img = apply_modality_lut(dcm.pixel_array, dcm).astype('uint16') #Must apply_modality_lut here since it's not applied to slice7_dcm in ACRObject
+#        img = dcm.pixel_array 
+
         img = apply_modality_lut(dcm.pixel_array, dcm).astype('uint16') #Must apply_modality_lut here since it's not applied to slice7_dcm in ACRObject
 #        img = dcm.pixel_array 
 
@@ -94,6 +103,7 @@ class ACRUniformity(HazenTask):
         )  # Required pixel radius to produce ~1cm2 ROI
 
         if self.ACR_obj.MediumACRPhantom==True:
+            r_large = np.ceil(np.sqrt(16000*0.90 / np.pi) / res[0]).astype(int) #Making it a 90% smaller than 160cm^2 (16000mm^2) to avoid the bit at the top
             r_large = np.ceil(np.sqrt(16000*0.90 / np.pi) / res[0]).astype(int) #Making it a 90% smaller than 160cm^2 (16000mm^2) to avoid the bit at the top
 
 
@@ -118,6 +128,12 @@ class ACRUniformity(HazenTask):
 
         min_image = img_masked * (img_masked < half_max)
         max_image = img_masked * (img_masked > half_max)
+        #Check data:
+#        plot.imshow(min_image, cmap=plot.cm.bone)  # set the color map to bone 
+#        plot.show() 
+#        plot.imshow(max_image, cmap=plot.cm.bone)  # set the color map to bone 
+#        plot.show()         
+        
         #Check data:
 #        plot.imshow(min_image, cmap=plot.cm.bone)  # set the color map to bone 
 #        plot.show() 
@@ -266,18 +282,18 @@ class ACRUniformity(HazenTask):
                 r_small * np.cos(theta) + max_loc[1],
                 r_small * np.sin(theta) + max_loc[0],
                 c="yellow",
-            )
+            )'''
             axes[1].annotate(
                 "Min = " + str(np.round(sig_min, 1)),
                 [min_loc[1], min_loc[0] + 10 / res[0]],
                 c="white",
             )
 
-            axes[1].plot(
+            '''axes[1].plot(
                 r_small * np.cos(theta) + min_loc[1],
                 r_small * np.sin(theta) + min_loc[0],
                 c="yellow",
-            )
+            )'''
             axes[1].annotate(
                 "Max = " + str(np.round(sig_max, 1)),
                 [max_loc[1], max_loc[0] + 10 / res[0]],

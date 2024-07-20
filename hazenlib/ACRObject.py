@@ -64,7 +64,7 @@ class ACRObject:
         x = np.array([dcm.ImagePositionPatient[0] for dcm in self.dcm_list])
         y = np.array([dcm.ImagePositionPatient[1] for dcm in self.dcm_list])
         z = np.array([dcm.ImagePositionPatient[2] for dcm in self.dcm_list])
-#        print(f'x array is {x}')
+        #print(f'x array is {x}')
         
         if orientation=='Transverse':
             dicom_stack = [self.dcm_list[i] for i in np.argsort(z)]
@@ -125,9 +125,9 @@ class ACRObject:
                 cv2.HOUGH_GRADIENT,
                 1,
 #                param1=50,
-#                param2=30,
+#                param2=10,
                 param1=50,
-                param2=10,                
+                param2=30,                
                 minDist=int(180 / dx),
 #                minRadius=int(5 / dx),
 #                maxRadius=int(16 / dx),
@@ -136,7 +136,7 @@ class ACRObject:
             )
             for norm_image in normalised_images
         ]
-        #print(f'detected_circles is {detected_circles}')
+#        print(f'detected_circles is {detected_circles}')
 
         if detected_circles[0] is not None:
 #        if detected_circles[0] is None:            

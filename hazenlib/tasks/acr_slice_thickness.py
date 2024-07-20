@@ -120,6 +120,8 @@ class ACRSliceThickness(HazenTask):
         # x limits of profile fail in sagittal view due to air-bubble. Fix these values as will not vary much (HR 26.04.2024)
 
         x = [round(50/res[1]),round(200/res[1])]
+
+        x = [round(50/res[1]),round(200/res[1])]
         # Y
         c = skimage.measure.profile_line(
             img,

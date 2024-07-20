@@ -105,6 +105,7 @@ def RunAnalysis():
         messagebox.showerror("Error", "No Results Path Set")
 
     MedACRAnalysis_FullReport.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAccEdges=GeoAccEdges, RunGeoAccRods=GeoAccRods, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
+#    MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAccEdges, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
 
 PathFrame = ttk.Frame(root)
 DCMPathButton = ttk.Button(text="Set DICOM Path", command=SetDCMPath,width=22)
