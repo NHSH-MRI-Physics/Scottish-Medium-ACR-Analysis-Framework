@@ -68,14 +68,16 @@ class ACRSNR(HazenTask):
         if self.subtract is None:
             try:
                 results["file"] = self.img_desc(snr_dcm)
-                snr, normalised_snr, signal, noise = self.snr_by_smoothing(
+                snr, normalised_snr, signal, noise, col, row = self.snr_by_smoothing(
                     snr_dcm, self.measured_slice_width
                 )
                 results["measurement"]["snr by smoothing"] = {
                     "measured": round(snr, 2),
                     "normalised": round(normalised_snr, 2),
                     "signal": signal,
-                    "noise": noise
+                    "noise": noise,
+                    "centre y": row,
+                    "centre x": col
                 }
             except Exception as e:
                 print(
@@ -164,7 +166,7 @@ class ACRSNR(HazenTask):
 
         # filter size = 9, following MATLAB code and McCann 2013 paper for head coil, although note McCann 2013
         # recommends 25x25 for body coil.
-        # Was set to 25 which is too high; causing +15%higher SNR wrt manual measurement. FilterSize=9 causes <1% difference HR 17.06.24
+        # Was set to 25 which is too high; causing +15%higher SNR wrt manual measurement. FilterSize=9 causes <1% difference [HR 17.06.24]
         filtered_array = ndimage.uniform_filter(a, 9, mode="constant")
         return filtered_array
 
@@ -309,7 +311,7 @@ class ACRSNR(HazenTask):
             fig.savefig(img_path)
             self.report_files.append(img_path)
 
-        return snr, normalised_snr, signal_rounded, noise_rounded
+        return snr, normalised_snr, signal_rounded, noise_rounded, col, row
 
     def snr_by_subtraction(
         self, dcm1: pydicom.Dataset, dcm2: pydicom.Dataset, measured_slice_width=None

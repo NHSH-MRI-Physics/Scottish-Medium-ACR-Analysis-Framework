@@ -84,6 +84,8 @@ class ACRSliceThickness(HazenTask):
             tuple: x and y coordinates of ramp
         """
         # X
+        #print(f'res = {res}')
+
         investigate_region = int(np.ceil(5.5 / res[1]).item())
 #        print(f'investigate_region is {investigate_region}')
         if np.mod(investigate_region, 2) == 0:
@@ -116,7 +118,8 @@ class ACRSliceThickness(HazenTask):
         # take rough estimate of x points for later line profiles
         #x = np.round([np.min(width_pts) + 0.2 * width, np.max(width_pts) - 0.2 * width])
         # x limits of profile fail in sagittal view due to air-bubble. Fix these values as will not vary much (HR 26.04.2024)
-        x = [85,165]
+
+        x = [round(50/res[1]),round(200/res[1])]
         # Y
         c = skimage.measure.profile_line(
             img,
@@ -149,9 +152,9 @@ class ACRSliceThickness(HazenTask):
         half_max = np.max(data) * 0.5
 
         # Naive attempt
-        half_max_crossing_indices = np.argwhere(
-            np.diff(np.sign(data - half_max))
-        ).flatten()
+        if all(np.argwhere(np.diff(np.sign(data - half_max))) < 751):
+            half_max_crossing_indices = (np.argwhere(np.diff(np.sign(data - half_max))).flatten())
+        #print(f'half_max_crossing_indices={half_max_crossing_indices}')
 
         # Interpolation
         def simple_interp(x_start, ydata):
@@ -165,7 +168,7 @@ class ACRSliceThickness(HazenTask):
                 float: true x coordinate of the half maximum
             """
             x_init = x_start - 5
-            x_pts = np.arange(x_start - 5, x_start + 5)
+            #x_pts = np.arange(x_start - 5, x_start + 5)
             x_pts = np.arange(x_init, x_init + 11)
             y_pts = ydata[x_pts]
 
@@ -194,7 +197,7 @@ class ACRSliceThickness(HazenTask):
         res = dcm.PixelSpacing  # In-plane resolution from metadata
         cxy = self.ACR_obj.centre
         x_pts, y_pts = self.find_ramps(img, cxy, res)
-#        print(f'Ramp x is {x_pts} and Ramp y is {y_pts}')
+        #print(f'Ramp x is {x_pts} and Ramp y is {y_pts}')
 
         interp_factor = 5
         sample = np.arange(1, x_pts[1] - x_pts[0] + 2)
@@ -228,6 +231,7 @@ class ACRSliceThickness(HazenTask):
             interp_lines = [
                 scipy.interpolate.interp1d(sample, line)(new_sample) for line in lines
             ]
+            #print(f'interp_line length = {len(interp_lines)}, interp_line={interp_lines}')
             fwhm = [self.FWHM(interp_line) for interp_line in interp_lines]
             ramp_length[0, i] = (1 / interp_factor) * np.diff(fwhm[0]) * res[0]
             ramp_length[1, i] = (1 / interp_factor) * np.diff(fwhm[1]) * res[0]
@@ -329,5 +333,5 @@ class ACRSliceThickness(HazenTask):
             )
             fig.savefig(img_path)
             self.report_files.append(img_path)
-            print(f'Results file is {img_path}')
+            #print(f'Results file is {img_path}')
         return slice_thickness

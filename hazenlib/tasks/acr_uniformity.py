@@ -20,9 +20,11 @@ import os
 import sys
 import traceback
 import numpy as np
+import math as math
 
 from hazenlib.HazenTask import HazenTask
 from hazenlib.ACRObject import ACRObject
+import matplotlib.pyplot as plot #Didn't like 'plt' with error: "cannot access local variable 'plt' where it is not associated with a value"
 from pydicom.pixel_data_handlers.util import apply_modality_lut
 
 
@@ -49,13 +51,13 @@ class ACRUniformity(HazenTask):
         results["file"] = self.img_desc(self.ACR_obj.slice7_dcm)
 
         try:
-            unif, max_roi, min_roi, max_loc, min_loc  = self.get_integral_uniformity(self.ACR_obj.slice7_dcm)
+            unif, max_roi, min_roi, max_pos, min_pos = self.get_integral_uniformity(self.ACR_obj.slice7_dcm)
             results["measurement"] = {
                 "integral uniformity %": round(unif, 2),
                 "max roi": round(max_roi,1),
                 "min roi": round(min_roi,1),
-                "max pos": max_loc,
-                "min pos": min_loc
+                "max pos": max_pos,
+                "min pos": min_pos
                 }
 
         except Exception as e:
@@ -73,27 +75,16 @@ class ACRUniformity(HazenTask):
 
     def get_integral_uniformity(self, dcm):
         """Calculate the integral uniformity in accordance with ACR guidance.
-
+        global plt
         Args:
             dcm (pydicom.Dataset): DICOM image object to calculate uniformity from
 
         Returns:
             int or float: value of integral unformity
         """
-        img = apply_modality_lut(dcm.pixel_array, dcm).astype('uint16')
-        #img=dcm.pixel_array
-        #for idx,(y,x) in enumerate(zip(img[0],img[1])
-        print(f'Pix[66,66]= {img[66][66]}')        
-        print(f'Pix[67,67]= {img[67][67]}')
-        print(f'Pix[68,68]= {img[68][68]}')
-        print(f'Pix[69,69]= {img[69][69]}')
-        print(f'Pix[70,70]= {img[70][70]}')
-        print(f'Pix[80,80]= {img[80][80]}')
-        print(f'Pix[90,90]= {img[90][90]}')
-        print(f'Pix[100,100]= {img[100][100]}')
-        print(f'Pix[110,110]= {img[110][110]}')
-        print(f'Pix[120,120]= {img[120][120]}')
-        print(f'Pix[130,130]= {img[130][130]}')
+        img = apply_modality_lut(dcm.pixel_array, dcm).astype('uint16') #Must apply_modality_lut here since it's not applied to slice7_dcm in ACRObject
+#        img = dcm.pixel_array 
+
         res = dcm.PixelSpacing  # In-plane resolution from metadata
         r_large = np.ceil(80 / res[0]).astype(
             int
@@ -103,7 +94,7 @@ class ACRUniformity(HazenTask):
         )  # Required pixel radius to produce ~1cm2 ROI
 
         if self.ACR_obj.MediumACRPhantom==True:
-            r_large = np.ceil(np.sqrt(16000*0.90 / np.pi) / res[0]).astype(int) #Making it a 95% smaller than 160cm^2 (16000mm^2) to avoid the bit at the top
+            r_large = np.ceil(np.sqrt(16000*0.90 / np.pi) / res[0]).astype(int) #Making it a 90% smaller than 160cm^2 (16000mm^2) to avoid the bit at the top
 
 
         d_void = np.ceil(5 / res[0]).astype(
@@ -120,12 +111,19 @@ class ACRUniformity(HazenTask):
 
         lroi = self.ACR_obj.circular_mask([cxy[0], cxy[1] + d_void], r_large, dims)
         img_masked = lroi * img
+        buffer_roi = self.ACR_obj.circular_mask([cxy[0], cxy[1] + d_void], 1.05*r_large, dims)
+        img_buffer = buffer_roi * img
 
         half_max = np.percentile(img_masked[np.nonzero(img_masked)], 50)
 
         min_image = img_masked * (img_masked < half_max)
         max_image = img_masked * (img_masked > half_max)
-
+        #Check data:
+#        plot.imshow(min_image, cmap=plot.cm.bone)  # set the color map to bone 
+#        plot.show() 
+#        plot.imshow(max_image, cmap=plot.cm.bone)  # set the color map to bone 
+#        plot.show()         
+        
         min_rows, min_cols = np.nonzero(min_image)[0], np.nonzero(min_image)[1]
         max_rows, max_cols = np.nonzero(max_image)[0], np.nonzero(max_image)[1]
 
@@ -161,14 +159,80 @@ class ACRUniformity(HazenTask):
             return mean_array
 
         min_data = uniformity_iterator(min_image, base_mask, min_rows, min_cols)
-        max_data = uniformity_iterator(max_image, base_mask, max_rows, max_cols)
-
-        sig_max = np.max(max_data)
-        sig_min = np.min(min_data[np.nonzero(min_data)])
+        plot.imshow(min_data, cmap=plot.cm.bone)  # set the color map to bone 
+        plot.show()
+        max_data = uniformity_iterator(max_image, base_mask, max_rows, max_cols)      
+        plot.imshow(max_data, cmap=plot.cm.bone)  # set the color map to bone 
+        plot.show()
+        sig_max = np.max(max_data) #This is a single pixel. ACR standard requires a 1cm2 ROI [HR 27.06.24]
+        sig_min = np.min(min_data[np.nonzero(min_data)]) #   -similarly, this is a single-pixel value, therefore more liable to noise [HR 27.06.24]
 
         max_loc = np.where(max_data == sig_max)
         min_loc = np.where(min_data == sig_min)
+        
 
+
+        #sig_max = np.max(img_masked) #This is a single pixel. ACR standard requires a 1cm2 ROI [HR 27.06.24]
+        #sig_min = np.min(img_masked[np.nonzero(img_masked)]) #   -similarly, this is a single-pixel value, therefore more liable to noise [HR 27.06.24]
+
+        #New code based on 1cm2 ROI centred at positions of max and min pixels in the large ROI
+        #Will compare the mean of ROIs centred at multiple identical max-or-min pixels (should they occur) and use the highest/lowest mean ROI, respectively [HR 11.07.24]
+        """max_locs = np.where(img_masked == np.max(img_masked))
+        print(f'max_locs={max_locs}, length = {len(max_locs[1])}')
+        roi_max=np.zeros(10)
+        for i in range(len(max_locs[1])):
+            print(f'Loop#{i}: Max pixel value(s) {img_buffer[max_locs[0][i],max_locs[1][i]]} at voxel [x,y] {max_locs[0][i],max_locs[1][i]}')
+            max_roi = img_buffer[int(max_locs[0][i])-round(5/res[0]):int(max_locs[0][i])+round(5/res[0]),int(max_locs[1][i])-round(5/res[0]):int(max_locs[1][i])+round(5/res[0])],
+            roi_max[i] = np.mean(max_roi)
+            plot.imshow(max_roi[0], cmap=plot.cm.bone)  # set the color map to bone 
+            plot.show() 
+        print(f'Mean of max_roi(s): {roi_max}')
+        
+        min_locs = np.where(img_masked == np.min(img_masked[np.nonzero(img_masked)]))
+        print(f'min_locs={min_locs}, length = {len(min_locs[1])}')
+        roi_min=np.zeros(10)
+        for i in range(len(min_locs[1])):
+            print(f'Loop# {i}: Min pixel value(s) {img_buffer[min_locs[0][i],min_locs[1][i]]} at voxel [x,y] {min_locs[0][i],min_locs[1][i]}')
+            min_roi = img_buffer[int(min_locs[0][i])-round(5/res[0]):int(min_locs[0][i])+round(5/res[0]),int(min_locs[1][i])-round(5/res[0]):int(min_locs[1][i])+round(5/res[0])],
+            roi_min[i] = np.mean(min_roi)
+            plot.imshow(min_roi[0], cmap=plot.cm.bone)  # set the color map to bone 
+            plot.show() 
+        print(f'Mean of min_roi(s): {roi_min}')
+  
+        min_loc = round(np.mean(min_locs[0])),round(np.mean(min_locs[1]))
+        for i in min_locs:
+            min_roi = img_buffer[int(min_locs[0])-round(5/res[0]):int(min_locs[0])+round(5/res[0]),int(min_locs[1])-round(5/res[0]):int(min_locs[1])+round(5/res[0])],
+            roi_min = np.mean(min_roi)   
+        min_loc = min_locs.index(min(min_locs))        
+        print(f'Min ROI values {roi_min} for 100 pixel ROI centred at voxel [x,y] {min_locs[1], min_locs[0]}')
+        
+        #print(f'Min value(s) {min_data[min_locs[0],min_locs[1]]} at voxel [x,y] {min_loc[1], min_loc[0]}')        
+        #max_roi = img[int(max_loc[0])-round(5/res[0]):int(max_loc[0])+round(5/res[0]),int(max_loc[1])-round(5/res[0]):int(max_loc[1])+round(5/res[0])]
+        #plot.imshow(max_roi, cmap=plot.cm.bone)  # set the color map to bone 
+        #plot.show()
+        
+        sig_max = np.max(roi_max)
+        sig_min = np.min(roi_min[np.nonzero(roi_min)])
+        max_index = max(enumerate(roi_max),key=lambda x: x[1])[0]# np.where(roi_max == sig_max)
+        min_index = min(enumerate(roi_min[np.nonzero(roi_min)]),key=lambda x: x[1])[0] #np.where(roi_min == sig_min)
+        print(f'max pixel at {max_locs[0][max_index],max_locs[1][max_index]}')
+        print(f'min pixel at {min_locs[0][min_index],min_locs[1][min_index]}')
+        max_loc=max_locs[0][max_index],max_locs[1][max_index]
+        min_loc=min_locs[0][min_index],min_locs[1][min_index]
+
+
+        print(f'Max ROI value is {sig_max} for 100 pixel ROI centred at voxel [x,y] {max_loc[0], max_loc[1]}')
+        print(f'Min ROI value is {sig_min} for 100 pixel ROI centred at voxel [x,y] {min_loc[0], min_loc[1]}')
+
+#        min_roi = img[int(min_loc[0])-round(5/res[0]):int(min_loc[0])+round(5/res[0]),int(min_loc[1])-round(5/res[0]):int(min_loc[1])+round(5/res[0])]
+#        print(f'Limits of min_roi are {int(min_loc[0])-round(5/res[0])} and {int(min_loc[0])+round(5/res[0])}')
+#        plot.imshow(img_masked, cmap=plot.cm.bone)  # set the color map to bone 
+#        plot.show()
+#        plot.imshow(min_roi, cmap=plot.cm.bone)  # set the color map to bone 
+#        plot.show() 
+#        sig_min = np.mean(min_roi)
+        """
+        
         piu = 100 * (1 - (sig_max - sig_min) / (sig_max + sig_min))
 
         if self.report:
@@ -192,6 +256,12 @@ class ACRUniformity(HazenTask):
             axes[1].scatter(
                 [max_loc[1], min_loc[1]], [max_loc[0], min_loc[0]], c="red", marker="x"
             )
+
+            """ROI_min=plt.Rectangle((min_loc[1]-round(5/res[0]),min_loc[0]-round(5/res[0])),10/res[0],10/res[0],color='y',fill=False)
+            axes[1].add_patch(ROI_min)
+            ROI_max=plt.Rectangle((max_loc[1]-round(5/res[0]),max_loc[0]-round(5/res[0])),10/res[0],10/res[0],color='y',fill=False)
+            axes[1].add_patch(ROI_max)"""
+
             axes[1].plot(
                 r_small * np.cos(theta) + max_loc[1],
                 r_small * np.sin(theta) + max_loc[0],

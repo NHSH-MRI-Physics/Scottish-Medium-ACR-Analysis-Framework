@@ -28,6 +28,7 @@ import os
 import sys
 import traceback
 import numpy as np
+import matplotlib.pyplot as plot
 
 import scipy
 import skimage.morphology
@@ -94,7 +95,7 @@ class ACRSlicePosition(HazenTask):
             tuple: arrays of x and y coordinates of wedges
         """
         # X COORDINATES
-        x_investigate_region = np.ceil(35 / res[0]).astype(
+        x_investigate_region = np.ceil(15 / res[0]).astype( #15 was 35
             int
         )  # define width of region to test (comparable to wedges)
 
@@ -103,13 +104,9 @@ class ACRSlicePosition(HazenTask):
             x_investigate_region = x_investigate_region + 1
 
         w_point = np.argwhere(np.sum(mask, 0) > 0)[0].item()  # westmost point of object
-        e_point = np.argwhere(np.sum(mask, 0) > 0)[
-            -1
-        ].item()  # eastmost point of object
-        n_point = np.argwhere(np.sum(mask, 1) > 0)[
-            0
-        ].item()  # northmost point of object
-
+        e_point = np.argwhere(np.sum(mask, 0) > 0)[-1].item()  # eastmost point of object
+        n_point = np.argwhere(np.sum(mask, 1) > 0)[0].item()  # northmost point of object
+        #print(f'wpoint = {w_point}, e_point = {e_point}, npoint={n_point}')
         invest_x = []
         for k in range(x_investigate_region):
             y_loc = n_point + k  # add n_point to ensure in image's coordinate system
@@ -153,7 +150,9 @@ class ACRSlicePosition(HazenTask):
         # supposed distance from top of phantom to end of wedges
         end_point = n_point + np.round(50 / res[1]).astype(int)
         if (self.ACR_obj.MediumACRPhantom==True):
-            end_point = n_point + np.round(35 / res[1]).astype(int) #This may need adjusted i'm not to confident that it will always work...
+            end_point = n_point + np.round(35 / res[1]).astype(int) # This may need adjusted i'm not to confident that it will always work...
+
+       #print(f'end_point={end_point}')
 
         if np.mod(y_investigate_region, 2) == 0:
             # we want an odd number to see -N to N points in the y direction
@@ -178,7 +177,6 @@ class ACRSlicePosition(HazenTask):
         mean_y_profile = np.mean(invest_y, 1)  # mean of vertical projections of phantom
 
 
-
         abs_diff_y_profile = np.abs(
             np.diff(mean_y_profile)
         )  # absolute first derivative of mean
@@ -188,8 +186,9 @@ class ACRSlicePosition(HazenTask):
             abs_diff_y_profile, 2
         )  # find two highest peaks
         y_locs = (
-            w_point + y_peaks - 1
+            n_point + y_peaks - 1 #n_point was w_point ????
         )  # y coordinates of these peaks in image coordinate system(before diff operation)
+        #print(f'find_wedges: y_locs[0]={y_locs[0]} and y_locs[1]={y_locs[1]}')
 
         if y_locs[1] - y_locs[0] < 5 / res[1]:
             y = [
@@ -201,14 +200,12 @@ class ACRSlicePosition(HazenTask):
             )  # define y coordinate
 
         dist_to_y = np.abs(n_point - y[0]) * res[1]  # distance to y from top of phantom
-        y_pts = np.append(y, np.round(y[0] + (47 - dist_to_y) / res[1])).astype(
-            int
-        )  # place 2nd y point 47mm from top of phantom
+        y_pts = np.append(y, np.round(y[0] + (47 - dist_to_y) / res[1])).astype(int)  # place 2nd y point 47mm from top of phantom
         if (self.ACR_obj.MediumACRPhantom == True):
-            y_pts = np.append(y, np.round(y[0] + (35 - dist_to_y) / res[1])).astype(int)  # place 2nd y point 47mm from top of phantom
+            y_pts = np.append(y, np.round(y[0] + (35 - dist_to_y) / res[1])).astype(int)  # place 2nd y point 35mm from top of phantom
 
         
-        plt.imshow(img)
+        '''plt.imshow(img)
         plt.axhline(y=y_investigate_region, color='r', linestyle='-')
         plt.axhline(y=end_point, color='r', linestyle='-')
 
@@ -216,7 +213,7 @@ class ACRSlicePosition(HazenTask):
         plt.axhline(y=y_pts[1], color='b', linestyle='-')
 
         plt.axhline(y=44, color='g', linestyle='--')
-        plt.axhline(y=80, color='g', linestyle='--')
+        plt.axhline(y=80, color='g', linestyle='--')'''
 
         return x_pts, y_pts
 
@@ -229,10 +226,11 @@ class ACRSlicePosition(HazenTask):
         Returns:
             float: bar length difference
         """
-        img = dcm.pixel_array
+        img = dcm.pixel_array 
         res = dcm.PixelSpacing  # In-plane resolution from metadata
         mask = self.ACR_obj.mask_image
         x_pts, y_pts = self.find_wedges(img, mask, res)
+        #print(f'x_pts are {x_pts} and y_pts are {y_pts}')
 
         line_prof_L = skimage.measure.profile_line(
             img, (y_pts[0], x_pts[0]), (y_pts[1], x_pts[0]), mode="constant"
@@ -249,19 +247,23 @@ class ACRSlicePosition(HazenTask):
 
         # interpolate left line profile
         interp_line_prof_L = scipy.interpolate.interp1d(x, line_prof_L)(new_x)
-
+        '''print(f'interp_line_prof_L={interp_line_prof_L} with start(x,y)={x_pts[0],y_pts[0]} and end(x,y)={x_pts[0],y_pts[1]}')
+        plot.imshow(img, cmap=plot.cm.bone)  # set the color map to bone 
+        plot.plot([x_pts[0], x_pts[0]], [y_pts[0], y_pts[1]], "b")
+        plot.show()''' 
+                    
         # interpolate right line profile
         interp_line_prof_R = scipy.interpolate.interp1d(x, line_prof_R)(new_x)
 
         # difference of line profiles
         delta = interp_line_prof_L - interp_line_prof_R
         peaks, _ = ACRObject.find_n_highest_peaks(
-            abs(delta), 2, 0.5 * np.max(abs(delta))
+            abs(delta), 1, 0.5 * np.max(abs(delta))  #Changed number of peaks (n) from 2 to 1. This seems to return true peak and avoids local maxima [HR 02.07.24]
         )  # find two highest peaks
 
         # if only one peak, set dummy range
-        if len(peaks) == 1:
-            peaks = [peaks[0] - 50, peaks[0] + 50]
+        if len(peaks) == 1: # Removed this; ACRObject.find_n_highest_peaks will now only return 1 peak (see above)
+            peaks = [peaks[0] - 10, peaks[0] + 10] #Start/stop previously +/-50 from peak. Changed to +/-10 since 50 may overshoot [HR 02.07.24]
 
         # set multiplier for right or left shift based on sign of peak
         pos = (
@@ -328,6 +330,7 @@ class ACRSlicePosition(HazenTask):
                 * res[1],
                 interp_line_prof_L,
                 "b",
+                label=f"Left wedge",
             )
             axes[2].plot(
                 (1 / interp_factor)
@@ -335,9 +338,20 @@ class ACRSlicePosition(HazenTask):
                 * res[1],
                 interp_line_prof_R,
                 "r",
+                label=f"Right wedge",
             )
+#            axes[2].plot( #Added difference-line to check that the maximum is correctly located [HR 02.07.24]
+#              (1 / interp_factor)
+#                * np.linspace(1, len(interp_line_prof_R), len(interp_line_prof_R))
+#                * np.linspace(peaks[0],peaks[1],peaks[1]-peaks[0])
+#                * res[1],
+#                delta[peaks[0] : peaks[1]],
+#                "g--", 
+#                label=f"Difference",
+#            )
             axes[2].set_title("Original Line Profiles")
             axes[2].set_xlabel("Relative Pixel Position (mm)")
+            axes[2].legend(loc="best")
 
             axes[3].plot(
                 (1 / interp_factor)
