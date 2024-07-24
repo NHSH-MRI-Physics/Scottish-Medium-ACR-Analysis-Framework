@@ -732,7 +732,6 @@ class ACRSpatialResolution(HazenTask):
 
             x_values = np.arange(len(Lines))
             y_interp = scipy.interpolate.interp1d(x_values, Lines)
-
             PeaksandTroughs = list(Peaks)+list(Troughs)        
             
             def Sin(x, phase):
@@ -742,12 +741,13 @@ class ACRSpatialResolution(HazenTask):
                 fit = curve_fit(Sin, PeaksandTroughs, Lines[PeaksandTroughs], p0=p0)
             else:
                 fit = curve_fit(Sin, x_values, Lines, p0=p0) # if we find no peaks/troughs just go ahead and fit to the whole line 
-            x=np.arange(0,xCutoff,0.0001)
+            x=np.arange(0,img.shape[1],0.0001)
             data_fit = Sin(x,*fit[0])
 
             PreicatedPeaks=[]
             PreicatedTroughs=[]
 
+            #Based on the sin wave get the predicted peaks and troughs
             i=0
             while(len(PreicatedPeaks)<4):
                 Prediction = ((np.pi/2+i*2*np.pi) - fit[0][0] )/(2*np.pi*(1/(PixelSteps*2)))
@@ -768,14 +768,17 @@ class ACRSpatialResolution(HazenTask):
 
             #Organise the peaks to check for any gaps or false peaks
             PeakOrgArray = [None,None,None,None]
+            PeakDistancesFromPrediction = [None,None,None,None]
             for peak in Peaks:
                 diff = np.abs(np.array(PreicatedPeaks)-peak)
                 Idx = np.argmin(diff)
                 if PeakOrgArray[Idx]==None:
                     PeakOrgArray[Idx] = peak
+                    PeakDistancesFromPrediction[Idx] = diff[Idx]
                 else:
-                    if diff[Idx] < PeakOrgArray[Idx]: #If two peaks get slotted into the same region then take the one that best matches the expected position. 
+                    if diff[Idx] < PeakDistancesFromPrediction[Idx]: #If two peaks get slotted into the same region then take the one that best matches the expected position. 
                         PeakOrgArray[Idx] = peak
+                        PeakDistancesFromPrediction[Idx] = diff[Idx]
 
             FinalPeaks = [None,None,None,None]
             for OrgIdx in range(0,len(PeakOrgArray)):
@@ -786,16 +789,16 @@ class ACRSpatialResolution(HazenTask):
                     FinalPeaks[OrgIdx] = PreicatedPeaks[OrgIdx]
 
             #Maybe this should be treated the same way as above but al leave it as it is for now
-            TrothOrgArray = [None,None,None]
+            TroughOrgArray = [None,None,None]
             for trough in Troughs:
                 for I in range(3):
                     if trough >= FinalPeaks[I] and trough < FinalPeaks[I+1]:
-                        TrothOrgArray[I] = trough
+                        TroughOrgArray[I] = trough
             
             FinalTroughs=[None,None,None]
             for OrgIdx in range(0,len(FinalTroughs)):
-                if TrothOrgArray[OrgIdx]!=None:
-                    FinalTroughs[OrgIdx] = TrothOrgArray[OrgIdx]
+                if TroughOrgArray[OrgIdx]!=None:
+                    FinalTroughs[OrgIdx] = TroughOrgArray[OrgIdx]
                 else:
                     print("Warning: Trough number " + str(OrgIdx+1) +" is predicted in hole size " +str(CurrentHole) +" mm")
                     FinalTroughs[OrgIdx] = PreicatedTroughs[OrgIdx]
@@ -826,6 +829,22 @@ class ACRSpatialResolution(HazenTask):
 
             StartPoint = list(Rect.get_xy())
             EndPoint = [Rect.get_xy()[0]+Rect.get_width(),Rect.get_xy()[1]+Rect.get_height()]
+
+            StepSize = Rect.get_height()/4.0
+            Lines=np.zeros(img.shape[0])
+            if Vertical==True:
+                StepSize = Rect.get_width()/4.0
+                Lines=np.zeros(img.shape[1])
+
+            for i in range(0,4):
+                if Vertical==False:
+                    xvalues=np.linspace(0,img.shape[1],img.shape[1],endpoint=True)
+                    yvalues=[i*StepSize]*len(xvalues)
+                    Line = griddata(points, values, (yvalues, xvalues), method='linear')
+                    Lines+=Line
+            return Lines
+
+            '''
             IterationAxis = 1 #This is going to determine if we iterate along x or y (horizontal or verticlal lines)
             if Vertical==True:
                 IterationAxis=0
@@ -854,10 +873,10 @@ class ACRSpatialResolution(HazenTask):
                     xvalues=[IterValue]*len(yvalues)
                 Line = griddata(points, values, (yvalues, xvalues), method='linear')
                 Lines += Line
-            return Lines
+            '''
+            
 
         def GetCutOffs(img):
-            
             import matplotlib
             matplotlib.use('TkAgg')
             Thresh = 0
@@ -865,40 +884,35 @@ class ACRSpatialResolution(HazenTask):
                 Thresh+=np.mean(img[i,:])
             Thresh /= img.shape[1]
 
-
-            GapplessROI = img>=Thresh
-            #fig, ax = plt.subplots(nrows=1, ncols=1)
-            plt.imshow(img)
-            plt.imshow(GapplessROI,alpha=0.5)
-            plt.show()
+            from skimage.morphology import convex_hull_image
+            
+            BinaryImage = img>=Thresh
             num = 0
             count =0
             while num != 3:
-                GapplessROI=skimage.morphology.binary_dilation(GapplessROI)
-                label_image,num = skimage.morphology.label(GapplessROI+1,return_num=True,connectivity=2)
+                BinaryImage=skimage.morphology.binary_dilation(BinaryImage)
+                label_image,num = skimage.morphology.label(BinaryImage+1,return_num=True,connectivity=2)
                 count+=1
                 print(num)
-                #fig, ax = plt.subplots(nrows=1, ncols=1)
-                plt.imshow(img)
-                plt.imshow(GapplessROI,alpha=0.5)
-                plt.show()
-
             for i in range(0,count):
-                GapplessROI=skimage.morphology.binary_erosion(GapplessROI)
-                fig, ax = plt.subplots(nrows=1, ncols=1)
-                #fig, ax = plt.subplots(nrows=1, ncols=1)
-                plt.imshow(img)
-                plt.imshow(GapplessROI,alpha=0.5)
-                plt.show()
+                BinaryImage=skimage.morphology.binary_erosion(BinaryImage)
 
-            #fig, ax = plt.subplots(nrows=1, ncols=1)
-            plt.imshow(img)
-            plt.imshow(GapplessROI,alpha=0.5)
-            plt.show()
+            Quarters = [int(round(img.shape[0]/4,0)),int(round(img.shape[1]/4,0))]
+            UpperRect = [0,0,None,None]
+            LowerRect = [None,None,img.shape[0]-Quarters[0],img.shape[1]-Quarters[1]]
 
+            UpperRect[2] = np.where(BinaryImage[0:Quarters[0],:]==1)[1].max()
+            UpperRect[3] = np.where(BinaryImage[:,0:Quarters[1]]==1)[0].max()
             
+            LowerRect[1] = np.where(BinaryImage[:,img.shape[1]-Quarters[1]:img.shape[1]]==1)[0].min()
+            LowerRect[0] = np.where(BinaryImage[img.shape[0]-Quarters[0]:img.shape[0],:]==1)[1].min()
 
-            return 0,0
+            LowerRect[2] = img.shape[0]-LowerRect[0]-1
+            LowerRect[3] = img.shape[1]-LowerRect[1]-1
+
+            rectUpper = patches.Rectangle((UpperRect[0], UpperRect[1]), UpperRect[2], UpperRect[3], linewidth=1, edgecolor="red", facecolor='none', linestyle="-")
+            rectLower = patches.Rectangle((LowerRect[0], LowerRect[1]), LowerRect[2], LowerRect[3], linewidth=1, edgecolor="blue", facecolor='none', linestyle="-")
+            return rectUpper,rectLower
 
         Crops = self.GetROICrops()
         imgs = [Crops["1.1mm holes"],Crops["1.0mm holes"],Crops["0.9mm holes"],Crops["0.8mm holes"]]
@@ -918,51 +932,67 @@ class ACRSpatialResolution(HazenTask):
 
         for I in range(0,1):
             img = imgs[I]
-            
-            PixelSteps = HoleSize[I]/self.ACR_obj.pixel_spacing[0]
-            StepSize = PixelSteps
+            InterpPoints=[]
+            InterpValues=[]
+            #Set up Interpolation, im sure there is a far better way of doing this in a more python way...
+            for X in range(img.shape[1]):
+                for Y in range(img.shape[0]):
+                    InterpPoints.append([Y,X])
+                    InterpValues.append(img[Y,X])
+
             colors = ['r','g','b','y']
             ProcessedSizes.append(HoleSize[I])
-
-            yCutoff = None
-            xCutoff = None
-
-            y= -PixelSteps*0.5
-            x = img.shape[0]-PixelSteps*1.5
-
-
-
-            xCutoff,yCutoff = GetCutOffs(img)
-
-            yCutoff = y + (PixelSteps*2)*3
-            xCutoff = (x- PixelSteps*6) + (PixelSteps*2)
-
-
+            UpperRect,LowerRect= GetCutOffs(img)
+            ROISizeUpper = UpperRect.get_height()/4.0
+            ROISizeLower = LowerRect.get_width()/4.0
             if self.report:
                 ax0 = fig.add_subplot(gs[0, I])
                 ax0.imshow(img)
                 ax0.set_title("Hole Size: " + str(HoleSize[I])+" mm")
             
-            MiddlesHor = []
-            MiddlesVert= []
-
-            y = -PixelSteps*0.5
-            x = img.shape[0]-PixelSteps*1.5
 
             AllLinesAndResultsHor = []
             ContrastResponseResultsHor = []
             AllLinesAndResultsVert = []
             ContrastResponseResultsVert = []
+            MiddlesHor=[]
+            MiddlesVert=[]
 
-            points=[]
-            values=[]
-            #Set up Interpolation, im sure there is a far better way of doing this in a more python way...
-            for X in range(img.shape[1]):
-                for Y in range(img.shape[0]):
-                    points.append([Y,X])
-                    values.append(img[Y,X])
+            xUpper=0
+            yUpper=0
+            
+            xLower=LowerRect.get_x()
+            yLower=0
+            
+            plt.close("all")
+            plt.imshow(img)
+            plt.gca().add_patch(UpperRect)
+            plt.gca().add_patch(LowerRect)
+            plt.xlim(0,50)
 
             for i in range(4):
+                #PixelSteps is the size of the peg in pixel space this may need rescaled based on the size of the distortion (have a think about it)
+                PegSize_In_Pixels = HoleSize[I]/self.ACR_obj.pixel_spacing[0]
+
+                '''
+                #Horizontal Component
+                rect = patches.Rectangle((xUpper, yUpper), img.shape[1], ROISizeUpper, linewidth=1, edgecolor=colors[i], facecolor='none', linestyle="-")
+                plt.gca().add_patch(rect)
+                yUpper+=ROISizeUpper
+                MiddlesHor.append( (rect.get_y()+rect.get_y()+rect.get_height())/2.0 )
+                Lines = ExtractLines(rect,InterpPoints,InterpValues,img)
+                AllLinesAndResultsHor.append([Lines,None,None,None,None])
+                ContrastResponseResultsHor.append(None)
+                ContrastResponseResultsHor[-1], AllLinesAndResultsHor[-1][1], AllLinesAndResultsHor[-1][2], AllLinesAndResultsHor[-1][3], AllLinesAndResultsHor[-1][4] = GetContrastResponseFactor(Lines,PegSize_In_Pixels,HoleSize[I])
+                '''
+                #Vertical Component
+                rect = patches.Rectangle((xLower, yLower), ROISizeLower,img.shape[0], linewidth=1, edgecolor=colors[i], facecolor='none', linestyle="--")
+                plt.gca().add_patch(rect)
+                xLower+=ROISizeLower
+                plt.show()
+                sys.exit()
+
+                '''
                 rect = patches.Rectangle((0, y), xCutoff, PixelSteps*2, linewidth=1, edgecolor=colors[i], facecolor='none', linestyle="-")
                 MiddlesHor.append( (y+(y+PixelSteps*2.0))/2.0)
                 if self.report:
@@ -981,11 +1011,16 @@ class ACRSpatialResolution(HazenTask):
                 if self.report:
                     ax0.add_patch(rect)
                 x -= PixelSteps*2
+                
 
                 Lines = ExtractLines(rect,points,values,img)
                 AllLinesAndResultsVert.append([Lines,None,None,None,None])
                 ContrastResponseResultsVert.append(None)
                 ContrastResponseResultsVert[-1], AllLinesAndResultsVert[-1][1], AllLinesAndResultsVert[-1][2], AllLinesAndResultsVert[-1][3], AllLinesAndResultsVert[-1][4] = GetContrastResponseFactor(Lines,PixelSteps,HoleSize[I])
+                '''
+
+            plt.show()
+            sys.exit()
 
             BestHorIndex=ContrastResponseResultsHor.index(max(ContrastResponseResultsHor))
             BestVertIndex=ContrastResponseResultsVert.index(max(ContrastResponseResultsVert))

@@ -8,8 +8,8 @@ import shutil
 import os
 import MedACROptions
 import MedACR_ToleranceTableCheckerV2 as MedACR_ToleranceTableChecker
-inputdata = "C:\\Users\John\Desktop\ACR Blair T1"
-inputdata = "C:\\Users\John\Desktop\Raigmore ACR MRI 2 Test data"
+inputdata = "MedACRTestingSet\ACR Blair T1"
+inputdata = "MedACRTestingSet\Raigmore ACR MRI 2 Test data"
 
 #Get a list of all sequences for batch testing
 files = get_dicom_files(inputdata)
