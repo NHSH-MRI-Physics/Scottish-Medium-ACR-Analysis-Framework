@@ -19,7 +19,7 @@ from scipy.interpolate import griddata
 
 
 inputdata = "MedACRTesting/TestData/ACR_ARDL_Tests"
-Seq = "ACR AxT1 High Res"
+Seq = "ACR AxT1 High AR"
 #Seq = "ACR AxT1"
 files = get_dicom_files(inputdata)
 ACRDICOMSFiles = {}
@@ -41,30 +41,48 @@ gs = gridspec.GridSpec(nrows=4, ncols=4,height_ratios=[3, 1,1,1])
 gridspec_kw={'width_ratios': [1, 3]}
 def GetContrastResponseFactor(Lines,PixelSteps,CurrentHole):
     #All this below should be in a fuunction
-    Peaks, PeakProperties = scipy.signal.find_peaks(Lines,distance=PixelSteps)
-    Troughs, TroughsProperties = scipy.signal.find_peaks(-Lines,distance=PixelSteps)
-    
-    #plt.close("all")
-    #plt.plot(Lines)
-    #plt.show()
+    if PixelSteps >= 1:
+        Peaks, PeakProperties = scipy.signal.find_peaks(Lines,distance=PixelSteps)
+        Troughs, TroughsProperties = scipy.signal.find_peaks(-Lines,distance=PixelSteps)
+    else:
+        Peaks, PeakProperties = scipy.signal.find_peaks(Lines)
+        Troughs, TroughsProperties = scipy.signal.find_peaks(-Lines)  
 
-    #Peaks=list(np.delete(Peaks,[1]))
-    #Troughs=list(np.delete(Troughs,[1]))
+    x_values = np.arange(len(Lines))
+    y_interp = scipy.interpolate.interp1d(x_values, Lines)
 
     PeaksandTroughs = list(Peaks)+list(Troughs)        
     
     def Sin(x, phase):
         return np.sin(2*np.pi*x * 1/(PixelSteps*2) + phase) * np.max(Lines)/2 + np.mean(Lines)
     p0=[0]
-    fit = curve_fit(Sin, PeaksandTroughs, Lines[PeaksandTroughs], p0=p0)
+    if len(PeaksandTroughs) >0:
+        fit = curve_fit(Sin, PeaksandTroughs, Lines[PeaksandTroughs], p0=p0)
+    else:
+        fit = curve_fit(Sin, x_values, Lines, p0=p0) # if we find no peaks/troughs just go ahead and fit to the whole line 
     x=np.arange(0,xCutoff,0.0001)
     data_fit = Sin(x,*fit[0])
 
     PreicatedPeaks=[]
     PreicatedTroughs=[]
-    for i in range (0,4):
-        PreicatedPeaks.append (((np.pi/2+i*2*np.pi) - fit[0][0] )/(2*np.pi*(1/(PixelSteps*2))))
-        PreicatedTroughs.append (((3*np.pi/2+i*2*np.pi) - fit[0][0] )/(2*np.pi*(1/(PixelSteps*2))))
+
+    i=0
+    while(len(PreicatedPeaks)<4):
+        Prediction = ((np.pi/2+i*2*np.pi) - fit[0][0] )/(2*np.pi*(1/(PixelSteps*2)))
+        if Prediction >=0 and Prediction < max(x_values):
+            PreicatedPeaks.append(Prediction)
+        if Prediction > max(x_values):
+            PreicatedPeaks.append(max(x_values))
+        i+=1
+
+    i=0
+    while(len(PreicatedTroughs)<4):
+        Prediction = ((3*np.pi/2+i*2*np.pi) - fit[0][0] )/(2*np.pi*(1/(PixelSteps*2)))
+        if Prediction >=0 and Prediction < max(x_values):
+            PreicatedTroughs.append(Prediction)
+        if Prediction > max(x_values):
+            PreicatedTroughs.append(max(x_values))
+        i+=1
 
     #Organise the peaks to check for any gaps or false peaks
     PeakOrgArray = [None,None,None,None]
@@ -84,7 +102,7 @@ def GetContrastResponseFactor(Lines,PixelSteps,CurrentHole):
         else:
             print("Warning: Peak number " + str(OrgIdx+1) +" is predicted in hole size " +str(CurrentHole) +" mm")
             FinalPeaks[OrgIdx] = PreicatedPeaks[OrgIdx]
-    
+
     #Maybe this should be treated the same way as above but al leave it as it is for now
     TrothOrgArray = [None,None,None]
     for trough in Troughs:
@@ -99,14 +117,6 @@ def GetContrastResponseFactor(Lines,PixelSteps,CurrentHole):
         else:
             print("Warning: Trough number " + str(OrgIdx+1) +" is predicted in hole size " +str(CurrentHole) +" mm")
             FinalTroughs[OrgIdx] = PreicatedTroughs[OrgIdx]
-
-
-    y_interp = scipy.interpolate.interp1d(np.arange(len(Lines)), Lines)
-
-    #plt.close("all")
-    #plt.plot(Lines)
-    #plt.plot(Peaks,Lines[Peaks],"x",linestyle="")
-    #plt.show()
 
     PeaksTroughsX = []
     PeaksTroughsY=[]
@@ -123,7 +133,7 @@ def GetContrastResponseFactor(Lines,PixelSteps,CurrentHole):
         PeaksTroughsX.append(Troughs)
         PeaksTroughsY.append(y_interp(Troughs))
 
-    MeanTrough/=4
+    MeanTrough/=3
     Amplitude = MeanPeak-MeanTrough
     return Amplitude/MeanPeak,MeanPeak,MeanTrough,PeaksTroughsX,PeaksTroughsY
 
@@ -145,7 +155,7 @@ def ExtractLines(Rect,points,values,img):
         EndPoint[IterationAxis]=img.shape[1]-1
 
     #The number of samples we do should be equal to the number of pixels, its all the data we have so this makes sense i think?
-    NumberOfPixelsInRange = math.floor(EndPoint[IterationAxis]-StartPoint[IterationAxis]) 
+    NumberOfPixelsInRange = math.ceil(EndPoint[IterationAxis]-StartPoint[IterationAxis]) 
 
     if Vertical==False:
         xvalues=np.linspace(0,xCutoff,math.ceil(xCutoff),endpoint=True)
@@ -163,6 +173,8 @@ def ExtractLines(Rect,points,values,img):
             xvalues=[IterValue]*len(yvalues)
         Line = griddata(points, values, (yvalues, xvalues), method='linear')
         Lines += Line
+
+
     return Lines
 
 ContrastResponsesHorAllRes=[]
@@ -173,11 +185,7 @@ LineTest=[]
 
 for I in range(0,4):
     img = imgs[I]
-
-    #plt.close("all")
-    #plt.imshow(img)
-    #plt.show()
-
+    
     PixelSteps = HoleSize[I]/res
     StepSize = PixelSteps
     colors = ['r','g','b','y']
@@ -228,7 +236,7 @@ for I in range(0,4):
         ContrastResponseResultsHor.append(None)
         ContrastResponseResultsHor[-1], AllLinesAndResultsHor[-1][1], AllLinesAndResultsHor[-1][2], AllLinesAndResultsHor[-1][3], AllLinesAndResultsHor[-1][4] = GetContrastResponseFactor(Lines,PixelSteps,HoleSize[I])
         
-        rect = patches.Rectangle((x, yCutoff), PixelSteps*2, img.shape[1]-2-yCutoff, linewidth=1, edgecolor=colors[i], facecolor='none', linestyle="--")
+        rect = patches.Rectangle((x, yCutoff), PixelSteps*2, img.shape[0]-1-yCutoff, linewidth=1, edgecolor=colors[i], facecolor='none', linestyle="--")
         MiddlesVert.append( (x+(x+PixelSteps*2.0))/2.0)
         ax0.add_patch(rect)
         x -= PixelSteps*2
@@ -246,7 +254,7 @@ for I in range(0,4):
     ax_hor.axhline(y=AllLinesAndResultsHor[BestHorIndex][1], color='r', linestyle='-')
     ax_hor.axhline(y=AllLinesAndResultsHor[BestHorIndex][2], color='b', linestyle='-')
     ax_hor.plot(AllLinesAndResultsHor[BestHorIndex][3],AllLinesAndResultsHor[BestHorIndex][4],marker="x", color="orange",linestyle="")
-    ax_hor.get_yaxis().set_visible(False)
+    #ax_hor.get_yaxis().set_visible(False)
     ax0.plot([0,xCutoff],[MiddlesHor[BestHorIndex],MiddlesHor[BestHorIndex]],linestyle = "-",color="g")
 
     ax_vert = fig.add_subplot(gs[2, I])
@@ -254,7 +262,7 @@ for I in range(0,4):
     ax_vert.axhline(y=AllLinesAndResultsVert[BestVertIndex][1], color='r', linestyle='-')
     ax_vert.axhline(y=AllLinesAndResultsVert[BestVertIndex][2], color='b', linestyle='-')
     ax_vert.plot(AllLinesAndResultsVert[BestVertIndex][3],AllLinesAndResultsVert[BestVertIndex][4],marker="x", color="orange",linestyle="")
-    ax_vert.get_yaxis().set_visible(False)
+    #ax_vert.get_yaxis().set_visible(False)
     ax0.plot([MiddlesVert[BestVertIndex],MiddlesVert[BestVertIndex]],[yCutoff,len(img)-1],linestyle = "--",color="g")
 
     ContrastResponsesHorAllRes.append(max(ContrastResponseResultsHor))

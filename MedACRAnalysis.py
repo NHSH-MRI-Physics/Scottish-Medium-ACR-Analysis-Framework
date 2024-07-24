@@ -16,12 +16,15 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 import os 
 from MedACROptions import *
 import MedACR_ToleranceTableCheckerV2 as MedACR_ToleranceTableChecker
+#from hazenlib.tasks.acr_spatial_resolution import ResOptions
 
 ReportText = ""
 ManualResTestText=None
 
 #Default options
 GeoMethod = GeometryOptions.ACRMETHOD
+SpatialResMethod = ResOptions.MTFMethod
+
 
 #This is a file which simply contains a function to run the analysis. It is in a seperate file so i can reuse it for the various implementations.
 def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False):
@@ -127,19 +130,38 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
     if RunAll==True or RunSpatialRes == True:
         print("Running Spatial Resoloution")
         #Run the dot matrix version
-        acr_spatial_resolution_task = ACRSpatialResolution(input_data=Data,report_dir=OutputPath,report=True,MediumACRPhantom=True,UseDotMatrix=True)
-        Res = acr_spatial_resolution_task.run()
+        if SpatialResMethod != ResOptions.Manual:
+            acr_spatial_resolution_task = ACRSpatialResolution(input_data=Data,report_dir=OutputPath,report=True,MediumACRPhantom=True)
+            acr_spatial_resolution_task.ResOption=SpatialResMethod
+            Res = acr_spatial_resolution_task.run()
 
-        ReportFile.write( '\t1.1mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["1.1mm holes"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["1.1mm holes"],"Spatial Resolution 1.1mm") ))
-        ReportFile.write( '\t1.0mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["1.0mm holes"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["1.0mm holes"],"Spatial Resolution 1.0mm") ))
-        ReportFile.write( '\t0.9mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["0.9mm holes"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["0.9mm holes"],"Spatial Resolution 0.9mm") ))
-        ReportFile.write( '\t0.8mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["0.8mm holes"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["0.8mm holes"],"Spatial Resolution 0.8mm") ))
-        
-        #Run the MTF
-        acr_spatial_resolution_task = ACRSpatialResolution(input_data=Data,report_dir=OutputPath,report=True,MediumACRPhantom=True,UseDotMatrix=False)
-        Res = acr_spatial_resolution_task.run()
-        ReportFile.write( '\tRaw MTF50 :        %-12s%-12s\n' % (str(Res["measurement"]["raw mtf50"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["raw mtf50"],"Spatial Resolution MTF50 Raw") ))
-        ReportFile.write( '\tFitted MTF50:      %-12s%-12s\n' % (str(Res["measurement"]["fitted mtf50"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["fitted mtf50"],"Spatial Resolution MTF50 Fitted") ))
+        if SpatialResMethod == ResOptions.DotMatrixMethod:
+            ReportFile.write( '\t1.1mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["1.1mm holes"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["1.1mm holes"],"Spatial Resolution 1.1mm") ))
+            ReportFile.write( '\t1.0mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["1.0mm holes"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["1.0mm holes"],"Spatial Resolution 1.0mm") ))
+            ReportFile.write( '\t0.9mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["0.9mm holes"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["0.9mm holes"],"Spatial Resolution 0.9mm") ))
+            ReportFile.write( '\t0.8mm Holes Score: %-12s%-12s\n' % (str(Res["measurement"]["0.8mm holes"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["0.8mm holes"],"Spatial Resolution 0.8mm") ))
+            
+        elif SpatialResMethod == ResOptions.MTFMethod:
+            #Run the MTF
+            ReportFile.write( '\tRaw MTF50 :        %-12s%-12s\n' % (str(Res["measurement"]["raw mtf50"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["raw mtf50"],"Spatial Resolution MTF50 Raw") ))
+            ReportFile.write( '\tFitted MTF50:      %-12s%-12s\n' % (str(Res["measurement"]["fitted mtf50"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["fitted mtf50"],"Spatial Resolution MTF50 Fitted") ))
+
+        elif SpatialResMethod == ResOptions.ContrastResponseMethod:
+            ReportFile.write( '\tHorizontal Contrast Response\n')
+            ReportFile.write( '\t\t1.1mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["1.1mm holes Horizontal"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["1.1mm holes Horizontal"],"Contrast Response Resolution","1.1mm holes Horizontal")))
+            ReportFile.write( '\t\t1.0mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["1.0mm holes Horizontal"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["1.0mm holes Horizontal"],"Contrast Response Resolution","1.0mm holes Horizontal")))
+            ReportFile.write( '\t\t0.9mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["0.9mm holes Horizontal"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["0.9mm holes Horizontal"],"Contrast Response Resolution","0.9mm holes Horizontal")))
+            ReportFile.write( '\t\t0.8mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["0.8mm holes Horizontal"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["0.8mm holes Horizontal"],"Contrast Response Resolution","0.8mm holes Horizontal")))
+
+            ReportFile.write( '\tVertical Contrast Response\n')
+            ReportFile.write( '\t\t1.1mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["1.1mm holes Vertical"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["1.1mm holes Vertical"],"Contrast Response Resolution","1.1mm holes Vertical")))
+            ReportFile.write( '\t\t1.0mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["1.0mm holes Vertical"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["1.0mm holes Vertical"],"Contrast Response Resolution","1.0mm holes Vertical")))
+            ReportFile.write( '\t\t0.9mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["0.9mm holes Vertical"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["0.9mm holes Vertical"],"Contrast Response Resolution","0.9mm holes Vertical")))
+            ReportFile.write( '\t\t0.8mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["0.8mm holes Vertical"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["0.8mm holes Vertical"],"Contrast Response Resolution","0.8mm holes Vertical")))
+        elif SpatialResMethod == ResOptions.Manual:
+            pass
+        else:
+            raise Exception("Unexpected option in spatial res module")
 
         #Add in Manual Res Test
         if ManualResTestText != None:

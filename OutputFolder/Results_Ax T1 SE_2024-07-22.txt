@@ -1,8 +1,9 @@
-Date Analysed: 2024-05-14
-Sequence Analysed: ACR AxT1
+Date Analysed: 2024-07-22
+Sequence Analysed: Ax T1 SE
 
 SNR Module
-	SNR: 228.53      Result: No Tolerance Set
+	SNR:            318.96      Result: No Tolerance Set
+	Normalised SNR: 17066.31    Result: No Tolerance Set
 
 Geometric Accuracy Module
 	Not Run

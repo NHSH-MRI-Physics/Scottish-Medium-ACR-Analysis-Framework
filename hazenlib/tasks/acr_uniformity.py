@@ -94,7 +94,7 @@ class ACRUniformity(HazenTask):
         )  # Required pixel radius to produce ~1cm2 ROI
 
         if self.ACR_obj.MediumACRPhantom==True:
-            r_large = np.ceil(np.sqrt(16000*0.9 / np.pi) / res[0]).astype(int) #Making it a 90% smaller than 160cm^2 (16000mm^2) to avoid the bit at the top
+            r_large = np.ceil(np.sqrt(16000*0.90 / np.pi) / res[0]).astype(int) #Making it a 90% smaller than 160cm^2 (16000mm^2) to avoid the bit at the top
 
 
         d_void = np.ceil(5 / res[0]).astype(
@@ -150,9 +150,6 @@ class ACRUniformity(HazenTask):
                 mean_array[row, col] = mean_val
 
             return mean_array
-
-        
-
         
         min_data = uniformity_iterator(min_image, base_mask, min_rows, min_cols)
         max_data = uniformity_iterator(max_image, base_mask, max_rows, max_cols)      

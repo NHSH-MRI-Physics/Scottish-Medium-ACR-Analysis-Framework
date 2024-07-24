@@ -117,6 +117,13 @@ try:
         if GeoAccOption.get() == "MagNet Method":
             MedACRAnalysis.GeoMethod=GeometryOptions.MAGNETMETHOD
 
+        MedACRAnalysis.SpatialResMethod=ResOptions.DotMatrixMethod
+        if SpatalResOption.get() == "MTF":
+            MedACRAnalysis.SpatialResMethod=ResOptions.MTFMethod
+        elif SpatalResOption.get() == "Contrast Response":
+            MedACRAnalysis.SpatialResMethod=ResOptions.ContrastResponseMethod
+        elif SpatalResOption.get() == "Manual":
+            MedACRAnalysis.SpatialResMethod=ResOptions.Manual
 
     def RunAnalysis():
         global CurrentROI
@@ -155,8 +162,8 @@ try:
         EnableOrDisableEverything(False)
 
         SetOptions()
-
-        if ManualResCheck.get()==1:
+        MedACRAnalysis.ManualResTestText=None
+        if SpatalResOption.get()=="Manual":
             ROIS = MedACRAnalysis.GetROIFigs(selected_option.get(),DCMfolder_path.get())
             plt.close('all')#Making sure no rogue plots are sitting in the background...
             
@@ -189,6 +196,7 @@ try:
                 root.wait_window(newWindow)
                 plt.close()
             MedACRAnalysis.ManualResTestText = ROI_Results_ResResults
+            #SpatialRes=False
         MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
         EnableOrDisableEverything(True)
 
@@ -332,9 +340,21 @@ try:
     Optionsframe = ttk.Frame(root)
     OptionsLabel = ttk.Label(master=Optionsframe,text="Options")
     OptionsLabel.pack(anchor=W)
-    ManualResCheck = IntVar(value=0)
-    ManualResBox = ttk.Checkbutton(Optionsframe, text='Use Manual Resolution Check',variable=ManualResCheck, onvalue=1, offvalue=0,state=NORMAL,command=None)
-    ManualResBox.pack(anchor=W)
+    
+
+    #ManualResCheck = IntVar(value=0)
+    #ManualResBox = ttk.Checkbutton(Optionsframe, text='Use Manual Resolution Check',variable=ManualResCheck, onvalue=1, offvalue=0,state=NORMAL,command=None)
+    #ManualResBox.pack(anchor=W)
+
+    MiniFrame = ttk.Frame(Optionsframe)
+    label = ttk.Label(MiniFrame, text="Spatial Res Method", anchor='w')
+    options = ["Dot Matrix","Dot Matrix", "MTF", "Contrast Response", "Manual", ] 
+    SpatalResOption = StringVar() 
+    drop = ttk.OptionMenu( MiniFrame , SpatalResOption , *options ) 
+    drop.config(width = 13)
+    drop.grid(row=0, column=0,padx=5)
+    label.grid(row=0, column=1)
+    MiniFrame.pack(anchor=W)
 
     MiniFrame = ttk.Frame(Optionsframe)
     label = ttk.Label(MiniFrame, text="Geo Acc Method", anchor='w')

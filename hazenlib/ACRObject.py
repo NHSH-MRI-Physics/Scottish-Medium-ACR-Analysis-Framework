@@ -17,9 +17,9 @@ class ACRObject:
             self.MediumACRPhantom = kwargs["MediumACRPhantom"]
             
         #Added in a flag to make use of the dot matrix instead of MTF for spatial res
-        self.UseDotMatrix=False
-        if "UseDotMatrix" in kwargs.keys():
-            self.UseDotMatrix =kwargs["UseDotMatrix"]
+        #self.UseDotMatrix=False
+        #if "UseDotMatrix" in kwargs.keys():
+        #    self.UseDotMatrix =kwargs["UseDotMatrix"]
 
         # Initialise an ACR object from a stack of images of the ACR phantom
         self.dcm_list = dcm_list
@@ -105,7 +105,7 @@ class ACRObject:
                 cv2.HOUGH_GRADIENT,
                 1,
                 param1=50,
-                param2=10,
+                param2=30,
                 minDist=int(180 / dx),
                 minRadius=int(10 / dx),
                 maxRadius=int(15 / dx),
@@ -184,7 +184,8 @@ class ACRObject:
         """
         img = self.images[6]
         dx, dy = self.pixel_spacing
-
+        img_blur = cv2.GaussianBlur(img, (1, 1), 0)
+        img_grad = cv2.Sobel(img_blur, 0, dx=1, dy=1)
 
         if (self.MediumACRPhantom==False):
             img_blur = cv2.GaussianBlur(img, (1, 1), 0)
@@ -205,7 +206,6 @@ class ACRObject:
             radius = int(detected_circles[2])
 
         else: #Tried to improve this by implementing a circle fitting algo, seems to be more relaiable needs more testing though.
-            '''
             img_blur = cv2.medianBlur(img,5)
             img_grad = cv2.Sobel(img_blur, 0, dx=1, dy=1)
 
@@ -217,10 +217,13 @@ class ACRObject:
                 param2=30,
                 minDist=int(180 / dy),
                 minRadius=int(155 / (2 * dy)),
-                maxRadius=int(175 / (2 * dx)),
+                maxRadius=int(180 / (2 * dx)),
             ).flatten()
+            centre = [int(i) for i in detected_circles[:2]]
+            radius = int(detected_circles[2])
+            
+            #The commented block below is a posible improvememnet but testing seems to suggest the above was ok
             '''
-
             values = img[img > np.mean(img)*0.1] 
             image = img > np.median(values)*0.5
             from skimage import io, color, measure, draw, img_as_bool
@@ -234,13 +237,10 @@ class ACRObject:
             test = image.shape
             x0, y0, r = optimize.fmin(cost, (int(image.shape[0]/2), int(image.shape[1]/2), 165 / (2 * dx)))
             detected_circles= [x0,y0,r]
-
-            #centre = [int(i) for i in detected_circles[:2]]
             centre = [int(round(i)) for i in detected_circles[:2]] # This is better as round than just int otherwise its always rounding down.
+            #radius = int(round(detected_circles[2]))
+            '''
             
-            #radius = int(detected_circles[2])
-            radius = int(round(detected_circles[2]))
-
         return centre, radius
 
     def get_mask_image(self, image, mag_threshold=0.05, open_threshold=500):
@@ -306,7 +306,9 @@ class ACRObject:
         x = np.linspace(0, dims[0]-1, dims[0])
         y = np.linspace(0, dims[1]-1, dims[1])
 
-
+        #This is the old code
+        #x = np.linspace(1, dims[0], dims[0])
+        #y = np.linspace(1, dims[1], dims[1])
 
         X, Y = np.meshgrid(x, y)
         mask = (X - centre[0]) ** 2 + (Y - centre[1]) ** 2 <= radius**2
