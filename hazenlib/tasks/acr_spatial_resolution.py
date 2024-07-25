@@ -820,6 +820,21 @@ class ACRSpatialResolution(HazenTask):
 
             MeanTrough/=3
             Amplitude = MeanPeak-MeanTrough
+
+            '''
+            plt.plot(Lines)
+            plt.axvline(FinalPeaks[0],color="r")
+            plt.axvline(FinalPeaks[1],color="r")
+            plt.axvline(FinalPeaks[2],color="r")
+            plt.axvline(FinalPeaks[3],color="r")
+            plt.axhline(MeanPeak,color="r")
+            plt.axvline(FinalTroughs[0],color="y")
+            plt.axvline(FinalTroughs[1],color="y")
+            plt.axvline(FinalTroughs[2],color="y")
+            plt.axhline(MeanTrough,color="y")
+            plt.show()
+            '''
+
             return Amplitude/MeanPeak,MeanPeak,MeanTrough,PeaksTroughsX,PeaksTroughsY
 
         def ExtractLines(Rect,points,values,img):
@@ -827,64 +842,40 @@ class ACRSpatialResolution(HazenTask):
             if Rect.get_width() < Rect.get_height():
                 Vertical=True
 
-            StartPoint = list(Rect.get_xy())
-            EndPoint = [Rect.get_xy()[0]+Rect.get_width(),Rect.get_xy()[1]+Rect.get_height()]
-
-            StepSize = Rect.get_height()/4.0
-            Lines=np.zeros(img.shape[0])
+            StepSize = Rect.get_height()/5.0
+            Lines=np.zeros(img.shape[1])
             if Vertical==True:
-                StepSize = Rect.get_width()/4.0
-                Lines=np.zeros(img.shape[1])
+                StepSize = Rect.get_width()/5.0
+                Lines=np.zeros(img.shape[0])
 
-            for i in range(0,4):
+            #plt.close("all")
+            #fig, (ax1, ax2) = plt.subplots(1, 2)
+            #ax1.imshow(img)
+            #ax1.add_patch(rect)
+            for i in range(1,5):
                 if Vertical==False:
-                    xvalues=np.linspace(0,img.shape[1],img.shape[1],endpoint=True)
-                    yvalues=[i*StepSize]*len(xvalues)
+                    xvalues=np.linspace(0,img.shape[1]-1,img.shape[1],endpoint=True)
+                    yvalues=[rect.get_y()+i*StepSize]*len(xvalues)
                     Line = griddata(points, values, (yvalues, xvalues), method='linear')
                     Lines+=Line
-            return Lines
-
-            '''
-            IterationAxis = 1 #This is going to determine if we iterate along x or y (horizontal or verticlal lines)
-            if Vertical==True:
-                IterationAxis=0
-
-            if IterationAxis==1 and StartPoint[IterationAxis] <0:
-                StartPoint[IterationAxis]=0
-            if IterationAxis==0 and EndPoint[IterationAxis] >=img.shape[1]-1:
-                EndPoint[IterationAxis]=img.shape[1]-1
-
-            #The number of samples we do should be equal to the number of pixels, its all the data we have so this makes sense i think?
-            NumberOfPixelsInRange = math.ceil(EndPoint[IterationAxis]-StartPoint[IterationAxis]) 
-
-            if Vertical==False:
-                xvalues=np.linspace(0,xCutoff,math.ceil(xCutoff),endpoint=True)
-                IterRange = np.linspace(StartPoint[IterationAxis],EndPoint[IterationAxis],NumberOfPixelsInRange,endpoint=False)
-                Lines=np.zeros(xvalues.shape[0])
-            else:
-                yvalues=np.linspace(yCutoff,img.shape[0]-1,math.ceil(img.shape[0]-yCutoff-1),endpoint=True)
-                IterRange = np.linspace(EndPoint[IterationAxis],StartPoint[IterationAxis],NumberOfPixelsInRange,endpoint=False)
-                Lines=np.zeros(yvalues.shape[0])
-            ##Checking iterRang and x range are right
-            for IterValue in IterRange:
-                if Vertical==False:
-                    yvalues=[IterValue]*len(xvalues)
+                    #ax1.axhline(yvalues[0])
                 else:
-                    xvalues=[IterValue]*len(yvalues)
-                Line = griddata(points, values, (yvalues, xvalues), method='linear')
-                Lines += Line
-            '''
+                    yvalues=np.linspace(0,img.shape[0]-1,img.shape[0],endpoint=True)
+                    xvalues=[rect.get_x() + i*StepSize]*len(yvalues)
+                    #ax1.axvline(xvalues[0])
+                    Line = griddata(points, values, (yvalues, xvalues), method='linear')
+                    Line = Line[::-1]
+                    Lines+=Line
+            #ax2.plot(Lines)
+            #plt.show()
+            return Lines
             
 
         def GetCutOffs(img):
-            import matplotlib
-            matplotlib.use('TkAgg')
             Thresh = 0
             for i in range(img.shape[1]):
-                Thresh+=np.mean(img[i,:])
+                Thresh+=np.mean(img[:,i])
             Thresh /= img.shape[1]
-
-            from skimage.morphology import convex_hull_image
             
             BinaryImage = img>=Thresh
             num = 0
@@ -893,7 +884,7 @@ class ACRSpatialResolution(HazenTask):
                 BinaryImage=skimage.morphology.binary_dilation(BinaryImage)
                 label_image,num = skimage.morphology.label(BinaryImage+1,return_num=True,connectivity=2)
                 count+=1
-                print(num)
+                #print(num)
             for i in range(0,count):
                 BinaryImage=skimage.morphology.binary_erosion(BinaryImage)
 
@@ -927,7 +918,6 @@ class ACRSpatialResolution(HazenTask):
         ContrastResponsesHorAllRes=[]
         ContrastResponsesVertAllRes=[]
         ProcessedSizes=[]
-
         LineTest=[]
 
         for I in range(0,1):
@@ -950,7 +940,6 @@ class ACRSpatialResolution(HazenTask):
                 ax0.imshow(img)
                 ax0.set_title("Hole Size: " + str(HoleSize[I])+" mm")
             
-
             AllLinesAndResultsHor = []
             ContrastResponseResultsHor = []
             AllLinesAndResultsVert = []
@@ -964,63 +953,31 @@ class ACRSpatialResolution(HazenTask):
             xLower=LowerRect.get_x()
             yLower=0
             
-            plt.close("all")
-            plt.imshow(img)
-            plt.gca().add_patch(UpperRect)
-            plt.gca().add_patch(LowerRect)
-            plt.xlim(0,50)
-
             for i in range(4):
-                #PixelSteps is the size of the peg in pixel space this may need rescaled based on the size of the distortion (have a think about it)
+                #PixelSteps is the size of the peg in pixel spac
                 PegSize_In_Pixels = HoleSize[I]/self.ACR_obj.pixel_spacing[0]
-
-                '''
                 #Horizontal Component
-                rect = patches.Rectangle((xUpper, yUpper), img.shape[1], ROISizeUpper, linewidth=1, edgecolor=colors[i], facecolor='none', linestyle="-")
-                plt.gca().add_patch(rect)
+                rect = patches.Rectangle((xUpper, yUpper), img.shape[1]-1, ROISizeUpper, linewidth=1, edgecolor=colors[i], facecolor='none', linestyle="-")
+                if self.report:
+                    plt.gca().add_patch(patches.Rectangle((xUpper, yUpper), UpperRect.get_width(), ROISizeUpper, linewidth=1, edgecolor=colors[i], facecolor='none', linestyle="-"))
                 yUpper+=ROISizeUpper
                 MiddlesHor.append( (rect.get_y()+rect.get_y()+rect.get_height())/2.0 )
                 Lines = ExtractLines(rect,InterpPoints,InterpValues,img)
                 AllLinesAndResultsHor.append([Lines,None,None,None,None])
                 ContrastResponseResultsHor.append(None)
                 ContrastResponseResultsHor[-1], AllLinesAndResultsHor[-1][1], AllLinesAndResultsHor[-1][2], AllLinesAndResultsHor[-1][3], AllLinesAndResultsHor[-1][4] = GetContrastResponseFactor(Lines,PegSize_In_Pixels,HoleSize[I])
-                '''
+                
                 #Vertical Component
                 rect = patches.Rectangle((xLower, yLower), ROISizeLower,img.shape[0], linewidth=1, edgecolor=colors[i], facecolor='none', linestyle="--")
-                plt.gca().add_patch(rect)
+                if self.report:
+                    plt.gca().add_patch(patches.Rectangle((xLower, LowerRect.get_y()), ROISizeLower,LowerRect.get_height(), linewidth=1, edgecolor=colors[i], facecolor='none', linestyle="--"))
                 xLower+=ROISizeLower
-                plt.show()
-                sys.exit()
-
-                '''
-                rect = patches.Rectangle((0, y), xCutoff, PixelSteps*2, linewidth=1, edgecolor=colors[i], facecolor='none', linestyle="-")
-                MiddlesHor.append( (y+(y+PixelSteps*2.0))/2.0)
-                if self.report:
-                    ax0.add_patch(rect)
-                
-                Lines = ExtractLines(rect,points,values,img)
-                LineTest.append(Lines)
-                y += PixelSteps*2
-
-                AllLinesAndResultsHor.append([Lines,None,None,None,None])
-                ContrastResponseResultsHor.append(None)
-                ContrastResponseResultsHor[-1], AllLinesAndResultsHor[-1][1], AllLinesAndResultsHor[-1][2], AllLinesAndResultsHor[-1][3], AllLinesAndResultsHor[-1][4] = GetContrastResponseFactor(Lines,PixelSteps,HoleSize[I])
-                
-                rect = patches.Rectangle((x, yCutoff), PixelSteps*2, img.shape[0]-1-yCutoff, linewidth=1, edgecolor=colors[i], facecolor='none', linestyle="--")
-                MiddlesVert.append( (x+(x+PixelSteps*2.0))/2.0)
-                if self.report:
-                    ax0.add_patch(rect)
-                x -= PixelSteps*2
-                
-
-                Lines = ExtractLines(rect,points,values,img)
+                MiddlesVert.append( (rect.get_x()+rect.get_x()+rect.get_width())/2.0 )
+                Lines = ExtractLines(rect,InterpPoints,InterpValues,img)
                 AllLinesAndResultsVert.append([Lines,None,None,None,None])
                 ContrastResponseResultsVert.append(None)
-                ContrastResponseResultsVert[-1], AllLinesAndResultsVert[-1][1], AllLinesAndResultsVert[-1][2], AllLinesAndResultsVert[-1][3], AllLinesAndResultsVert[-1][4] = GetContrastResponseFactor(Lines,PixelSteps,HoleSize[I])
-                '''
-
-            plt.show()
-            sys.exit()
+                ContrastResponseResultsVert[-1], AllLinesAndResultsVert[-1][1], AllLinesAndResultsVert[-1][2], AllLinesAndResultsVert[-1][3], AllLinesAndResultsVert[-1][4] = GetContrastResponseFactor(Lines,PegSize_In_Pixels,HoleSize[I])
+            
 
             BestHorIndex=ContrastResponseResultsHor.index(max(ContrastResponseResultsHor))
             BestVertIndex=ContrastResponseResultsVert.index(max(ContrastResponseResultsVert))
@@ -1028,19 +985,21 @@ class ACRSpatialResolution(HazenTask):
             if self.report:
                 ax_hor = fig.add_subplot(gs[1, I])
                 ax_hor.plot(AllLinesAndResultsHor[BestHorIndex][0],color="g",linestyle="-")
+                ax_hor.set_xlim(-1,UpperRect.get_width())
                 ax_hor.axhline(y=AllLinesAndResultsHor[BestHorIndex][1], color='r', linestyle='-')
                 ax_hor.axhline(y=AllLinesAndResultsHor[BestHorIndex][2], color='b', linestyle='-')
                 ax_hor.plot(AllLinesAndResultsHor[BestHorIndex][3],AllLinesAndResultsHor[BestHorIndex][4],marker="x", color="orange",linestyle="")
                 #ax_hor.get_yaxis().set_visible(False)
-                #ax0.plot([0,xCutoff],[MiddlesHor[BestHorIndex],MiddlesHor[BestHorIndex]],linestyle = "-",color="g")
+                ax0.plot([0,UpperRect.get_x()+UpperRect.get_width()],[MiddlesHor[BestHorIndex],MiddlesHor[BestHorIndex]],linestyle = "-",color="g")
 
                 ax_vert = fig.add_subplot(gs[2, I])
                 ax_vert.plot(AllLinesAndResultsVert[BestVertIndex][0],color="g",linestyle="--")
+                ax_vert.set_xlim(-1,LowerRect.get_height())
                 ax_vert.axhline(y=AllLinesAndResultsVert[BestVertIndex][1], color='r', linestyle='-')
                 ax_vert.axhline(y=AllLinesAndResultsVert[BestVertIndex][2], color='b', linestyle='-')
                 ax_vert.plot(AllLinesAndResultsVert[BestVertIndex][3],AllLinesAndResultsVert[BestVertIndex][4],marker="x", color="orange",linestyle="")
                 #ax_vert.get_yaxis().set_visible(False)
-                #ax0.plot([MiddlesVert[BestVertIndex],MiddlesVert[BestVertIndex]],[yCutoff,len(img)-1],linestyle = "--",color="g")
+                ax0.plot([MiddlesVert[BestVertIndex],MiddlesVert[BestVertIndex]],[LowerRect.get_y(),len(img)-1],linestyle = "--",color="g")
 
                 ContrastResponsesHorAllRes.append(max(ContrastResponseResultsHor))
                 ContrastResponsesVertAllRes.append(max(ContrastResponseResultsVert))

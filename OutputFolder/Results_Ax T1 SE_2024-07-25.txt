@@ -1,0 +1,10 @@
+Date Analysed: 2024-07-25
+Sequence Analysed: Ax T1 SE
+
+SNR Module
+	Not Run
+
+Geometric Accuracy Module
+	Not Run
+
+Spatial Resoloution Module

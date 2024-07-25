@@ -9,7 +9,7 @@ import os
 import MedACROptions
 import MedACR_ToleranceTableCheckerV2 as MedACR_ToleranceTableChecker
 inputdata = "MedACRTestingSet\ACR Blair T1"
-inputdata = "MedACRTestingSet\Raigmore ACR MRI 2 Test data"
+#inputdata = "MedACRTestingSet\Raigmore ACR MRI 2 Test data"
 
 #Get a list of all sequences for batch testing
 files = get_dicom_files(inputdata)
@@ -27,7 +27,7 @@ OuptutFolder = "OutputFolder"
 #if os.path.exists(OuptutFolder)==True:
 #    shutil.rmtree(OuptutFolder)
 ChosenSeq = "ACR_Axial_T1"
-ChosenSeq = "Ax T1 SE"
+#ChosenSeq = "Ax T1 SE"
 #ChosenSeq = "ACR_ax_T1" #"ACR AxT2"
 
 MedACR_ToleranceTableChecker.SetUpToleranceTable()
