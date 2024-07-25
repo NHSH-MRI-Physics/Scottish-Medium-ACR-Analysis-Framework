@@ -722,17 +722,24 @@ class ACRSpatialResolution(HazenTask):
 
     def get_ContrastResponse(self,dcm):
         def GetContrastResponseFactor(Lines,PixelSteps,CurrentHole):
-            #All this below should be in a fuunction
             if PixelSteps >= 1:
-                Peaks, PeakProperties = scipy.signal.find_peaks(Lines,distance=PixelSteps)
-                Troughs, TroughsProperties = scipy.signal.find_peaks(-Lines,distance=PixelSteps)
+                Peaks, PeakProperties = scipy.signal.find_peaks(Lines,distance=PixelSteps,height=(np.max(Lines)+np.min(Lines))/2.0)
+                Troughs, TroughsProperties = scipy.signal.find_peaks(-Lines,distance=PixelSteps,height=-(np.max(Lines)+np.min(Lines))/2.0)
             else:
-                Peaks, PeakProperties = scipy.signal.find_peaks(Lines)
-                Troughs, TroughsProperties = scipy.signal.find_peaks(-Lines)  
+                Peaks, PeakProperties = scipy.signal.find_peaks(Lines,height=(np.max(Lines)+np.min(Lines))/2.0)
+                Troughs, TroughsProperties = scipy.signal.find_peaks(-Lines,height=-(np.max(Lines)+np.min(Lines))/2.0)  
 
             x_values = np.arange(len(Lines))
             y_interp = scipy.interpolate.interp1d(x_values, Lines)
             PeaksandTroughs = list(Peaks)+list(Troughs)        
+
+            #print((np.max(Lines)+np.min(Lines))/2.0)
+            #print(Lines)
+            #plt.close("all")
+            #plt.plot(Lines)
+            #plt.plot(Lines[Peaks])
+            #plt.savefig("test.png")
+
             
             def Sin(x, phase):
                 return np.sin(2*np.pi*x * 1/(PixelSteps*2) + phase) * np.max(Lines)/2 + np.mean(Lines)
@@ -821,19 +828,19 @@ class ACRSpatialResolution(HazenTask):
             MeanTrough/=3
             Amplitude = MeanPeak-MeanTrough
 
-            '''
-            plt.plot(Lines)
-            plt.axvline(FinalPeaks[0],color="r")
-            plt.axvline(FinalPeaks[1],color="r")
-            plt.axvline(FinalPeaks[2],color="r")
-            plt.axvline(FinalPeaks[3],color="r")
-            plt.axhline(MeanPeak,color="r")
-            plt.axvline(FinalTroughs[0],color="y")
-            plt.axvline(FinalTroughs[1],color="y")
-            plt.axvline(FinalTroughs[2],color="y")
-            plt.axhline(MeanTrough,color="y")
-            plt.show()
-            '''
+            #plt.close("all")
+            #plt.plot(Lines)
+            #plt.axvline(FinalPeaks[0],color="r")
+            #plt.axvline(FinalPeaks[1],color="r")
+            #plt.axvline(FinalPeaks[2],color="r")
+            #plt.axvline(FinalPeaks[3],color="r")
+            #plt.axhline(MeanPeak,color="r")
+            #plt.axvline(FinalTroughs[0],color="y")
+            #plt.axvline(FinalTroughs[1],color="y")
+            #plt.axvline(FinalTroughs[2],color="y")
+            #plt.axhline(MeanTrough,color="y")
+            #plt.savefig("test.png")
+            
 
             return Amplitude/MeanPeak,MeanPeak,MeanTrough,PeaksTroughsX,PeaksTroughsY
 
@@ -855,19 +862,21 @@ class ACRSpatialResolution(HazenTask):
             for i in range(1,5):
                 if Vertical==False:
                     xvalues=np.linspace(0,img.shape[1]-1,img.shape[1],endpoint=True)
+                    xvalues=np.linspace(0,rect.get_width(),img.shape[1],endpoint=True)
                     yvalues=[rect.get_y()+i*StepSize]*len(xvalues)
                     Line = griddata(points, values, (yvalues, xvalues), method='linear')
                     Lines+=Line
                     #ax1.axhline(yvalues[0])
                 else:
                     yvalues=np.linspace(0,img.shape[0]-1,img.shape[0],endpoint=True)
-                    xvalues=[rect.get_x() + i*StepSize]*len(yvalues)
+                    xvalues=np.linspace(0,rect.get_height(),img.shape[0],endpoint=True)
+                    xvalues=[rect.get_x()+i*StepSize]*len(yvalues)
                     #ax1.axvline(xvalues[0])
                     Line = griddata(points, values, (yvalues, xvalues), method='linear')
                     Line = Line[::-1]
                     Lines+=Line
             #ax2.plot(Lines)
-            #plt.show()
+            #plt.savefig("test.png")
             return Lines
             
 
@@ -898,11 +907,19 @@ class ACRSpatialResolution(HazenTask):
             LowerRect[1] = np.where(BinaryImage[:,img.shape[1]-Quarters[1]:img.shape[1]]==1)[0].min()
             LowerRect[0] = np.where(BinaryImage[img.shape[0]-Quarters[0]:img.shape[0],:]==1)[1].min()
 
-            LowerRect[2] = img.shape[0]-LowerRect[0]-1
-            LowerRect[3] = img.shape[1]-LowerRect[1]-1
+            LowerRect[2] = img.shape[1]-LowerRect[0]-1
+            LowerRect[3] = img.shape[0]-LowerRect[1]-1
 
             rectUpper = patches.Rectangle((UpperRect[0], UpperRect[1]), UpperRect[2], UpperRect[3], linewidth=1, edgecolor="red", facecolor='none', linestyle="-")
             rectLower = patches.Rectangle((LowerRect[0], LowerRect[1]), LowerRect[2], LowerRect[3], linewidth=1, edgecolor="blue", facecolor='none', linestyle="-")
+            
+            #plt.close("all")
+            #plt.imshow(img)
+            #plt.imshow(BinaryImage,alpha=0.5)
+            #plt.gca().add_patch(rectUpper)
+            #plt.gca().add_patch(rectLower)
+            #plt.savefig("test.png")
+    
             return rectUpper,rectLower
 
         Crops = self.GetROICrops()
@@ -920,7 +937,7 @@ class ACRSpatialResolution(HazenTask):
         ProcessedSizes=[]
         LineTest=[]
 
-        for I in range(0,1):
+        for I in range(0,4):
             img = imgs[I]
             InterpPoints=[]
             InterpValues=[]

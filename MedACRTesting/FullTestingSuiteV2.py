@@ -10,6 +10,7 @@ import MedACROptions
 import MedACR_ToleranceTableCheckerV2 as MedACR_ToleranceTableChecker
 inputdata = "MedACRTestingSet\ACR Blair T1"
 #inputdata = "MedACRTestingSet\Raigmore ACR MRI 2 Test data"
+inputdata = "MedACRTestingSet\ACR_HNU_Lothian\DICOM"
 
 #Get a list of all sequences for batch testing
 files = get_dicom_files(inputdata)
@@ -28,7 +29,7 @@ OuptutFolder = "OutputFolder"
 #    shutil.rmtree(OuptutFolder)
 ChosenSeq = "ACR_Axial_T1"
 #ChosenSeq = "Ax T1 SE"
-#ChosenSeq = "ACR_ax_T1" #"ACR AxT2"
+ChosenSeq = "Ax_T1_ACR_Lothian" #"ACR AxT2"
 
 MedACR_ToleranceTableChecker.SetUpToleranceTable()
 MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
