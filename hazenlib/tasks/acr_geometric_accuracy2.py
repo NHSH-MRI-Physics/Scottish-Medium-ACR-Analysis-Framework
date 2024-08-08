@@ -67,23 +67,30 @@ class ACRGeometricAccuracy2(HazenTask):
         sample_spacing = 0.25
 
         rods, rods_initial = self.get_rods(arr)
-        horz_distances, vert_distances = self.get_rod_distances(rods)
+        horz_distances, vert_distances, horz_distances_CoM, vert_distances_CoM = self.get_rod_distances(rods, rods_initial)
         horz_distortion_mm, vert_distortion_mm = self.get_rod_distortions(
             horz_distances, vert_distances
         )
+        horz_distortion_mm_CoM, vert_distortion_mm_CoM = self.get_rod_distortions(
+            horz_distances_CoM, vert_distances_CoM
+        )    
         correction_coefficients_mm = self.get_rod_distortion_correction_coefficients(
             horizontal_distances=horz_distances
         )
 
         horizontal_linearity_mm = np.mean(horz_distances) * self.pixel_size
         vertical_linearity_mm = np.mean(vert_distances) * self.pixel_size
+        horizontal_linearity_mm_CoM = np.mean(horz_distances_CoM) * self.pixel_size
+        vertical_linearity_mm_CoM = np.mean(vert_distances_CoM) * self.pixel_size
 
         # calculate horizontal and vertical distances in mm from distances in pixels, for output
 
         horz_distances_mm = [round(x * self.pixel_size, 3) for x in horz_distances]
-
         vert_distances_mm = [round(x * self.pixel_size, 3) for x in vert_distances]
 
+        horz_distances_mm_CoM = [round(x * self.pixel_size, 3) for x in horz_distances_CoM]
+        vert_distances_mm_CoM = [round(x * self.pixel_size, 3) for x in vert_distances_CoM]
+        
         if self.report:
             import matplotlib.pyplot as plt
 
@@ -132,6 +139,8 @@ class ACRGeometricAccuracy2(HazenTask):
         distortion_values = {
             "vertical mm": round(vert_distortion_mm, 2),
             "horizontal mm": round(horz_distortion_mm, 2),
+            "vertical mm_CoM": round(vert_distortion_mm_CoM, 2),
+            "horizontal mm_CoM": round(horz_distortion_mm_CoM, 2),
         }
 
         linearity_values = {
@@ -144,6 +153,8 @@ class ACRGeometricAccuracy2(HazenTask):
             "linearity values": linearity_values,
             "horizontal distances mm": horz_distances_mm,
             "vertical distances mm": vert_distances_mm,
+            "CoM horizontal distances mm": horz_distances_mm_CoM,
+            "CoM vertical distances mm": vert_distances_mm_CoM,
         }
         return results
 #-------------------------------------------------------------
@@ -325,13 +336,13 @@ class ACRGeometricAccuracy2(HazenTask):
                     bbox["x_start"][idx],
                     bbox["y_start"][idx],
                 )
-                #print(f'Fitted point {idx} using Gaussian x0= {x0[idx]}, y0={y0[idx]}, x0_im={x0_im[idx]}, y0_im={y0_im[idx]}')
+                print(f'Fitted point {idx} using Gaussian x0= {x0[idx]}, y0={y0[idx]}, x0_im={x0_im[idx]}, y0_im={y0_im[idx]}')
             except:         
                 #x0[idx]=rods[idx].x         
                 #y0[idx]=rods[idx].y         
                 x0_im[idx]=rod_centres[idx][0]      
                 y0_im[idx]=rod_centres[idx][1]        
-                #print(f'Gaussian failed for point {idx}; centre-weighting x0_im={x0_im[idx]}, y0_im={y0_im[idx]}')
+                print(f'Gaussian failed for point {idx}; centre-weighting x0_im={x0_im[idx]}, y0_im={y0_im[idx]}')
             # note: flipped x/y
             rods[idx].x = y0_im[idx]
             rods[idx].y = x0_im[idx]
@@ -397,7 +408,7 @@ class ACRGeometricAccuracy2(HazenTask):
         ax.set_title("Rod Centroids")
         return ax
 
-    def get_rod_distances(self, rods):
+    def get_rod_distances(self, rods, rods_CoM):
         """
         Calculates horizontal and vertical distances between adjacent rods in pixels
         Changed this to return x and y distances between point, eg. rod(2).x - rod(0).x instead of abs. distances [HR 2024]
@@ -421,7 +432,12 @@ class ACRGeometricAccuracy2(HazenTask):
             float(rods[2].x - rods[0].x),
             float(rods[5].x - rods[3].x),
             float(rods[8].x - rods[6].x),
-        ]    
+        ]  
+        horz_dist_CoM = [
+            float(rods_CoM[2].x - rods_CoM[0].x),
+            float(rods_CoM[5].x - rods_CoM[3].x),
+            float(rods_CoM[8].x - rods_CoM[6].x),
+        ]   
         '''np.sqrt(
                 np.square((rods[2].y - rods[0].y)) + np.square(rods[2].x - rods[0].x)
             ),
@@ -437,7 +453,12 @@ class ACRGeometricAccuracy2(HazenTask):
             float(rods[0].y - rods[6].y),
             float(rods[1].y - rods[7].y),
             float(rods[2].y - rods[8].y),
-        ]    
+        ]   
+        vert_dist_CoM = [
+            float(rods_CoM[0].y - rods_CoM[6].y),
+            float(rods_CoM[1].y - rods_CoM[7].y),
+            float(rods_CoM[2].y - rods_CoM[8].y),
+        ] 
         '''np.sqrt(
                 np.square((rods[0].y - rods[6].y)) + np.square(rods[0].x - rods[6].x)
             ),
@@ -452,14 +473,19 @@ class ACRGeometricAccuracy2(HazenTask):
         # calculate the horizontal and vertical distances
         horz_dist = np.asarray(horz_dist, dtype='float64')
         vert_dist = np.asarray(vert_dist, dtype='float64')
+        horz_dist_CoM = np.asarray(horz_dist_CoM, dtype='float64')
+        vert_dist_CoM = np.asarray(vert_dist_CoM, dtype='float64')        
         Pixel_Size = float(self.pixel_size)
         horz_dist_mm = np.multiply(Pixel_Size, horz_dist)
         vert_dist_mm = np.multiply(Pixel_Size, vert_dist)
-        return horz_dist, vert_dist#, horz_dist_mm, vert_dist_mm
+        horz_dist_mm_CoM = np.multiply(Pixel_Size, horz_dist_CoM)
+        vert_dist_mm_CoM = np.multiply(Pixel_Size, vert_dist_CoM)
+        #return horz_dist, vert_dist, horz_dist_mm, vert_dist_mm, horz_dist_mm_CoM, vert_dist_mm_CoM
+        return horz_dist, vert_dist, horz_dist_CoM, vert_dist_CoM
         Pixel_Size = float(self.pixel_size)
         horz_dist_mm = np.multiply(Pixel_Size, horz_dist)
         vert_dist_mm = np.multiply(Pixel_Size, vert_dist)
-        return horz_dist, vert_dist#, horz_dist_mm, vert_dist_mm
+        return horz_dist, vert_dist, horz_dist_mm, vert_dist_mm
 
     def get_rod_distortion_correction_coefficients(self, horizontal_distances) -> dict:
         """

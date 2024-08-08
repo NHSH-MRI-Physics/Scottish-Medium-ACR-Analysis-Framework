@@ -60,7 +60,7 @@ class ACRObject:
         # This is to be able to flag to the user the caveat of measurments if deviating from ACR guidance
         #  -- Implemented below (HR 26.04.2024)
         orientation=get_image_orientation(self.dcm_list[0])
-
+        print(f'orientation is {orientation}')
         x = np.array([dcm.ImagePositionPatient[0] for dcm in self.dcm_list])
         y = np.array([dcm.ImagePositionPatient[1] for dcm in self.dcm_list])
         z = np.array([dcm.ImagePositionPatient[2] for dcm in self.dcm_list])
