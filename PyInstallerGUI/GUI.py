@@ -22,6 +22,7 @@ from MedACRAnalysis import *
 import datetime
 import numpy as np
 import VariableHolder
+import copy
 
 try:
     class TextRedirector(object):
@@ -191,6 +192,7 @@ try:
             if (Delta.total_seconds() > 0.0001):
 
                 #This isnt working as intended....
+                #Issue is this bit is consntatly adding everytime its moving when it should only add when the moust button is released.
                 WidthChange = event.x - VarHolder.StartingEvent.x
                 LevelChange = VarHolder.StartingEvent.y - event.y
                 
@@ -201,13 +203,11 @@ try:
 
                 VarHolder.WinLevelLabel.config(text = "Window Level: " + str(VarHolder.CurrentLevel))
                 VarHolder.WinWidthLabel.config(text = "Window Width: "+ str(VarHolder.CurrentWidth))
-
-
                 
                 VarHolder.TimeOfLastEvent = datetime.datetime.now()
     
     def StartTracking(event):
-        VarHolder.StartingEvent=event
+        VarHolder.StartingEvent=copy.copy(event)
 
     def EndTracking(event):
         VarHolder.StartingEvent=None
