@@ -126,7 +126,6 @@ class ACRSpatialResolution(HazenTask):
                 }
             elif(self.ResOption==ResOptions.ContrastResponseMethod):
                 HorContrastResponse, VertContrastResponse = self.get_ContrastResponse(mtf_dcm)
-                sys.exit()
                 results["measurement"] = {
                     "1.1mm holes Horizontal": round(HorContrastResponse[0],2),
                     "1.1mm holes Vertical": round(VertContrastResponse[0],2),

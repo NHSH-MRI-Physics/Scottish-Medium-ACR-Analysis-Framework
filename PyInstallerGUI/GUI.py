@@ -19,6 +19,9 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,NavigationToolbar2Tk) 
 from hazenlib.tasks.acr_spatial_resolution import ACRSpatialResolution
 from MedACRAnalysis import *
+import datetime
+import numpy as np
+import VariableHolder
 
 try:
     class TextRedirector(object):
@@ -39,6 +42,7 @@ try:
     root.title('Medium ACR Phantom QA Analysis Pre-Release')
     root.iconbitmap("_internal\ct-scan.ico")
 
+    VarHolder=VariableHolder.VarHolder()
 
     def SetDCMPath():
         dropdownResults.config(state="disabled")
@@ -62,7 +66,6 @@ try:
             if "Loc" not in data.SeriesDescription and "loc" not in data.SeriesDescription:
                 options.append(data.SeriesDescription)
 
-        
         options= list(set(options))
         options.sort()
         options.append(options[0])
@@ -101,16 +104,126 @@ try:
                 widgets.config(state="disabled")
 
     def ImageResolvable(newwindow):
-        global CurrentROI
-        global ROI_Results_ResResults
-        ROI_Results_ResResults[CurrentROI] = True
+        VarHolder.ROI_Results_ResResults[VarHolder.CurrentROI] = True
         newwindow.destroy()
 
     def ImageNotResolvable(newwindow):
-        global CurrentROI
-        global ROI_Results_ResResults
-        ROI_Results_ResResults[CurrentROI] = False
+        VarHolder.ROI_Results_ResResults[VarHolder.CurrentROI] = False
         newwindow.destroy()
+
+    def ResetWindowing():
+        BaseVmax = np.max(VarHolder.CurrentImage)
+        BaseVmin = np.min(VarHolder.CurrentImage)
+        VarHolder.CurrentLevel = (BaseVmax+BaseVmin)/2.0
+        VarHolder.CurrentWidth = (BaseVmax-BaseVmin)/2.0
+        VarHolder.WinLevelLabel.config(text = "Window Level: " + str(VarHolder.CurrentLevel))
+        VarHolder.WinWidthLabel.config(text = "Window Width: "+ str(VarHolder.CurrentWidth))
+        plot()
+
+    def AdjustWindowWithKeyboard(event):
+        key = event.keysym
+        if key == "Left":
+            VarHolder.CurrentWidth -=1
+        elif key == "Right":
+            VarHolder.CurrentWidth +=1
+        elif key == "Up":
+            VarHolder.CurrentLevel +=1
+        elif key == "Down":
+            VarHolder.CurrentLevel -=1
+        
+        if VarHolder.CurrentWidth <0:
+            VarHolder.CurrentWidth=0
+
+        VarHolder.WinLevelLabel.config(text = "Window Level: " + str(VarHolder.CurrentLevel))
+        VarHolder.WinWidthLabel.config(text = "Window Width: "+ str(VarHolder.CurrentWidth))
+
+        Vmin = VarHolder.CurrentLevel - VarHolder.CurrentWidth
+        Vmax = VarHolder.CurrentLevel + VarHolder.CurrentWidth
+        plot(Vmin=Vmin,Vmax=Vmax)
+
+
+    def ManualRes(ROIS):
+        for key in ROIS:
+            VarHolder.ROI_Results_ResResults[key]=None
+            VarHolder.CurrentROI=key
+            print ("Displaying Res Pattern: " +key)
+            VarHolder.newWindow =  tkinter.Toplevel(root)
+            
+            VarHolder.newWindow.iconbitmap("_internal\ct-scan.ico")
+            VarHolder.newWindow.geometry("500x540")
+            VarHolder.newWindow.configure(background='white')
+            plt.title(key)
+            VarHolder.CurrentImage = ROIS[key]
+            BaseVmax = np.max(VarHolder.CurrentImage)
+            BaseVmin = np.min(VarHolder.CurrentImage)
+            VarHolder.CurrentLevel = (BaseVmax+BaseVmin)/2.0
+            VarHolder.CurrentWidth = (BaseVmax-BaseVmin)/2.0
+
+            #plt.imshow(VarHolder.CurrentImage,cmap="gray",vmin=BaseVmin,vmax = BaseVmax)
+            plot()
+            VarHolder.Canvas = FigureCanvasTkAgg(plt.gcf(), master = VarHolder.newWindow)   
+            VarHolder.Canvas.draw() 
+            VarHolder.Canvas.get_tk_widget().pack(side=TOP)
+            toolbar = NavigationToolbar2Tk(VarHolder.Canvas, VarHolder.newWindow) 
+            toolbar.update() 
+            VarHolder.Canvas.get_tk_widget().pack() 
+
+            ResetWindowingBtn = ttk.Button(VarHolder.newWindow, text="Reset Windowing",width=20, command =ResetWindowing)
+            ResetWindowingBtn.place(relx=0.4, rely=0.89, anchor="center")
+
+            VarHolder.WinLevelLabel = ttk.Label(VarHolder.newWindow, text="Window Level: " + str(VarHolder.CurrentLevel), background="white", foreground="black")
+            VarHolder.WinLevelLabel.place(relx=0.8, rely=0.86,anchor="center")
+            VarHolder.WinWidthLabel = ttk.Label(VarHolder.newWindow, text="Window Width: "+ str(VarHolder.CurrentWidth), background="white", foreground="black")
+            VarHolder.WinWidthLabel.place(relx=0.8, rely=0.90,anchor="center")
+
+            VarHolder.newWindow.bind("<ButtonPress-1>", StartTracking)
+            VarHolder.newWindow.bind("<ButtonRelease-1>", EndTracking)
+            VarHolder.newWindow.bind("<B1-Motion>", Windowing_handler)
+
+            VarHolder.newWindow.bind('<Key>', AdjustWindowWithKeyboard)
+
+            root.wait_window(VarHolder.newWindow)
+            plt.close()
+
+    def Windowing_handler(event):
+        if VarHolder.StartingEvent != None:
+            Delta = datetime.datetime.now() - VarHolder.TimeOfLastEvent
+            if (Delta.total_seconds() > 0.0001):
+
+                #This isnt working as intended....
+                WidthChange = event.x - VarHolder.StartingEvent.x
+                LevelChange = VarHolder.StartingEvent.y - event.y
+                
+                VarHolder.CurrentLevel += (LevelChange)
+                VarHolder.CurrentWidth += (WidthChange)
+                if VarHolder.CurrentWidth <0:
+                    VarHolder.CurrentWidth=0
+
+                VarHolder.WinLevelLabel.config(text = "Window Level: " + str(VarHolder.CurrentLevel))
+                VarHolder.WinWidthLabel.config(text = "Window Width: "+ str(VarHolder.CurrentWidth))
+
+
+                
+                VarHolder.TimeOfLastEvent = datetime.datetime.now()
+    
+    def StartTracking(event):
+        VarHolder.StartingEvent=event
+
+    def EndTracking(event):
+        VarHolder.StartingEvent=None
+        Vmin = VarHolder.CurrentLevel - VarHolder.CurrentWidth
+        Vmax = VarHolder.CurrentLevel + VarHolder.CurrentWidth
+        plot(Vmin=Vmin,Vmax=Vmax)
+        VarHolder.Canvas.draw()
+
+
+    def plot(Vmin=None,Vmax=None):
+        if Vmin != None and Vmax != None:
+            plt.imshow(VarHolder.CurrentImage,cmap="gray",vmin=Vmin,vmax=Vmax)
+        else:
+            plt.imshow(VarHolder.CurrentImage,cmap="gray")
+        #if VarHolder.Canvas!=None:
+        #    VarHolder.Canvas.draw()
 
     def SetOptions():
         MedACRAnalysis.GeoMethod = GeometryOptions.ACRMETHOD
@@ -126,8 +239,6 @@ try:
             MedACRAnalysis.SpatialResMethod=ResOptions.Manual
 
     def RunAnalysis():
-        global CurrentROI
-        global ROI_Results_ResResults
         RunAll=False
         SNR=False
         GeoAcc=False
@@ -166,36 +277,8 @@ try:
         if SpatalResOption.get()=="Manual":
             ROIS = MedACRAnalysis.GetROIFigs(selected_option.get(),DCMfolder_path.get())
             plt.close('all')#Making sure no rogue plots are sitting in the background...
-            
-            for key in ROIS:
-                ROI_Results_ResResults[key]=None
-                CurrentROI=key
-                print ("Displaying Res Pattern: " +key)
-                newWindow =  tkinter.Toplevel(root)
-                newWindow.iconbitmap("_internal\ct-scan.ico")
-                newWindow.geometry("500x540")
-                newWindow.configure(background='white')
-                plt.title(key)
-                plt.imshow(ROIS[key])
-                canvas = FigureCanvasTkAgg(plt.gcf(), master = newWindow)   
-                canvas.draw() 
-                canvas.get_tk_widget().pack(side=TOP)
-                toolbar = NavigationToolbar2Tk(canvas, newWindow) 
-                toolbar.update() 
-                canvas.get_tk_widget().pack() 
-
-                Pattern_label = ttk.Label(newWindow, text="Is the Above Pattern Resolvable?", background="white", foreground="black")
-                Pattern_label.place(relx=0.5, rely=0.85,anchor="center")
-
-                Yes_button = ttk.Button(newWindow, text="Yes",width=3, command =lambda: ImageResolvable(newWindow))
-                Yes_button.place(relx=0.45, rely=0.89, anchor="center")
-
-                No_button = ttk.Button(newWindow, text="No",width=3, command = lambda: ImageNotResolvable(newWindow))
-                No_button.place(relx=0.55, rely=0.89, anchor="center")
-
-                root.wait_window(newWindow)
-                plt.close()
-            MedACRAnalysis.ManualResTestText = ROI_Results_ResResults
+            ManualRes(ROIS)
+            MedACRAnalysis.ManualResTestText = VarHolder.ROI_Results_ResResults
             #SpatialRes=False
         MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
         EnableOrDisableEverything(True)
@@ -244,8 +327,6 @@ try:
     WidgetsToToggle=[]
     InitalDirDICOM=None
     InitalDirOutput=None
-    CurrentROI=None
-    ROI_Results_ResResults = {}
 
     PathFrame = ttk.Frame(root)
     DCMPathButton = ttk.Button(text="Set DICOM Path", command=SetDCMPath,width=22)
@@ -373,6 +454,7 @@ try:
 
     hazenlib.logger.ConfigureLoggerForGUI()
     MedACR_ToleranceTableChecker.SetUpToleranceTable()
+
     root.mainloop()
 except Exception as e:
     messagebox.showerror("Error", e) 
