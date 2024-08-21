@@ -22,7 +22,6 @@ from MedACRAnalysis import *
 import datetime
 import numpy as np
 import VariableHolder
-import copy
 
 try:
     class TextRedirector(object):
@@ -104,15 +103,9 @@ try:
             for widgets in WidgetsToToggle:
                 widgets.config(state="disabled")
 
-    def ImageResolvable(newwindow):
-        VarHolder.ROI_Results_ResResults[VarHolder.CurrentROI] = True
-        newwindow.destroy()
-
-    def ImageNotResolvable(newwindow):
-        VarHolder.ROI_Results_ResResults[VarHolder.CurrentROI] = False
-        newwindow.destroy()
-
     def ResetWindowing():
+        VarHolder.WidthChange = 0
+        VarHolder.LevelChange = 0
         BaseVmax = np.max(VarHolder.CurrentImage)
         BaseVmin = np.min(VarHolder.CurrentImage)
         VarHolder.CurrentLevel = (BaseVmax+BaseVmin)/2.0
@@ -120,68 +113,107 @@ try:
         VarHolder.WinLevelLabel.config(text = "Window Level: " + str(VarHolder.CurrentLevel))
         VarHolder.WinWidthLabel.config(text = "Window Width: "+ str(VarHolder.CurrentWidth))
         plot()
+        VarHolder.Canvas.draw()
 
-    def AdjustWindowWithKeyboard(event):
-        key = event.keysym
-        if key == "Left":
-            VarHolder.CurrentWidth -=1
-        elif key == "Right":
-            VarHolder.CurrentWidth +=1
-        elif key == "Up":
-            VarHolder.CurrentLevel +=1
-        elif key == "Down":
-            VarHolder.CurrentLevel -=1
-        
-        if VarHolder.CurrentWidth <0:
-            VarHolder.CurrentWidth=0
+    def on_click_of_plot(event):
+        if event.inaxes is not None:
+            if event.button == 1 and VarHolder.ShiftPressed == False:
+                VarHolder.ManualResData[VarHolder.CurrentROI].HoleSize = VarHolder.CurrentROI
+                VarHolder.ManualResData[VarHolder.CurrentROI].Image = VarHolder.CurrentImage
+                if len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction]) <4:
+                    VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction].append( round(event.xdata))
+                    VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[VarHolder.Direction].append( round(event.ydata))
+                    plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[0], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[0], marker="x",color="blue")
+                    plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[1], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[1], marker="x",color="red")
+                    VarHolder.Canvas.draw()
 
-        VarHolder.WinLevelLabel.config(text = "Window Level: " + str(VarHolder.CurrentLevel))
-        VarHolder.WinWidthLabel.config(text = "Window Width: "+ str(VarHolder.CurrentWidth))
 
-        Vmin = VarHolder.CurrentLevel - VarHolder.CurrentWidth
-        Vmax = VarHolder.CurrentLevel + VarHolder.CurrentWidth
-        plot(Vmin=Vmin,Vmax=Vmax)
+            elif event.button == 1 and VarHolder.ShiftPressed == True and len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction]) >0:
+                Distances = []
+                for i in range(len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction])):
+                    Distances.append( (event.xdata - VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction][i])**2 + (event.ydata - VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[VarHolder.Direction][i])**2)
+                IndexOfClosest = np.argmin(Distances)
+                
+                if Distances[IndexOfClosest] < 0.1:
+                    del VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction][IndexOfClosest]
+                    del VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[VarHolder.Direction][IndexOfClosest]
+                    
+                    if VarHolder.Direction==0:
+                        VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[VarHolder.Direction] = zip(*sorted(zip(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[VarHolder.Direction])))
+                    elif VarHolder.Direction ==1:
+                        VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[VarHolder.Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction] = zip(*sorted(zip(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[VarHolder.Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction])))
 
+                    VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction] = list(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction])
+                    VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[VarHolder.Direction] = list(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[VarHolder.Direction])
+                    
+                    plt.clf()
+                    plt.title(VarHolder.CurrentROI) 
+                    plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[0], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[0], marker="x",color="blue")
+                    plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[1], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[1], marker="x",color="red")
+                    plot()
+                    VarHolder.Canvas.draw()
+
+    def DetectShiftPress(event):
+        if event.key == 'shift':
+            VarHolder.ShiftPressed = True
+
+    def DetectShiftReleased(event):
+        if event.key == 'shift':
+            VarHolder.ShiftPressed = False
+        if event.key == "control":
+            if VarHolder.Direction == 0:
+                VarHolder.Direction = 1
+                VarHolder.WinDirectionLabel.config(text = "Current Direction: Vertical")
+            elif VarHolder.Direction == 1:
+                VarHolder.Direction = 0
+                VarHolder.WinDirectionLabel.config(text = "Current Direction: Horizontal")
 
     def ManualRes(ROIS):
         for key in ROIS:
-            VarHolder.ROI_Results_ResResults[key]=None
+            VarHolder.ManualResData[key] = VariableHolder.ManualResData()
             VarHolder.CurrentROI=key
             print ("Displaying Res Pattern: " +key)
             VarHolder.newWindow =  tkinter.Toplevel(root)
-            
             VarHolder.newWindow.iconbitmap("_internal\ct-scan.ico")
             VarHolder.newWindow.geometry("500x540")
             VarHolder.newWindow.configure(background='white')
-            plt.title(key)
+            VarHolder.newWindow.resizable(False,False)
+            plt.title(key) 
             VarHolder.CurrentImage = ROIS[key]
             BaseVmax = np.max(VarHolder.CurrentImage)
             BaseVmin = np.min(VarHolder.CurrentImage)
             VarHolder.CurrentLevel = (BaseVmax+BaseVmin)/2.0
             VarHolder.CurrentWidth = (BaseVmax-BaseVmin)/2.0
-
-            #plt.imshow(VarHolder.CurrentImage,cmap="gray",vmin=BaseVmin,vmax = BaseVmax)
             plot()
             VarHolder.Canvas = FigureCanvasTkAgg(plt.gcf(), master = VarHolder.newWindow)   
+            plt.gcf().canvas.callbacks.connect('button_press_event', on_click_of_plot)
+            plt.gcf().canvas.callbacks.connect('key_press_event', DetectShiftPress)
+            plt.gcf().canvas.callbacks.connect('key_release_event', DetectShiftReleased)
+
             VarHolder.Canvas.draw() 
             VarHolder.Canvas.get_tk_widget().pack(side=TOP)
             toolbar = NavigationToolbar2Tk(VarHolder.Canvas, VarHolder.newWindow) 
             toolbar.update() 
             VarHolder.Canvas.get_tk_widget().pack() 
 
+            SubmitPoints = ttk.Button(VarHolder.newWindow, text="Submit",width=10, command =ResetWindowing)
+            SubmitPoints.place(relx=0.11, rely=0.89, anchor="center")
+
             ResetWindowingBtn = ttk.Button(VarHolder.newWindow, text="Reset Windowing",width=20, command =ResetWindowing)
             ResetWindowingBtn.place(relx=0.4, rely=0.89, anchor="center")
 
+            VarHolder.WinDirectionLabel = ttk.Label(VarHolder.newWindow, text="Current Direction: Horizontal", background="white", foreground="black")
+            VarHolder.WinDirectionLabel.place(relx=0.3, rely=0.85,anchor="center")
+
             VarHolder.WinLevelLabel = ttk.Label(VarHolder.newWindow, text="Window Level: " + str(VarHolder.CurrentLevel), background="white", foreground="black")
             VarHolder.WinLevelLabel.place(relx=0.8, rely=0.86,anchor="center")
+
             VarHolder.WinWidthLabel = ttk.Label(VarHolder.newWindow, text="Window Width: "+ str(VarHolder.CurrentWidth), background="white", foreground="black")
             VarHolder.WinWidthLabel.place(relx=0.8, rely=0.90,anchor="center")
 
-            VarHolder.newWindow.bind("<ButtonPress-1>", StartTracking)
-            VarHolder.newWindow.bind("<ButtonRelease-1>", EndTracking)
-            VarHolder.newWindow.bind("<B1-Motion>", Windowing_handler)
-
-            VarHolder.newWindow.bind('<Key>', AdjustWindowWithKeyboard)
+            VarHolder.newWindow.bind("<ButtonPress-3>", StartTracking)
+            VarHolder.newWindow.bind("<ButtonRelease-3>", EndTracking)
+            VarHolder.newWindow.bind("<B3-Motion>", Windowing_handler)
 
             root.wait_window(VarHolder.newWindow)
             plt.close()
@@ -190,29 +222,35 @@ try:
         if VarHolder.StartingEvent != None:
             Delta = datetime.datetime.now() - VarHolder.TimeOfLastEvent
             if (Delta.total_seconds() > 0.0001):
+                VarHolder.WidthChange = event.x - VarHolder.StartingEvent.x
+                VarHolder.LevelChange = VarHolder.StartingEvent.y - event.y  
+                TempCurrentLevel = VarHolder.CurrentLevel + VarHolder.LevelChange
+                TempCurrentWidth = VarHolder.CurrentWidth + VarHolder.WidthChange
+                if TempCurrentWidth <0:
+                    TempCurrentWidth = 0
 
-                #This isnt working as intended....
-                #Issue is this bit is consntatly adding everytime its moving when it should only add when the moust button is released.
-                WidthChange = event.x - VarHolder.StartingEvent.x
-                LevelChange = VarHolder.StartingEvent.y - event.y
-                
-                VarHolder.CurrentLevel += (LevelChange)
-                VarHolder.CurrentWidth += (WidthChange)
-                if VarHolder.CurrentWidth <0:
-                    VarHolder.CurrentWidth=0
+                VarHolder.WinLevelLabel.config(text = "Window Level: " + str(TempCurrentLevel))
+                VarHolder.WinWidthLabel.config(text = "Window Width: "+ str(TempCurrentWidth))
 
-                VarHolder.WinLevelLabel.config(text = "Window Level: " + str(VarHolder.CurrentLevel))
-                VarHolder.WinWidthLabel.config(text = "Window Width: "+ str(VarHolder.CurrentWidth))
-                
+                #We need to remove the current change, if we do not every step we add more to the taacker. Eg: Step 1 +1 step 2 +2 meaning wihtout the removal we get +3 instead of the intended +2
+                TempCurrentLevel -= (VarHolder.LevelChange)
+                TempCurrentWidth -= (VarHolder.WidthChange)
+
                 VarHolder.TimeOfLastEvent = datetime.datetime.now()
     
     def StartTracking(event):
-        VarHolder.StartingEvent=copy.copy(event)
+        VarHolder.StartingEvent=event
 
     def EndTracking(event):
         VarHolder.StartingEvent=None
+        VarHolder.CurrentLevel = VarHolder.CurrentLevel + VarHolder.LevelChange
+        VarHolder.CurrentWidth = VarHolder.CurrentWidth + VarHolder.WidthChange
+        if VarHolder.CurrentWidth <0:
+            VarHolder.CurrentWidth = 0
+        
         Vmin = VarHolder.CurrentLevel - VarHolder.CurrentWidth
         Vmax = VarHolder.CurrentLevel + VarHolder.CurrentWidth
+
         plot(Vmin=Vmin,Vmax=Vmax)
         VarHolder.Canvas.draw()
 
@@ -222,8 +260,6 @@ try:
             plt.imshow(VarHolder.CurrentImage,cmap="gray",vmin=Vmin,vmax=Vmax)
         else:
             plt.imshow(VarHolder.CurrentImage,cmap="gray")
-        #if VarHolder.Canvas!=None:
-        #    VarHolder.Canvas.draw()
 
     def SetOptions():
         MedACRAnalysis.GeoMethod = GeometryOptions.ACRMETHOD
@@ -278,7 +314,7 @@ try:
             ROIS = MedACRAnalysis.GetROIFigs(selected_option.get(),DCMfolder_path.get())
             plt.close('all')#Making sure no rogue plots are sitting in the background...
             ManualRes(ROIS)
-            MedACRAnalysis.ManualResTestText = VarHolder.ROI_Results_ResResults
+            MedACRAnalysis.ManualResTestText = VarHolder.ManualResData
             #SpatialRes=False
         MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
         EnableOrDisableEverything(True)
