@@ -16,10 +16,13 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 import os 
 from MedACROptions import *
 import MedACR_ToleranceTableCheckerV2 as MedACR_ToleranceTableChecker
+import numpy as np
+import scipy.ndimage
+import matplotlib.pyplot as plt
 #from hazenlib.tasks.acr_spatial_resolution import ResOptions
 
 ReportText = ""
-ManualResTestText=None
+ManualResData=None
 
 #Default options
 GeoMethod = GeometryOptions.ACRMETHOD
@@ -164,15 +167,82 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
             raise Exception("Unexpected option in spatial res module")
 
         #Add in Manual Res Test
-        if ManualResTestText != None:
-            for key in ManualResTestText:
+        if ManualResData != None:
+            for key in ManualResData:
                 Result = "Not Tested"
-                if ManualResTestText[key]==True:
-                    Result="Resolved"
-                elif ManualResTestText[key]==False:
-                    Result="Not Resolved"
+                import matplotlib
+                matplotlib.use( 'tkagg' )
+                fig, (ax1, ax2, ax3) = plt.subplots(3,1)
+                fig.suptitle(key + ' Manual Resolution Output',y=0.99)
+                fig.set_size_inches(20, 20)
+                ax1.imshow(ManualResData[key].Image)
+                ContrastResponse = []
+                for Direction in range(2):                    
+                    xpointsPeaks = ManualResData[key].ChosenPointsXPeaks[Direction]
+                    ypointsPeaks = ManualResData[key].ChosenPointsYPeaks[Direction]
+                    xpointsTroughs = ManualResData[key].ChosenPointsXTroughs[Direction]
+                    ypointsTroughs = ManualResData[key].ChosenPointsYTroughs[Direction]
+
+                    #Do Peaks
+                    zPeaks = scipy.ndimage.map_coordinates(ManualResData[key].Image, np.vstack((ypointsPeaks,xpointsPeaks)),order=1, mode = "nearest")
+
+                    xLine = np.array([])
+                    yLine = np.array([])                    
+                    for i in range(3):
+                        endpoint = False
+                        if i == 2:
+                            endpoint=True
+                        xLine=np.append(xLine, np.linspace(xpointsPeaks[i],xpointsTroughs[i],endpoint=False))
+                        xLine=np.append(xLine, np.linspace(xpointsTroughs[i],xpointsPeaks[i+1],endpoint=endpoint))
+
+                        yLine=np.append(yLine, np.linspace(ypointsPeaks[i],ypointsTroughs[i],endpoint=False))
+                        yLine=np.append(yLine, np.linspace(ypointsTroughs[i],ypointsPeaks[i+1],endpoint=endpoint))
+                    zLine = scipy.ndimage.map_coordinates(ManualResData[key].Image, np.vstack((yLine,xLine)),order=1, mode = "nearest")
+           
+                    MeanPeak = np.mean(zPeaks)
+                    if Direction==0:
+                        ax1.plot(xpointsPeaks, ypointsPeaks,marker="X",ls='',color="blue",markersize=10)
+                    else:
+                        ax1.plot(xpointsPeaks, ypointsPeaks,marker="X",ls='',color="red",markersize=10)
+
+                    if Direction==0: 
+                        ax2.plot(xpointsPeaks,zPeaks, marker="X",ls='',color="blue",markersize=10,label ="Horizontal Peaks")  
+                        ax2.axhline(y=MeanPeak, color='blue', linestyle='-',label ="Mean Peak")
+                        ax2.plot(xLine, zLine,marker="",ls='-.',color="blue",label="Sample Line")
+                    else:
+                        ax3.plot(ypointsPeaks,zPeaks, marker="X",ls='',color="red",markersize=10,label ="Vertical Peaks")   
+                        ax3.axhline(y=MeanPeak, color='red', linestyle='-',label ="Mean Peak")      
+                        ax3.plot(yLine, zLine,marker="",ls='-.',color="red",label="Sample Line") 
+
+                    #Do Troughs
+                    zTroughs = scipy.ndimage.map_coordinates(ManualResData[key].Image, np.vstack((ypointsTroughs,xpointsTroughs)),order=1, mode = "nearest")
+                    MeanTrough = np.mean(zTroughs)
+                    if Direction==0:
+                        ax1.plot(xpointsTroughs, ypointsTroughs,marker="o",ls='',color="blue",markersize=10)
+                    else:
+                        ax1.plot(xpointsTroughs, ypointsTroughs,marker="o",ls='',color="red",markersize=10)
+            
+                    if Direction==0: 
+                        ax2.plot(xpointsTroughs,zTroughs, marker="o",ls='',color="blue",markersize=10,label ="Horizontal Troughs")     
+                        ax2.axhline(y=MeanTrough, color='blue', linestyle='--',label ="Mean Trough")
+                        ax2.legend()
+                    else:       
+                        ax3.plot(ypointsTroughs,zTroughs, marker="o",ls='',color="red",markersize=10,label ="Vertical Troughs")   
+                        ax3.axhline(y=MeanTrough, color='red', linestyle='--',label ="Mean Trough")
+                        ax3.legend()
+                    
+                    
+                    Amplitude = abs(MeanPeak - MeanTrough)
+                    ContrastResponse.append(round(Amplitude/MeanPeak,3))
                 
-                ReportFile.write( '\tManual '+key+' Resolution : %-15s%-12s\n' % (str(Result),MedACR_ToleranceTableChecker.GetPassResult(Result,"Manual Resolution",key)))
+                fig.tight_layout()
+                if not os.path.exists(OutputPath+"/ACRSpatialResolution"):
+                    os.makedirs(OutputPath+"/ACRSpatialResolution")
+                plt.savefig(OutputPath+"/ACRSpatialResolution/"+Seq+"_"+key+"_ManualRes.png")
+                #plt.show()
+
+                ReportFile.write( '\tManual '+key+' Resolution Hor: %-15s%-12s\n' % (str(ContrastResponse[0]),MedACR_ToleranceTableChecker.GetPassResult(ContrastResponse[0],"Manual Resolution",key +" Horizontal")))
+                ReportFile.write( '\tManual '+key+' Resolution Vert: %-15s%-12s\n' % (str(ContrastResponse[1]),MedACR_ToleranceTableChecker.GetPassResult(ContrastResponse[1],"Manual Resolution",key +" Vertical")))
         TestCounter+=1
 
 

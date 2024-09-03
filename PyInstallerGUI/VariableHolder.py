@@ -1,4 +1,6 @@
 import datetime
+from tkinter import ttk
+from tkinter import IntVar
 class VarHolder:
     StartingEvent=None
     TimeOfLastEvent = datetime.datetime.now()
@@ -16,6 +18,7 @@ class VarHolder:
     LevelChange=0
     ManualResData={}
     ShiftPressed = False
+    CtrlPressed = False
     Direction=0
 
 class ManualResData:
@@ -26,8 +29,10 @@ class ManualResData:
     ContrastResponse = None
     LineData = None
     def __init__(self):
-        self.ChosenPointsX = [[],[]] #0 = hor 1 = vert
-        self.ChosenPointsY = [[],[]]
+        self.ChosenPointsXPeaks = [[],[]] #0 = hor 1 = vert
+        self.ChosenPointsYPeaks = [[],[]]
+        self.ChosenPointsXTroughs = [[],[]] #0 = hor 1 = vert
+        self.ChosenPointsYTroughs = [[],[]]
         self.HoleSize = None
         self.Image = None
         self.ContrastResponse = None

@@ -3,10 +3,14 @@
         <Test Min="90"/>
     </Module>
     <Module name = "Manual Resolution">
-        <Test name="1.1mm holes" Equal="Resolved"/>
-        <Test name="1.0mm holes" Equal="Resolved"/>
-        <Test name="0.9mm holes" Equal="Resolved"/>
-        <Test name="0.8mm holes" Equal="Resolved"/>
+        <Test name="1.1mm holes Horizontal" Min="0.4"/>
+        <Test name="1.0mm holes Horizontal" Min="0.4"/>
+        <Test name="0.9mm holes Horizontal" Min="0.4"/>
+        <Test name="0.8mm holes Horizontal" Min="0.4"/>
+        <Test name="1.1mm holes Vertical" Min="0.4"/>
+        <Test name="1.0mm holes Vertical" Min="0.4"/>
+        <Test name="0.9mm holes Vertical" Min="0.4"/>
+        <Test name="0.8mm holes Vertical" Min="0.4"/>
     </Module>
     <Module name = "Contrast Response Resolution">
         <Test name="1.1mm holes Horizontal" Min="0.4"/>

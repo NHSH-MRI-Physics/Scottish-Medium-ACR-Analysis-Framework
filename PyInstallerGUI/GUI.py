@@ -115,69 +115,169 @@ try:
         plot()
         VarHolder.Canvas.draw()
 
-    def on_click_of_plot(event):
+    def SubmitPoints():
+        if len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[0]) == 4 and len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[0]) == 4:
+            if len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[1]) == 4 and len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[1]) == 4:
+                if len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[0]) == 3 and len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[0]) == 3:
+                    if len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[1]) == 3 and len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[1]) == 3:
+                        VarHolder.NewWindow.destroy()
+                        return
+        messagebox.showinfo("error", "There must be 4 peaks (crosses) and 3 (circles) troughs horizontal (blue) and vertical (red) points chosen.")
+
+    def on_click_on_plot(event):
         if event.inaxes is not None:
             if event.button == 1 and VarHolder.ShiftPressed == False:
                 VarHolder.ManualResData[VarHolder.CurrentROI].HoleSize = VarHolder.CurrentROI
                 VarHolder.ManualResData[VarHolder.CurrentROI].Image = VarHolder.CurrentImage
-                if len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction]) <4:
-                    VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction].append( round(event.xdata))
-                    VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[VarHolder.Direction].append( round(event.ydata))
-                    plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[0], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[0], marker="x",color="blue")
-                    plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[1], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[1], marker="x",color="red")
+                if len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[VarHolder.Direction]) + len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[VarHolder.Direction]) <7:
+                    if len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[VarHolder.Direction]) < 4:
+                        VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[VarHolder.Direction].append( (event.xdata))
+                        VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[VarHolder.Direction].append( (event.ydata))
+                        Marker = "x"
+                        plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[0], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[0],linestyle='' ,marker=Marker,color="blue")
+                        plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[1], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[1],linestyle='' ,marker=Marker,color="red")
+                    #elif len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[VarHolder.Direction]) > 4:
+                    else:
+                        VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[VarHolder.Direction].append( (event.xdata))
+                        VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[VarHolder.Direction].append( (event.ydata))
+                        Marker="o"
+                        plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[0], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[0],linestyle='', marker=Marker,color="blue")
+                        plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[1], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[1],linestyle='', marker=Marker,color="red")
+                    
                     VarHolder.Canvas.draw()
 
 
-            elif event.button == 1 and VarHolder.ShiftPressed == True and len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction]) >0:
-                Distances = []
-                for i in range(len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction])):
-                    Distances.append( (event.xdata - VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction][i])**2 + (event.ydata - VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[VarHolder.Direction][i])**2)
-                IndexOfClosest = np.argmin(Distances)
+            elif event.button == 1 and VarHolder.ShiftPressed == True:
+                DistancesPeak = []
+                for i in range(len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[VarHolder.Direction])):
+                    DistancesPeak.append( (event.xdata - VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[VarHolder.Direction][i])**2 + (event.ydata - VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[VarHolder.Direction][i])**2)
+                if len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[VarHolder.Direction]) >0:
+                    IndexOfClosestPeak = np.argmin(DistancesPeak)
+
+                DistancesTrough = []
+                for i in range(len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[VarHolder.Direction])):
+                    DistancesTrough.append( (event.xdata - VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[VarHolder.Direction][i])**2 + (event.ydata - VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[VarHolder.Direction][i])**2)
+                if len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[VarHolder.Direction]) >0:
+                    IndexOfClosestTrough = np.argmin(DistancesTrough)
                 
-                if Distances[IndexOfClosest] < 0.1:
-                    del VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction][IndexOfClosest]
-                    del VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[VarHolder.Direction][IndexOfClosest]
-                    
-                    if VarHolder.Direction==0:
-                        VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[VarHolder.Direction] = zip(*sorted(zip(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[VarHolder.Direction])))
-                    elif VarHolder.Direction ==1:
-                        VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[VarHolder.Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction] = zip(*sorted(zip(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[VarHolder.Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction])))
+                DonePeaks = False
+                if len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[VarHolder.Direction]) >0:
+                    if DistancesPeak[IndexOfClosestPeak] < 0.1:
+                        del VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[VarHolder.Direction][IndexOfClosestPeak]
+                        del VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[VarHolder.Direction][IndexOfClosestPeak]
+                        
+                        if len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[VarHolder.Direction]) >0:
+                            if VarHolder.Direction==0:
+                                VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[VarHolder.Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[VarHolder.Direction] = zip(*sorted(zip(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[VarHolder.Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[VarHolder.Direction])))
+                            elif VarHolder.Direction ==1:
+                                VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[VarHolder.Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[VarHolder.Direction] = zip(*sorted(zip(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[VarHolder.Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[VarHolder.Direction])))
 
-                    VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction] = list(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[VarHolder.Direction])
-                    VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[VarHolder.Direction] = list(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[VarHolder.Direction])
-                    
-                    plt.clf()
-                    plt.title(VarHolder.CurrentROI) 
-                    plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[0], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[0], marker="x",color="blue")
-                    plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsX[1], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsY[1], marker="x",color="red")
-                    plot()
-                    VarHolder.Canvas.draw()
+                        VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[VarHolder.Direction] = list(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[VarHolder.Direction])
+                        VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[VarHolder.Direction] = list(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[VarHolder.Direction])
+                        
+                        plt.clf()
+                        plt.title(VarHolder.CurrentROI) 
+                        plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[0], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[0], marker="x",color="blue", linestyle = '')
+                        plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[1], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[1], marker="x",color="red", linestyle = '')
+                        plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[0], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[0], marker="o",color="blue", linestyle = '')
+                        plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[1], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[1], marker="o",color="red", linestyle = '')
+                        
+                        Vmin = VarHolder.CurrentLevel - VarHolder.CurrentWidth
+                        Vmax = VarHolder.CurrentLevel + VarHolder.CurrentWidth
+                        plot(Vmin=Vmin,Vmax=Vmax)
+
+                        VarHolder.Canvas.draw()
+                        DonePeaks=True
+
+                if len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[VarHolder.Direction]) >0:
+                    if DistancesTrough[IndexOfClosestTrough] < 0.1 and DonePeaks==False:
+                        del VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[VarHolder.Direction][IndexOfClosestTrough]
+                        del VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[VarHolder.Direction][IndexOfClosestTrough]
+                        
+                        if len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[VarHolder.Direction]) >0:
+                            if VarHolder.Direction==0:
+                                VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[VarHolder.Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[VarHolder.Direction] = zip(*sorted(zip(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[VarHolder.Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[VarHolder.Direction])))
+                            elif VarHolder.Direction ==1:
+                                VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[VarHolder.Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[VarHolder.Direction] = zip(*sorted(zip(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[VarHolder.Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[VarHolder.Direction])))
+
+                        VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[VarHolder.Direction] = list(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[VarHolder.Direction])
+                        VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[VarHolder.Direction] = list(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[VarHolder.Direction])
+                        
+                        plt.clf()
+                        plt.title(VarHolder.CurrentROI) 
+                        plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[0], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[0], marker="x",color="blue", linestyle = '')
+                        plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[1], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[1], marker="x",color="red", linestyle = '')
+                        plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[0], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[0], marker="o",color="blue", linestyle = '')
+                        plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[1], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[1], marker="o",color="red", linestyle = '')
+                        
+                        Vmin = VarHolder.CurrentLevel - VarHolder.CurrentWidth
+                        Vmax = VarHolder.CurrentLevel + VarHolder.CurrentWidth
+                        plot(Vmin=Vmin,Vmax=Vmax)
+                        VarHolder.Canvas.draw()
 
     def DetectShiftPress(event):
         if event.key == 'shift':
             VarHolder.ShiftPressed = True
+        if event.key == "control" :
+            VarHolder.Direction = 1
+            VarHolder.WinDirectionLabel.config(text = "Current Direction: Vertical")
+        if event.key == "ctrl+shift" or event.key == "shift+control":
+            VarHolder.ShiftPressed = True
+            VarHolder.Direction = 1
+            VarHolder.WinDirectionLabel.config(text = "Current Direction: Vertical")
 
     def DetectShiftReleased(event):
         if event.key == 'shift':
             VarHolder.ShiftPressed = False
         if event.key == "control":
-            if VarHolder.Direction == 0:
-                VarHolder.Direction = 1
-                VarHolder.WinDirectionLabel.config(text = "Current Direction: Vertical")
-            elif VarHolder.Direction == 1:
-                VarHolder.Direction = 0
-                VarHolder.WinDirectionLabel.config(text = "Current Direction: Horizontal")
+            VarHolder.Direction = 0
+            VarHolder.WinDirectionLabel.config(text = "Current Direction: Horizontal")
+        if event.key == "ctrl+shift" or event.key == "shift+control":
+            VarHolder.ShiftPressed = False
+            VarHolder.Direction = 0
+            VarHolder.WinDirectionLabel.config(text = "Current Direction: Horizontal")
+
+        if event.key == "alt":
+            print("Automatically fitting troughs..")
+            for Direction in range(2):
+                if len(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[Direction]) == 4:
+                    if Direction==0:
+                        SortedXPeaks, SortedYPeaks = zip(*sorted(zip(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[Direction])))
+                    else:
+                        SortedYPeaks, SortedXPeaks = zip(*sorted(zip(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[Direction])))
+
+                    VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[Direction] = []
+                    VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[Direction] = []
+
+                    for idx in range(3):
+                        VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[Direction].append( (SortedXPeaks[idx] + SortedXPeaks[idx+1])/2.0 )
+                        VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[Direction].append( (SortedYPeaks[idx] + SortedYPeaks[idx+1])/2.0 )
+
+            plt.clf()
+            plt.title(VarHolder.CurrentROI) 
+            plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[0], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[0], marker="x",color="blue", linestyle = '')
+            plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXPeaks[1], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYPeaks[1], marker="x",color="red", linestyle = '')
+            plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[0], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[0], marker="o",color="blue", linestyle = '')
+            plt.plot(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[1], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[1], marker="o",color="red", linestyle = '')
+            
+            Vmin = VarHolder.CurrentLevel - VarHolder.CurrentWidth
+            Vmax = VarHolder.CurrentLevel + VarHolder.CurrentWidth
+            plot(Vmin=Vmin,Vmax=Vmax)
+            VarHolder.Canvas.draw()
+
+
+            #SortedYPeaks, SortedXPeaks = zip(*sorted(zip(VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsYTroughs[VarHolder.Direction], VarHolder.ManualResData[VarHolder.CurrentROI].ChosenPointsXTroughs[VarHolder.Direction])))
 
     def ManualRes(ROIS):
         for key in ROIS:
             VarHolder.ManualResData[key] = VariableHolder.ManualResData()
             VarHolder.CurrentROI=key
             print ("Displaying Res Pattern: " +key)
-            VarHolder.newWindow =  tkinter.Toplevel(root)
-            VarHolder.newWindow.iconbitmap("_internal\ct-scan.ico")
-            VarHolder.newWindow.geometry("500x540")
-            VarHolder.newWindow.configure(background='white')
-            VarHolder.newWindow.resizable(False,False)
+            VarHolder.NewWindow =  tkinter.Toplevel(root)
+            VarHolder.NewWindow.iconbitmap("_internal\ct-scan.ico")
+            VarHolder.NewWindow.geometry("500x540")
+            VarHolder.NewWindow.configure(background='white')
+            VarHolder.NewWindow.resizable(False,False)
             plt.title(key) 
             VarHolder.CurrentImage = ROIS[key]
             BaseVmax = np.max(VarHolder.CurrentImage)
@@ -185,37 +285,39 @@ try:
             VarHolder.CurrentLevel = (BaseVmax+BaseVmin)/2.0
             VarHolder.CurrentWidth = (BaseVmax-BaseVmin)/2.0
             plot()
-            VarHolder.Canvas = FigureCanvasTkAgg(plt.gcf(), master = VarHolder.newWindow)   
-            plt.gcf().canvas.callbacks.connect('button_press_event', on_click_of_plot)
+            VarHolder.Canvas = FigureCanvasTkAgg(plt.gcf(), master = VarHolder.NewWindow)   
+            plt.gcf().canvas.callbacks.connect('button_press_event', on_click_on_plot)
             plt.gcf().canvas.callbacks.connect('key_press_event', DetectShiftPress)
             plt.gcf().canvas.callbacks.connect('key_release_event', DetectShiftReleased)
 
             VarHolder.Canvas.draw() 
             VarHolder.Canvas.get_tk_widget().pack(side=TOP)
-            toolbar = NavigationToolbar2Tk(VarHolder.Canvas, VarHolder.newWindow) 
+            toolbar = NavigationToolbar2Tk(VarHolder.Canvas, VarHolder.NewWindow) 
             toolbar.update() 
             VarHolder.Canvas.get_tk_widget().pack() 
 
-            SubmitPoints = ttk.Button(VarHolder.newWindow, text="Submit",width=10, command =ResetWindowing)
-            SubmitPoints.place(relx=0.11, rely=0.89, anchor="center")
+            SubmitPointsBtn = ttk.Button(VarHolder.NewWindow, text="Submit",width=10, command =SubmitPoints)
+            SubmitPointsBtn.place(relx=0.11, rely=0.89, anchor="center")
 
-            ResetWindowingBtn = ttk.Button(VarHolder.newWindow, text="Reset Windowing",width=20, command =ResetWindowing)
+            ResetWindowingBtn = ttk.Button(VarHolder.NewWindow, text="Reset Windowing",width=20, command =ResetWindowing)
             ResetWindowingBtn.place(relx=0.4, rely=0.89, anchor="center")
 
-            VarHolder.WinDirectionLabel = ttk.Label(VarHolder.newWindow, text="Current Direction: Horizontal", background="white", foreground="black")
+            VarHolder.WinDirectionLabel = ttk.Label(VarHolder.NewWindow, text="Current Direction: Horizontal", background="white", foreground="black")
             VarHolder.WinDirectionLabel.place(relx=0.3, rely=0.85,anchor="center")
 
-            VarHolder.WinLevelLabel = ttk.Label(VarHolder.newWindow, text="Window Level: " + str(VarHolder.CurrentLevel), background="white", foreground="black")
+            VarHolder.WinLevelLabel = ttk.Label(VarHolder.NewWindow, text="Window Level: " + str(VarHolder.CurrentLevel), background="white", foreground="black")
             VarHolder.WinLevelLabel.place(relx=0.8, rely=0.86,anchor="center")
 
-            VarHolder.WinWidthLabel = ttk.Label(VarHolder.newWindow, text="Window Width: "+ str(VarHolder.CurrentWidth), background="white", foreground="black")
+            VarHolder.WinWidthLabel = ttk.Label(VarHolder.NewWindow, text="Window Width: "+ str(VarHolder.CurrentWidth), background="white", foreground="black")
             VarHolder.WinWidthLabel.place(relx=0.8, rely=0.90,anchor="center")
 
-            VarHolder.newWindow.bind("<ButtonPress-3>", StartTracking)
-            VarHolder.newWindow.bind("<ButtonRelease-3>", EndTracking)
-            VarHolder.newWindow.bind("<B3-Motion>", Windowing_handler)
+            VarHolder.NewWindow.bind("<ButtonPress-3>", StartTracking)
+            VarHolder.NewWindow.bind("<ButtonRelease-3>", EndTracking)
+            VarHolder.NewWindow.bind("<B3-Motion>", Windowing_handler)
 
-            root.wait_window(VarHolder.newWindow)
+            
+
+            root.wait_window(VarHolder.NewWindow)
             plt.close()
 
     def Windowing_handler(event):
@@ -312,9 +414,16 @@ try:
         MedACRAnalysis.ManualResTestText=None
         if SpatalResOption.get()=="Manual":
             ROIS = MedACRAnalysis.GetROIFigs(selected_option.get(),DCMfolder_path.get())
+
+
+            #DEBUGGING STUFF
+            #del ROIS[list(ROIS.keys())[1]]
+            #del ROIS[list(ROIS.keys())[1]]
+            #del ROIS[list(ROIS.keys())[1]]
+
             plt.close('all')#Making sure no rogue plots are sitting in the background...
             ManualRes(ROIS)
-            MedACRAnalysis.ManualResTestText = VarHolder.ManualResData
+            MedACRAnalysis.ManualResData = VarHolder.ManualResData
             #SpatialRes=False
         MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
         EnableOrDisableEverything(True)
