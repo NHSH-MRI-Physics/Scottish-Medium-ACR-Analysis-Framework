@@ -94,6 +94,7 @@ class ACRSliceThickness(HazenTask):
 
         invest_x = np.array(invest_x).T
         mean_x_profile = np.mean(invest_x, 1)
+
         abs_diff_x_profile = np.absolute(np.diff(mean_x_profile))
 
         # find the points corresponding to the transition between:
@@ -108,7 +109,8 @@ class ACRSliceThickness(HazenTask):
         width_pts = [x_locs[1], x_locs[2]]
         width = np.max(width_pts) - np.min(width_pts)
         # take rough estimate of x points for later line profiles
-        x = np.round([np.min(width_pts) + 0.2 * width, np.max(width_pts) - 0.2 * width])
+        x = np.round([np.min(width_pts) + 0.1 * width, np.max(width_pts) - 0.1 * width]) #Had to reduce this, sometimes 0.2 is to narrow. 
+        #x = [round(50/res[1]),round(200/res[1])]
 
         #In some instances there can be a bubble or something that messes up the detection. If this happens nad we end up ith a wrong width then revert to a hardcoded region
         ExpectedWidth = [190*0.8,190*1.2]
