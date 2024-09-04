@@ -73,8 +73,8 @@ class ACRGeometricAccuracyMagNetMethod(HazenTask):
         Avg_vertical_Distance_mm = np.mean(vert_distances) * self.pixel_size
 
         # calculate horizontal and vertical distances in mm from distances in pixels, for output
-        horz_distances_mm = [round(x * self.pixel_size, 3) for x in horz_distances]
-        vert_distances_mm = [round(x * self.pixel_size, 3) for x in vert_distances]
+        horz_distances_mm = [round(x * self.pixel_size, 2) for x in horz_distances]
+        vert_distances_mm = [round(x * self.pixel_size, 2) for x in vert_distances]
 
         if self.report:
             import matplotlib.pyplot as plt
