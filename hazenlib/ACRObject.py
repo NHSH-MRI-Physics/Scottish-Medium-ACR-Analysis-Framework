@@ -307,8 +307,8 @@ class ACRObject:
         y = np.linspace(0, dims[1]-1, dims[1])
 
         #This is the old code
-        #x = np.linspace(1, dims[0], dims[0])
-        #y = np.linspace(1, dims[1], dims[1])
+        x = np.linspace(1, dims[0], dims[0])
+        y = np.linspace(1, dims[1], dims[1])
 
         X, Y = np.meshgrid(x, y)
         mask = (X - centre[0]) ** 2 + (Y - centre[1]) ** 2 <= radius**2

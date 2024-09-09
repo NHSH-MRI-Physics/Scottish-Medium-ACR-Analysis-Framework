@@ -94,7 +94,7 @@ class ACRSlicePosition(HazenTask):
             tuple: arrays of x and y coordinates of wedges
         """
         # X COORDINATES
-        x_investigate_region = np.ceil(15 / res[0]).astype(
+        x_investigate_region = np.ceil(35 / res[0]).astype(
             int
         )  # define width of region to test (comparable to wedges)
 

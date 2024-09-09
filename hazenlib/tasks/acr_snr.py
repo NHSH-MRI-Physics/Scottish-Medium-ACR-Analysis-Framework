@@ -24,7 +24,7 @@ from scipy import ndimage
 import hazenlib.utils
 from hazenlib.HazenTask import HazenTask
 from hazenlib.ACRObject import ACRObject
-
+from pydicom.pixel_data_handlers.util import apply_modality_lut
 
 class ACRSNR(HazenTask):
     """Signal-to-noise ratio measurement class for DICOM images of the ACR phantom
@@ -163,8 +163,8 @@ class ACRSNR(HazenTask):
         Returns:
             np.array: pixel array of the filtered image
         """
-        a = dcm.pixel_array.astype("int")
-
+        #a = dcm.pixel_array.astype("int")
+        a = apply_modality_lut(dcm.pixel_array,dcm).astype('int') 
         # filter size = 9, following MATLAB code and McCann 2013 paper for head coil, although note McCann 2013
         # recommends 25x25 for body coil.
         filtered_array = ndimage.uniform_filter(a, 9, mode="constant")
@@ -182,7 +182,8 @@ class ACRSNR(HazenTask):
         Returns:
             np.array: pixel array representing the image noise
         """
-        a = dcm.pixel_array.astype("int")
+        #a = dcm.pixel_array.astype("int")
+        a = apply_modality_lut(dcm.pixel_array,dcm).astype('int') 
 
         # Convolve image with boxcar/uniform kernel
         imsmoothed = self.filtered_image(dcm)
@@ -209,7 +210,7 @@ class ACRSNR(HazenTask):
         if type(dcm) == np.ndarray:
             data = dcm
         else:
-            data = dcm.pixel_array
+            data = apply_modality_lut(dcm.pixel_array,dcm).astype('int') #dcm.pixel_array
 
         sample = [None] * 5
         # for array indexing: [row, column] format
@@ -329,7 +330,7 @@ class ACRSNR(HazenTask):
         col, row = centre
 
         difference = np.subtract(
-            dcm1.pixel_array.astype("int"), dcm2.pixel_array.astype("int")
+            apply_modality_lut(dcm1.pixel_array,dcm1).astype('int'), apply_modality_lut(dcm2.pixel_array,dcm2).astype('int') #dcm1.pixel_array.astype("int"), dcm2.pixel_array.astype("int")
         )
 
         signal = [
