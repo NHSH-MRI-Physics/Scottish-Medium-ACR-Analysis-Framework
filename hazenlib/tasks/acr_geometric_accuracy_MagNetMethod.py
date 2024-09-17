@@ -280,8 +280,8 @@ class ACRGeometricAccuracyMagNetMethod(HazenTask):
             # note: flipped x/y
 
             # this skips the gaussian bit
-            #x0_im[idx]=rod_centres[idx][0]      
-            #y0_im[idx]=rod_centres[idx][1] 
+            x0_im[idx]=rod_centres[idx][0]      
+            y0_im[idx]=rod_centres[idx][1] 
 
             rods[idx].x = y0_im[idx]
             rods[idx].y = x0_im[idx]

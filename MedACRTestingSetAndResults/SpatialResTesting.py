@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
 import numpy as np
 
-file = "MedACRTestingSetAndResults\Blair Gartnavel\IM_0038"
+file = "MedACRTestingSetAndResults\Raigmore ACR MRI 2 Test data\MR.X.1.2.276.0.7230010.3.1.4.0.1432.1716923148.720636.dcm"
 data = pydicom.dcmread(file).pixel_array
 points = []
 values = []
@@ -56,14 +56,6 @@ files = [
 #print(Contrast)
 #print(np.std(Contrast))
 
-#Contrast = GetContrastResponse(["MedACRTestingSetAndResults\SpatialResTesting\Gartnavel\\1.1mmImageJ.csv"])
-#print(Contrast)
-
-Contrast = GetContrastResponse(["MedACRTestingSetAndResults\SpatialResTesting\Gartnavel\\1.0mmImageJ.csv"])
+Contrast = GetContrastResponse(["MedACRTestingSetAndResults\SpatialResTesting\Raig 2\\0.8mmImageJ.csv"])
 print(Contrast)
 
-Contrast = GetContrastResponse(["MedACRTestingSetAndResults\SpatialResTesting\Gartnavel\\0.9mmImageJ.csv"])
-print(Contrast)
-
-Contrast = GetContrastResponse(["MedACRTestingSetAndResults\SpatialResTesting\Gartnavel\\0.8mmImageJ.csv"])
-print(Contrast)
