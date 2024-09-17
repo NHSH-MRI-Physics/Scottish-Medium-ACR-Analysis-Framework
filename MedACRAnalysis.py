@@ -239,6 +239,7 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
                 if not os.path.exists(OutputPath+"/ACRSpatialResolution"):
                     os.makedirs(OutputPath+"/ACRSpatialResolution")
                 plt.savefig(OutputPath+"/ACRSpatialResolution/"+Seq+"_"+key+"_ManualRes.png")
+                plt.close()
                 #plt.show()
 
                 ReportFile.write( '\tManual '+key+' Resolution Hor: %-15s%-12s\n' % (str(ContrastResponse[0]),MedACR_ToleranceTableChecker.GetPassResult(ContrastResponse[0],"Manual Resolution",key +" Horizontal")))

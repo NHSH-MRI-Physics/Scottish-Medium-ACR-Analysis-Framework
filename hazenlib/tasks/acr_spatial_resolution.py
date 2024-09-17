@@ -127,14 +127,14 @@ class ACRSpatialResolution(HazenTask):
             elif(self.ResOption==ResOptions.ContrastResponseMethod):
                 HorContrastResponse, VertContrastResponse = self.get_ContrastResponse(mtf_dcm)
                 results["measurement"] = {
-                    "1.1mm holes Horizontal": round(HorContrastResponse[0],2),
-                    "1.1mm holes Vertical": round(VertContrastResponse[0],2),
-                    "1.0mm holes Horizontal": round(HorContrastResponse[1],2),
-                    "1.0mm holes Vertical": round(VertContrastResponse[1],2),
-                    "0.9mm holes Horizontal": round(HorContrastResponse[2],2),
-                    "0.9mm holes Vertical": round(VertContrastResponse[2],2),
-                    "0.8mm holes Horizontal": round(HorContrastResponse[3],2),
-                    "0.8mm holes Vertical": round(VertContrastResponse[3],2)
+                    "1.1mm holes Horizontal": round(HorContrastResponse[0]*100.0,2),
+                    "1.1mm holes Vertical": round(VertContrastResponse[0]*100.0,2),
+                    "1.0mm holes Horizontal": round(HorContrastResponse[1]*100.0,2),
+                    "1.0mm holes Vertical": round(VertContrastResponse[1]*100.0,2),
+                    "0.9mm holes Horizontal": round(HorContrastResponse[2]*100.0,2),
+                    "0.9mm holes Vertical": round(VertContrastResponse[2]*100.0,2),
+                    "0.8mm holes Horizontal": round(HorContrastResponse[3]*100.0,2),
+                    "0.8mm holes Vertical": round(VertContrastResponse[3]*100.0,2)
                 }
                 
             elif(self.ResOption==ResOptions.Manual):
@@ -858,6 +858,7 @@ class ACRSpatialResolution(HazenTask):
             #fig, (ax1, ax2) = plt.subplots(1, 2)
             #ax1.imshow(img)
             #ax1.add_patch(rect)
+            
             for i in range(1,5):
                 if Vertical==False:
                     xvalues=np.linspace(0,img.shape[1]-1,img.shape[1],endpoint=True)
@@ -874,9 +875,26 @@ class ACRSpatialResolution(HazenTask):
                     Line = griddata(points, values, (yvalues, xvalues), method='linear')
                     Line = Line[::-1]
                     Lines+=Line
+            '''
+            if Vertical==False:
+                xvalues=np.linspace(0,img.shape[1]-1,img.shape[1],endpoint=True)
+                xvalues=np.linspace(0,rect.get_width(),img.shape[1],endpoint=True)
+                yvalues=[rect.get_y()+rect.get_height()/2.0]*len(xvalues)
+                Line = griddata(points, values, (yvalues, xvalues), method='linear')
+                Lines+=Line
+                #ax1.axhline(yvalues[0])
+            else:
+                yvalues=np.linspace(0,img.shape[0]-1,img.shape[0],endpoint=True)
+                xvalues=np.linspace(0,rect.get_height(),img.shape[0],endpoint=True)
+                xvalues=[rect.get_x()+rect.get_width()/2.0]*len(yvalues)
+                #ax1.axvline(xvalues[0])
+                Line = griddata(points, values, (yvalues, xvalues), method='linear')
+                Line = Line[::-1]
+                Lines+=Line
+            '''
             #ax2.plot(Lines)
             #plt.savefig("test.png")
-            return Lines
+            return Lines/4.0
             
 
         def GetCutOffs(img):

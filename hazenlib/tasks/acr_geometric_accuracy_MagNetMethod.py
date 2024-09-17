@@ -278,6 +278,11 @@ class ACRGeometricAccuracyMagNetMethod(HazenTask):
                 y0_im[idx]=rod_centres[idx][1]        
                 #print(f'Gaussian failed for point {idx}; centre-weighting x0_im={x0_im[idx]}, y0_im={y0_im[idx]}')
             # note: flipped x/y
+
+            # this skips the gaussian bit
+            #x0_im[idx]=rod_centres[idx][0]      
+            #y0_im[idx]=rod_centres[idx][1] 
+
             rods[idx].x = y0_im[idx]
             rods[idx].y = x0_im[idx]
 
