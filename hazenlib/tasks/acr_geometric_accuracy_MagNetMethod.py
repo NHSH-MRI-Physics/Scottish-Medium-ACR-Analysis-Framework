@@ -361,7 +361,7 @@ class ACRGeometricAccuracyMagNetMethod(HazenTask):
             displace = +VertDist[count]/4
             if i == 1:
                 displace=-VertDist[count]/4
-            plt.annotate( str(HorDist[count])+"mm", xy = ( MidPointx+8,MidPointy+displace),ha='center',va='center',color=color[count],fontsize=size, rotation=90) 
+            plt.annotate( str(VertDist[count])+"mm", xy = ( MidPointx+8,MidPointy+displace),ha='center',va='center',color=color[count],fontsize=size, rotation=90) 
             count+=1
 
         for idx, rod in enumerate(rods):
