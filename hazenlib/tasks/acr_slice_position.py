@@ -57,7 +57,7 @@ class ACRSlicePosition(HazenTask):
         """
         # Identify relevant slices
         dcms = [self.ACR_obj.dcms[0], self.ACR_obj.dcms[-1]]
-        dcms = [dcms[-1]]
+        #dcms = [dcms[-1]]
 
         # Initialise results dictionary
         results = self.init_result_dict()
@@ -289,35 +289,13 @@ class ACRSlicePosition(HazenTask):
                 difference[lag_val:] = np.nan
             # filler value to suppress warning when trying to calculate mean of array filled with NaN otherwise
             # calculate difference
-            err[k] = 1e10 if np.isnan(difference).all() else np.nanmean(difference)
-
-
-            plt.plot(np.roll(interp_line_prof_L, lag_val),color="red")
-            plt.axvline(x=peaks[0]+lag_val,color="red")
-            plt.axvline(x=peaks[1]+lag_val,color="red")  
-
-            plt.plot(interp_line_prof_R,color="blue")
-            plt.axvline(x=peaks[0],color="blue")
-            plt.axvline(x=peaks[1],color="blue")
-
-            x = np.arange(peaks[0],peaks[1],1)
-            plt.plot(x,difference)
-
-            #plt.plot(np.roll(static_line_L, lag_val),color="red")
-            #plt.plot(static_line_R,color="blue")
-            #plt.plot(difference)
-
-            plt.savefig("Debugging/"+str(k)+".png")
-            plt.close()
-        print(min(err))
+            err[k] = 1e10 if np.isnan(difference).all() else np.abs(np.nanmean(difference))
 
         # find minimum non-zero error
         temp = np.argwhere(err == np.min(err[err > 0]))[0]
 
         # find shift corresponding to above error
         shift = -lag[temp][0] if pos == 1 else lag[temp][0]
-        print(shift)
-
 
         # calculate bar length difference
         dL = pos * np.abs(shift) * (1 / interp_factor) * res[1]
