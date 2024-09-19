@@ -147,22 +147,18 @@ class ACRGeometricAccuracyMagNetMethod(HazenTask):
             )  # ensure voxel values positive for maximisation
 
         """ Initial Center-of-mass Rod Locator """
+        dx = self.ACR_obj.centre[0] - int(round(self.img_size/2.0))
+        dy = self.ACR_obj.centre[1] - int(round(self.img_size/2.0))
 
         #Mask image to central 3x3 rod region, which should be in central square between 30% - 70% of image limits
         #Mask required as thresholding technique sensitive to random noise in background causing lots of spurious thresholds with 10 regions
         mask_low=round(0.3 * self.img_size)
         mask_high=round(0.7 * self.img_size)
         #print(f'mask_low is {mask_low}, mask_high is {mask_high}')
-        arr_inv[0:mask_low,:]=0
-        arr_inv[mask_high:self.img_size,:]=0
-        arr_inv[:,0:mask_low]=0
-        arr_inv[:,mask_high:self.img_size]=0
-
-        #Check data:
-#        plt.imshow(arr, cmap=plt.cm.bone)  # set the color map to bone 
-#        plt.show() 
-#        plt.imshow(arr_inv, cmap=plt.cm.bone)  # set the color map to bone 
-#        plt.show() 
+        arr_inv[0:mask_low+dy:]=0
+        arr_inv[mask_high+dy:self.img_size,:]=0
+        arr_inv[:,0:mask_low+dx]=0
+        arr_inv[:,mask_high+dx:self.img_size]=0
 
         # threshold and binaries the image in order to locate the rods.
         img_max = np.max(arr_inv)  #arr # maximum number of img intensity
@@ -216,9 +212,16 @@ class ACRGeometricAccuracyMagNetMethod(HazenTask):
         #dummy=[np.round(elem,1) for elem in rod_centres]
         #print(dummy)
 
+        SkiSkipGaussFitpGauss=True
+        kwargs = self.ACR_obj.kwargs
+        if "SkipGaussFit" in kwargs:
+            SkipGaussFit = kwargs["SkipGaussFit"]
+        if SkipGaussFit==True:
+            return rods_initial, rods_initial
+        
+
 
         """ Gaussian 2D Rod Locator """
-
         # setup bounding box dict
         # TODO: make these into Rod class properties and functions
         # rather than loop over 9 each time
@@ -279,10 +282,6 @@ class ACRGeometricAccuracyMagNetMethod(HazenTask):
                 #print(f'Gaussian failed for point {idx}; centre-weighting x0_im={x0_im[idx]}, y0_im={y0_im[idx]}')
             # note: flipped x/y
 
-            # this skips the gaussian bit
-            x0_im[idx]=rod_centres[idx][0]      
-            y0_im[idx]=rod_centres[idx][1] 
-
             rods[idx].x = y0_im[idx]
             rods[idx].y = x0_im[idx]
 
@@ -317,7 +316,8 @@ class ACRGeometricAccuracyMagNetMethod(HazenTask):
             )
             fig.savefig(img_path)
             self.report_files.append(img_path)
-            '''
+        '''
+
         return rods, rods_initial
 
     def plot_rods(self, ax, arr, rods, rods_initial,HorDist,VertDist):  # pragma: no cover

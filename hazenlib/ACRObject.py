@@ -42,6 +42,8 @@ class ACRObject:
             self.LocalisierDCM=dcmread(kwargs["Localiser"])
         else:
             self.LocalisierDCM = None
+
+        self.kwargs = kwargs
         
 
     def sort_images(self):

@@ -110,7 +110,7 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
             ReportFile.write( '\t\tDiagonal distance SW (mm): %-12s%-12s\n' % (str(GeoDist["measurement"][GeoDist["file"][1]]["Diagonal distance SW"]),MedACR_ToleranceTableChecker.GetPassResult(GeoDist["measurement"][GeoDist["file"][1]]["Diagonal distance SW"],"Geometric Accuracy","ACRMethod") ))
             ReportFile.write( '\t\tDiagonal distance SE (mm): %-12s%-12s\n' % (str(GeoDist["measurement"][GeoDist["file"][1]]["Diagonal distance SE"]),MedACR_ToleranceTableChecker.GetPassResult(GeoDist["measurement"][GeoDist["file"][1]]["Diagonal distance SE"],"Geometric Accuracy","ACRMethod") ))
         if (GeoMethod == GeometryOptions.MAGNETMETHOD):
-            acr_geometric_accuracy_MagNetMethod = ACRGeometricAccuracyMagNetMethod(input_data=Data,report_dir=OutputPath,MediumACRPhantom=True,report=True)
+            acr_geometric_accuracy_MagNetMethod = ACRGeometricAccuracyMagNetMethod(input_data=Data,report_dir=OutputPath,MediumACRPhantom=True,report=True, SkipGaussFit=True)
             GeoDist = acr_geometric_accuracy_MagNetMethod.run()
             print("Horizontal CoV(%):        "+str(GeoDist["measurement"]["distortion"]["distortion values"]["horizontal CoV"]))
             print("Vertical CoV(%):          "+str(GeoDist["measurement"]["distortion"]["distortion values"]["vertical CoV"]))
