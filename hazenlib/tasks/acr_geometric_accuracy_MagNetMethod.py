@@ -212,10 +212,13 @@ class ACRGeometricAccuracyMagNetMethod(HazenTask):
         #dummy=[np.round(elem,1) for elem in rod_centres]
         #print(dummy)
 
-        SkiSkipGaussFitpGauss=True
         kwargs = self.ACR_obj.kwargs
         if "SkipGaussFit" in kwargs:
             SkipGaussFit = kwargs["SkipGaussFit"]
+        else:
+            SkipGaussFit=True
+
+
         if SkipGaussFit==True:
             return rods_initial, rods_initial
         

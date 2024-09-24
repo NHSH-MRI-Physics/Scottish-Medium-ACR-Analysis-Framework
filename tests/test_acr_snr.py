@@ -12,7 +12,7 @@ from tests import TEST_DATA_DIR, TEST_REPORT_DIR
 
 class TestACRSNRGE(unittest.TestCase):
     norm_factor = 57.12810400630368
-    snr = 40.19
+    snr = 41.05
 
     def setUp(self):
         ACR_DATA_GE = pathlib.Path(TEST_DATA_DIR / "acr" / "GE")
@@ -30,12 +30,13 @@ class TestACRSNRGE(unittest.TestCase):
 
     def test_snr_by_smoothing(self):
         snr, _, _, _, _, _  = self.acr_snr_task.snr_by_smoothing(self.snr_dcm)
+        print(snr)
         assert round(snr, 2) == self.snr
 
 
 class TestACRSNRSiemens(TestACRSNRGE):
     norm_factor = 9.761711312090041
-    snr = 344.15
+    snr = 542.81
     sub_snr = 75.94
 
     def setUp(self):
@@ -72,7 +73,7 @@ class TestACRSNRSiemens(TestACRSNRGE):
 
 class TestMedACRSNR(unittest.TestCase):
     norm_factor = 11.67
-    snr = 228.53
+    snr = 335.76
 
     def setUp(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")

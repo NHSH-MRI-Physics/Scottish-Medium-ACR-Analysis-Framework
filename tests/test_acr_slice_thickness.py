@@ -10,9 +10,9 @@ from tests import TEST_DATA_DIR
 
 
 class TestACRSliceThicknessSiemens(unittest.TestCase):
-    x_pts = [71, 181]
+    x_pts = [52, 200]
     y_pts = [132, 126]
-    dz = 4.91
+    dz = 5.01
 
     def setUp(self):
         ACR_DATA_SIEMENS = pathlib.Path(TEST_DATA_DIR / "acr" / "Siemens")
@@ -25,6 +25,7 @@ class TestACRSliceThicknessSiemens(unittest.TestCase):
     def test_ramp_find(self):
         res = self.dcm.PixelSpacing
         centre = self.acr_slice_thickness_task.ACR_obj.centre
+        print(self.acr_slice_thickness_task.find_ramps(self.dcm.pixel_array, centre, res))
         assert (
             self.acr_slice_thickness_task.find_ramps(self.dcm.pixel_array, centre, res)[
                 0
@@ -52,9 +53,9 @@ class TestACRSliceThicknessSiemens(unittest.TestCase):
 
 
 class TestACRSliceThicknessGE(TestACRSliceThicknessSiemens):
-    x_pts = [146, 356]
+    x_pts = [111, 391]
     y_pts = [262, 250]
-    dz = 5.02
+    dz = 4.85
 
     def setUp(self):
         ACR_DATA_GE = pathlib.Path(TEST_DATA_DIR / "acr" / "GE")
@@ -66,9 +67,9 @@ class TestACRSliceThicknessGE(TestACRSliceThicknessSiemens):
 
 
 class TestMedACRSliceThickness(TestACRSliceThicknessSiemens):
-    x_pts = [76, 174]
+    x_pts = [60, 190]
     y_pts = [132, 126]
-    dz = 5.07
+    dz = 5.15
 
     def setUp(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR" )

@@ -8,6 +8,7 @@ from hazenlib.utils import get_dicom_files
 from hazenlib.tasks.acr_spatial_resolution import ACRSpatialResolution
 from hazenlib.ACRObject import ACRObject
 from tests import TEST_DATA_DIR, TEST_REPORT_DIR
+from hazenlib.tasks.acr_spatial_resolution import ResOptions
 
 
 class TestACRSpatialResolutionSiemens(unittest.TestCase):
@@ -95,20 +96,27 @@ class TestACRSpatialResolutionGE(TestACRSpatialResolutionSiemens):
         self.data = self.dcm.pixel_array
         self.res = self.dcm.PixelSpacing
 
-#TODO we shoudl test MTF but since the phantom isnt titled i never impletrmented it 
+
 class TestMedACRSpatialResolution(unittest.TestCase):
     DotMatrixResult = {'task': 'ACRSpatialResolution', 'file': 'ACR_AxT1_4_1', 'measurement': {'1.1mm holes': 2524630.81, '1.0mm holes': 1230470.89, '0.9mm holes': 284317.18, '0.8mm holes': 391006.3}}
-
+    ContrastResponseResult = {'task': 'ACRSpatialResolution', 'file': 'ACR_AxT1_4_1', 'measurement': {'1.1mm holes Horizontal': 65.21, '1.1mm holes Vertical': 33.85, '1.0mm holes Horizontal': 65.07, '1.0mm holes Vertical': 14.78, '0.9mm holes Horizontal': 18.25, '0.9mm holes Vertical': 7.39, '0.8mm holes Horizontal': 2.75, '0.8mm holes Vertical': 3.61}}
     def setUp(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
         ge_files = get_dicom_files(ACR_DATA_Med)
 
         self.acr_spatial_resolution_task = ACRSpatialResolution(
-            input_data=ge_files, report_dir=pathlib.PurePath.joinpath(TEST_REPORT_DIR)
+            input_data=ge_files, report_dir=pathlib.PurePath.joinpath(TEST_REPORT_DIR),report=False
             ,MediumACRPhantom=True
-            ,UseDotMatrix=True
         )
+        
     
     def test_DotMatrix(self):
+        self.acr_spatial_resolution_task.ResOption=ResOptions.DotMatrixMethod
         Res =  self.acr_spatial_resolution_task.run()
         assert Res == self.DotMatrixResult
+
+    def test_ContrastResponse(self):
+        self.acr_spatial_resolution_task.ResOption=ResOptions.ContrastResponseMethod
+        Res =  self.acr_spatial_resolution_task.run()
+        print(Res)
+        assert Res == self.ContrastResponseResult

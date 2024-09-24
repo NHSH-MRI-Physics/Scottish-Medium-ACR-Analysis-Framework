@@ -1035,8 +1035,8 @@ class ACRSpatialResolution(HazenTask):
                 #ax_vert.get_yaxis().set_visible(False)
                 ax0.plot([MiddlesVert[BestVertIndex],MiddlesVert[BestVertIndex]],[LowerRect.get_y(),len(img)-1],linestyle = "--",color="g")
 
-                ContrastResponsesHorAllRes.append(max(ContrastResponseResultsHor))
-                ContrastResponsesVertAllRes.append(max(ContrastResponseResultsVert))
+            ContrastResponsesHorAllRes.append(max(ContrastResponseResultsHor))
+            ContrastResponsesVertAllRes.append(max(ContrastResponseResultsVert))
 
 
         if self.report:

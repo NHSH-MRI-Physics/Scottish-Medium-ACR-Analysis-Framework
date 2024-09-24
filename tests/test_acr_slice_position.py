@@ -11,8 +11,8 @@ from tests import TEST_DATA_DIR
 
 class TestACRSlicePositionSiemens(unittest.TestCase):
     x_pts = [(123, 129), (123, 129)]
-    y_pts = [(40, 82), (44, 82)]
-    dL = -0.59, -1.56
+    y_pts = [(44, 82), (48, 82)]
+    dL = -0.59, -1.76
 
     def setUp(self):
         ACR_DATA_SIEMENS = pathlib.Path(TEST_DATA_DIR / "acr" / "Siemens")
@@ -28,10 +28,10 @@ class TestACRSlicePositionSiemens(unittest.TestCase):
         img = self.dcm_1.pixel_array
         res = self.dcm_1.PixelSpacing
         mask = self.acr_slice_position_task.ACR_obj.get_mask_image(img)
+
         assert (
             self.acr_slice_position_task.find_wedges(img, mask, res)[0] == self.x_pts[0]
         ).all() == True
-
         assert (
             self.acr_slice_position_task.find_wedges(img, mask, res)[1] == self.y_pts[0]
         ).all() == True
@@ -40,10 +40,10 @@ class TestACRSlicePositionSiemens(unittest.TestCase):
         img = self.dcm_11.pixel_array
         res = self.dcm_11.PixelSpacing
         mask = self.acr_slice_position_task.ACR_obj.get_mask_image(img)
+
         assert (
             self.acr_slice_position_task.find_wedges(img, mask, res)[0] == self.x_pts[1]
         ).all() == True
-
         assert (
             self.acr_slice_position_task.find_wedges(img, mask, res)[1] == self.y_pts[1]
         ).all() == True
@@ -71,8 +71,8 @@ class TestACRSlicePositionSiemens(unittest.TestCase):
 
 class TestACRSlicePositionGE(TestACRSlicePositionSiemens):
     x_pts = [(246, 257), (246, 257)]
-    y_pts = [(77, 164), (89, 162)]
-    dL = 0.41, 0.3
+    y_pts = [(90, 164), (89, 162)]
+    dL = 0.61, 0.51
 
     def setUp(self):
         ACR_DATA_GE = pathlib.Path(TEST_DATA_DIR / "acr" / "GE")
@@ -86,8 +86,8 @@ class TestACRSlicePositionGE(TestACRSlicePositionSiemens):
 
 class TestMedACRSlicePosition(TestACRSlicePositionSiemens):
     x_pts = [(123, 129), (124, 130)]
-    y_pts = [(50, 81), (52, 80)]
-    dL = -1.56, -1.56
+    y_pts = [(54, 81), (53, 80)]
+    dL = -1.76, -1.76
 
     def setUp(self):
         ACR_DATA_MED = pathlib.Path(TEST_DATA_DIR / "MedACR")

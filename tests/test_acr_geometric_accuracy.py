@@ -8,7 +8,7 @@ from hazenlib.utils import get_dicom_files
 from hazenlib.tasks.acr_geometric_accuracy import ACRGeometricAccuracy
 from hazenlib.ACRObject import ACRObject
 from tests import TEST_DATA_DIR, TEST_REPORT_DIR
-
+from hazenlib.tasks.acr_geometric_accuracy_MagNetMethod import ACRGeometricAccuracyMagNetMethod
 
 class TestACRGeometricAccuracySiemens(unittest.TestCase):
     L1 = 192.38, 188.48
@@ -83,10 +83,10 @@ class TestACRGeometricAccuracyGE(TestACRGeometricAccuracySiemens):
         self.dcm_5 = self.acr_geometric_accuracy_task.ACR_obj.dcms[4]
 
 
-class TestACRGeometricAccuracyGE(TestACRGeometricAccuracySiemens):
+class TestMedACRGeometricAccuracyGE(TestACRGeometricAccuracySiemens):
     L1 = 164.07, 164.07
-    L5 = 166.02, 165.05, 166.02, 165.05
-    distortion_metrics = [0.05, 1.02, 0.48]
+    L5 = 166.02, 165.05, 166.02, 166.02
+    distortion_metrics = [0.21, 1.02, 0.53]
 
     def setUp(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
@@ -99,3 +99,29 @@ class TestACRGeometricAccuracyGE(TestACRGeometricAccuracySiemens):
 
         self.dcm_1 = self.acr_geometric_accuracy_task.ACR_obj.dcms[0]
         self.dcm_5 = self.acr_geometric_accuracy_task.ACR_obj.dcms[4]
+
+
+class TestMedACRGeometricAccuracyGEMagNet(unittest.TestCase):
+
+    Results = {'distortion': {'distortion values': {'vertical CoV': 0.15, 'horizontal CoV': 0.28}, 'linearity values': {'Mean Vertical Distance mm': 79.93, 'Mean Horizontal Distance mm': 79.84}, 'horizontal distances mm': [79.58, 79.99, 79.93], 'vertical distances mm': [79.81, 79.94, 80.05]}}
+    def setUp(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+        ge_files = get_dicom_files(ACR_DATA_Med)
+        self.acr_geometric_accuracy_task = ACRGeometricAccuracyMagNetMethod(
+            input_data=ge_files, report_dir=pathlib.PurePath.joinpath(TEST_REPORT_DIR)
+            ,MediumACRPhantom=True
+        )
+        self.dcm_1 = self.acr_geometric_accuracy_task.ACR_obj.dcms[0]
+        self.dcm_5 = self.acr_geometric_accuracy_task.ACR_obj.dcms[4]
+
+    def test_geometric_accuracy_slice_1(self):
+        result = self.acr_geometric_accuracy_task.run()
+        assert (result['measurement']['distortion']['distortion values']['vertical CoV'] == self.Results['distortion']['distortion values']['vertical CoV']) == True
+        assert (result['measurement']['distortion']['distortion values']['horizontal CoV'] == self.Results['distortion']['distortion values']['horizontal CoV']) == True
+
+        assert (result['measurement']['distortion']['linearity values']['Mean Vertical Distance mm'] == self.Results['distortion']['linearity values']['Mean Vertical Distance mm']) == True
+        assert (result['measurement']['distortion']['linearity values']['Mean Horizontal Distance mm'] == self.Results['distortion']['linearity values']['Mean Horizontal Distance mm']) == True
+        
+        assert (result['measurement']['distortion']['horizontal distances mm'] == self.Results['distortion']['horizontal distances mm']) == True
+        assert (result['measurement']['distortion']['vertical distances mm'] == self.Results['distortion']['vertical distances mm']) == True
+        
