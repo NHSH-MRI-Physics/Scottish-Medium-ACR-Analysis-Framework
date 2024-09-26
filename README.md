@@ -1,4 +1,4 @@
-![bitmap](https://github.com/user-attachments/assets/e2396cbd-39a0-4213-afdb-64e92b88db04)![image](https://github.com/user-attachments/assets/032f9caf-3bcf-4d5c-8767-4617c70a7bba)![Med_ACR_Tra_T2_8001_7](https://github.com/user-attachments/assets/9be40afe-aa31-4ba7-a4bc-dd2f7336b526)![example workflow](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/actions/workflows/Run_UnitTests.yml/badge.svg)
+![UnitTests](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/actions/workflows/Run_UnitTests.yml/badge.svg)
 
 Version: Pre-Release
 
@@ -38,9 +38,32 @@ it is expected to be a directory containing DICOM files, where each file corespo
 
 ![image](https://github.com/user-attachments/assets/df2a6626-892f-44e3-8fef-5d1766ddf014)
 
+## Modules
+### Uniformity
+This is computed by moving a 1cm^2 circular ROI over the phantom and computing the mean pixel value in each region. By considering the maximum and minimum values the percentage uniformity can be determeined. 
+
+### Slice Position
+On the ACR Phantom, the slice position can be determined by examining two bars located at the top of the phantom. The difference in the bars height coresponds to the error in slice position. The code produces a line profile over each bar and determines the offset between them. Hence it can compute the slice position error. 
+
+### Spatial Resolution
+
+### Slice Thickness
+The ACR phantom contains two ramps which depending on the slice thickness will appear longer or shorter. The code draws a line over each bar and compute the full width half maximum of the profile. Based on the width of the profile, the slice thickness can be deteremined. 
+
+### Signal to Noise Ratio
+Signal to noise ratio is computed by firstly taken the mean pixel value in 5 regions of interest to produce 5 signal values. The image is convoluted with a 9x9 boxcar kernal to produce a smoothed image. The convoluted image is subtracted from the original signal image to produce a noise image. The standard deviation is taken in each region of interest in the noise image. This allows a signal to noise ratio be computed for each region of interest. Finally the mean over all region of interests is computed giving the final result. 
+
+### Geometric Accuracy
+
+### Ghosting
+A region of interest is placed withn the phantom and 4 further are placed above, below, left and right of the phantom. By considering the fraction between the signal in the peripheral regions with that of the centre, the percentage value of ghosting can be deteremined. 
+
+## Tolerance Table
+
 ## Testing Protocol 
 
-
+## Bug Reports and Feature Requests
+Please make any bug reports or feature requests by logging an issue [here](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/issues) or send an email to the developers below. 
 
 ## Developers
 John Tracey NHS Highland (John.tracey@NHS.scot)
