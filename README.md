@@ -59,8 +59,10 @@ Signal to noise ratio is computed by firstly taken the mean pixel value in 5 reg
 A region of interest is placed withn the phantom and 4 further are placed above, below, left and right of the phantom. By considering the fraction between the signal in the peripheral regions with that of the centre, the percentage value of ghosting can be deteremined. 
 
 ## Tolerance Table
+The tolerance table is used to quickly identify if a test is within tolerance. The tolerance table is in the ToleranceTable/ToleranceTable.xml file. In order to add a test to the tolerance table, you must add an XML element called module with the name field set to be the same as the module in question. For each module you can then add test tolerances, a child element is then added named Test. In each element the name field must be set to be equal to the specific test result (for example "1.1mm holes Horizontal").  You can then set a Min, Max or Equals value in this element. If the value is greater than min, lower than max or equal to the tolerance then it is considered within tolerance. If a module or test is not found in the tolerance table, then the script returns "No Tolerance Set". If no name is set on the test element, then the same tolerance is used for every test in that module.
 
 ## Testing Protocol 
+To confirm the scripts, match expected results a testing protocol was developed. The goal of this was test each module and confirm it meets manual measurements is within a given tolerance. This testing protocol can be found [here](https://scottish.sharepoint.com/:w:/s/NHSSMPCEMRI/Ef7I4xEsJOxPrcbgW4FlG_IBkFG3_8y_jdjDgZxb_EJOjA?e=gOoL50) and the results found [here](https://scottish.sharepoint.com/:x:/s/NHSSMPCEMRI/EbfQMYNIC6ZCp17BOsFy1KoBZfUzNkAewbwQtcjvyraJ6g?e=ikbuEM). Unfortunately, an NHS Scotland account is required to access these documents.
 
 ## Bug Reports and Feature Requests
 Please make any bug reports or feature requests by logging an issue [here](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/issues) or send an email to the developers below. 
