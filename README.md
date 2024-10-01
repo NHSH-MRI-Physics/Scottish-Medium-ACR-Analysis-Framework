@@ -47,11 +47,11 @@ This is computed by moving a 1cm^2 circular ROI over the phantom and computing t
 On the ACR Phantom, the slice position can be determined by examining two bars located at the top of the phantom. The difference in the bars height coresponds to the error in slice position. The code produces a line profile over each bar and determines the offset between them. Hence it can compute the slice position error. 
 
 ### Spatial Resolution
-### Contrast Response 
+#### Contrast Response 
 On slice 1 there is a series of dot matrices designed to measure resoloution performance. For each grid, this module automatically attempts to determine what row and coloumn in each grid yeilds the highest contrast response. This is repeated for each grid yeilding a contrast response value as a function of grid size.
-### Modulation Transfer Function
-
-### Manual (Recomended option)
+#### Modulation Transfer Function
+On slice 1 an edge is found and a profile extracted. This profile is differentated and the fourier transform taken, computing the MTF. For this to be effective the phantom is expected to be rotated by at least 15 degrees. 
+#### Manual (Recomended option)
 This module displays to the user each resolution grid. The user then has to highlight the peaks and troughs on each grid image. This is conducted by left clicking 4 times to identify the 4 horizontal peaks (blue crosses) and then 3 times to identify the 3 troughs (blue circles). By holding ctrl-left clicking the user that highlights the 4 vertical peaks and 3 vertical troughs in the same fashion as the horizontal component. By Pressing Alt, the troughs are automatically assigned based on the middle location between the peaks. The windowing can also be adjusted by right clicking and dragging. After all 4 resolution grids have been evaluated the contrast response is computed.
 
 ### Slice Thickness
@@ -62,7 +62,9 @@ Signal to noise ratio is computed by firstly taken the mean pixel value in 5 reg
 
 ### Geometric Accuracy
 ### ACR Method
+The horizontal and vertical size of the phantom is measured on slice 1. The diagonal, horizontal and vertical size of the phantom is measured on slice 5. These values are then compared with the expected size of the phantom,  
 ### MagNET Method (Recomended option)
+
 
 ### Ghosting
 A region of interest is placed withn the phantom and 4 further are placed above, below, left and right of the phantom. By considering the fraction between the signal in the peripheral regions with that of the centre, the percentage value of ghosting can be deteremined. 
