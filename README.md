@@ -15,7 +15,6 @@ Please note this project is currently a work in progress, dervived from the [Haz
 - [ ] get baseline values from a series of scanners
 
 ## Instalation, Set up and Quickstart
-
 ## Requiremenets 
 - Windows (Mac and Linux coming soon)
 ## Installation
@@ -32,6 +31,7 @@ Please note this project is currently a work in progress, dervived from the [Haz
 
 ![bitmap](https://github.com/user-attachments/assets/d980cfdd-2142-46ae-942e-a1e206b8ac48)
 
+## 
 
 ## Expected Data Format
 it is expected to be a directory containing DICOM files, where each file coresponds to one slice, it is possible to have several sequeunces contained within the folder. Data should be collected as laid out in the [ACR Large and medium guidance document](https://www.acraccreditation.org/-/media/ACRAccreditation/Documents/MRI/ACR-Large--Med-Phantom-Guidance-102022.pdf). If it is desired to test sagittal and coronal axis, this is possible by rotating the phantom appropriately. It is important that the phantom or field of view is rotated such that circular component as at the top of the image and the resolution block is located at the bottom regardless if you are imaging axial, sagittal or coronal.  See the Image below for an example. 
@@ -46,6 +46,11 @@ This is computed by moving a 1cm^2 circular ROI over the phantom and computing t
 On the ACR Phantom, the slice position can be determined by examining two bars located at the top of the phantom. The difference in the bars height coresponds to the error in slice position. The code produces a line profile over each bar and determines the offset between them. Hence it can compute the slice position error. 
 
 ### Spatial Resolution
+### Contrast Response 
+On slice 1 there is a series of dot matrices designed to measure resoloution performance. For each grid, this module automatically attempts to determine what row and coloumn in each grid yeilds the highest contrast response. This is repeated for each grid yeilding a contrast response value as a function of grid size.
+### Modulation Transfer Function
+### Manual (Recomended option)
+
 
 ### Slice Thickness
 The ACR phantom contains two ramps which depending on the slice thickness will appear longer or shorter. The code draws a line over each bar and compute the full width half maximum of the profile. Based on the width of the profile, the slice thickness can be deteremined. 
@@ -54,6 +59,8 @@ The ACR phantom contains two ramps which depending on the slice thickness will a
 Signal to noise ratio is computed by firstly taken the mean pixel value in 5 regions of interest to produce 5 signal values. The image is convoluted with a 9x9 boxcar kernal to produce a smoothed image. The convoluted image is subtracted from the original signal image to produce a noise image. The standard deviation is taken in each region of interest in the noise image. This allows a signal to noise ratio be computed for each region of interest. Finally the mean over all region of interests is computed giving the final result. 
 
 ### Geometric Accuracy
+### ACR Method
+### MagNET Method (Recomended option)
 
 ### Ghosting
 A region of interest is placed withn the phantom and 4 further are placed above, below, left and right of the phantom. By considering the fraction between the signal in the peripheral regions with that of the centre, the percentage value of ghosting can be deteremined. 
