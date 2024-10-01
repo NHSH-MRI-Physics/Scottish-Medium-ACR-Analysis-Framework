@@ -49,8 +49,9 @@ On the ACR Phantom, the slice position can be determined by examining two bars l
 ### Contrast Response 
 On slice 1 there is a series of dot matrices designed to measure resoloution performance. For each grid, this module automatically attempts to determine what row and coloumn in each grid yeilds the highest contrast response. This is repeated for each grid yeilding a contrast response value as a function of grid size.
 ### Modulation Transfer Function
-### Manual (Recomended option)
 
+### Manual (Recomended option)
+This module displays to the user each resolution grid. The user then has to highlight the peaks and troughs on each grid image. This is conducted by left clicking 4 times to identify the 4 horizontal peaks (blue crosses) and then 3 times to identify the 3 troughs (blue circles). By holding ctrl-left clicking the user that highlights the 4 vertical peaks and 3 vertical troughs in the same fashion as the horizontal component. By Pressing Alt, the troughs are automatically assigned based on the middle location between the peaks. The windowing can also be adjusted by right clicking and dragging. After all 4 resolution grids have been evaluated the contrast response is computed.
 
 ### Slice Thickness
 The ACR phantom contains two ramps which depending on the slice thickness will appear longer or shorter. The code draws a line over each bar and compute the full width half maximum of the profile. Based on the width of the profile, the slice thickness can be deteremined. 
