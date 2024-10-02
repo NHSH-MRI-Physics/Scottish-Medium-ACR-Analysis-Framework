@@ -85,8 +85,8 @@ class TestACRGeometricAccuracyGE(TestACRGeometricAccuracySiemens):
 
 class TestMedACRGeometricAccuracyGE(TestACRGeometricAccuracySiemens):
     L1 = 164.07, 164.07
-    L5 = 166.02, 165.05, 166.02, 166.02
-    distortion_metrics = [0.21, 1.02, 0.53]
+    L5 = 166.02, 165.05, 166.02, 165.05
+    distortion_metrics = [0.05, 1.02, 0.48]
 
     def setUp(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")

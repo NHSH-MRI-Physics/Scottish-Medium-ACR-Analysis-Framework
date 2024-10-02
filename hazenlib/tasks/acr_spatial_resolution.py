@@ -95,7 +95,7 @@ class ACRSpatialResolution(HazenTask):
             dict: results are returned in a standardised dictionary structure specifying the task name, input DICOM Series Description + SeriesNumber + InstanceNumber, task measurement key-value pairs, optionally path to the generated images for visualisation
         """
         rot_ang = self.ACR_obj.rot_angle
-        if np.abs(rot_ang) < 3:
+        if np.abs(rot_ang) < 3 and self.ResOption==ResOptions.MTFMethod:
             logger.warning(
                 f"The estimated rotation angle of the ACR phantom is {np.round(rot_ang, 3)} degrees, which "
                 f"is less than the recommended 3 degrees. Results will be unreliable!"
@@ -646,9 +646,9 @@ class ACRSpatialResolution(HazenTask):
                 Xpos.append(region.centroid[1])
                 CropsBB.append([minr+leftCorner[1]-ROISize[1], maxr+leftCorner[1]-ROISize[1], minc+leftCorner[0], maxc+leftCorner[0]])
                 ROIS.append(ROI)           
-        plt.imshow(Crop)
-        plt.savefig("test.png", dpi=300)
-        plt.close("all")
+        #plt.imshow(Crop)
+        #plt.savefig("test.png", dpi=300)
+        #plt.close("all")
 
         #take the 4 most right objects, ignoring anything after that. If the blocks on the left get seperated then this can cause issues which is solved by this appraoch.
         OrderedXpos = sorted(Xpos, reverse=True)

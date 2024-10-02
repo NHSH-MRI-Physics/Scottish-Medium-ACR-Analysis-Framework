@@ -10,7 +10,7 @@ from tests import TEST_DATA_DIR, TEST_REPORT_DIR
 
 
 class TestACRUniformitySiemens(unittest.TestCase):
-    piu = 67.95 #Had to change this beacause of a bug fix in ACRObjects circular_mask
+    piu = 67.43 #Had to change this beacause of a bug fix in ACRObjects circular_mask
 
     def setUp(self):
         ACR_DATA_SIEMENS = pathlib.Path(TEST_DATA_DIR / "acr" / "Siemens")
@@ -38,7 +38,7 @@ class TestACRUniformitySiemens(unittest.TestCase):
 
 
 class TestACRUniformityGE(TestACRUniformitySiemens):
-    piu = 85.17 #Had to change this beacause of a bug fix in ACRObjects circular_mask
+    piu = 84.66 #Had to change this beacause of a bug fix in ACRObjects circular_mask
 
     def setUp(self):
         ACR_DATA_GE = pathlib.Path(TEST_DATA_DIR / "acr" / "GE")
@@ -50,7 +50,7 @@ class TestACRUniformityGE(TestACRUniformitySiemens):
 
 class TestMedACRUniformity(TestACRUniformitySiemens):
     #piu = 75.9
-    piu = 76.49
+    piu = 76.33
     def setUp(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
         ge_files = get_dicom_files(ACR_DATA_Med)

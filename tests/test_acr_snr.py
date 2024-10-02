@@ -26,6 +26,7 @@ class TestACRSNRGE(unittest.TestCase):
 
     def test_normalisation_factor(self):
         SNR_factor = self.acr_snr_task.get_normalised_snr_factor(self.snr_dcm)
+        print(self.norm_factor)
         assert SNR_factor == self.norm_factor
 
     def test_snr_by_smoothing(self):
@@ -73,7 +74,7 @@ class TestACRSNRSiemens(TestACRSNRGE):
 
 class TestMedACRSNR(unittest.TestCase):
     norm_factor = 11.67
-    snr = 335.76
+    snr = 337.24
 
     def setUp(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
@@ -91,4 +92,5 @@ class TestMedACRSNR(unittest.TestCase):
 
     def test_snr_by_smoothing(self):
         snr, _, _, _, _, _ = self.acr_snr_task.snr_by_smoothing(self.snr_dcm)
+        print(snr)
         assert round(snr, 2) == self.snr

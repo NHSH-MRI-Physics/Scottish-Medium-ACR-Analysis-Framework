@@ -42,6 +42,14 @@ try:
     root.title('Medium ACR Phantom QA Analysis Pre-Release')
     root.iconbitmap("_internal\ct-scan.ico")
 
+    def Tidyup():
+        sys.stdout = None
+        sys.stderr = None
+        if VarHolder.NewWindow!= None:
+            VarHolder.NewWindow.destroy()
+        root.destroy()
+    root.protocol("WM_DELETE_WINDOW", Tidyup)
+
     VarHolder=VariableHolder.VarHolder()
 
     def SetDCMPath():
@@ -58,14 +66,21 @@ try:
         DCMfolder_path.set(filename)
         InitalDirDICOM=DCMfolder_path.get()
 
-        options=[]
+        Seqs={}
         files = get_dicom_files(DCMfolder_path.get())
         sequences = []
         for file in files:
             data = pydicom.dcmread(file)
             if "Loc" not in data.SeriesDescription and "loc" not in data.SeriesDescription:
-                options.append(data.SeriesDescription)
-
+                #options.append(data.SeriesDescription)
+                if data.SeriesDescription not in Seqs:
+                    Seqs[data.SeriesDescription]=1
+                else:
+                    Seqs[data.SeriesDescription]+=1
+        options=[]
+        for seq in Seqs.keys():
+            if Seqs[seq] == 11:
+                options.append(seq)
         options= list(set(options))
         options.sort()
         options.append(options[0])
@@ -315,6 +330,10 @@ try:
             VarHolder.NewWindow.bind("<ButtonRelease-3>", EndTracking)
             VarHolder.NewWindow.bind("<B3-Motion>", Windowing_handler)
 
+            def disable_event():
+                pass
+            VarHolder.NewWindow.protocol("WM_DELETE_WINDOW", disable_event)
+
             
 
             root.wait_window(VarHolder.NewWindow)
@@ -377,6 +396,14 @@ try:
             MedACRAnalysis.SpatialResMethod=ResOptions.Manual
 
     def RunAnalysis():
+
+        if DCMfolder_path.get()=="Not Set!":
+            messagebox.showerror("Error", "No DICOM Path Set")
+            return
+        if Resultsfolder_path.get()=="Not Set!":
+            messagebox.showerror("Error", "No Results Path Set")
+            return
+
         RunAll=False
         SNR=False
         GeoAcc=False
@@ -403,11 +430,7 @@ try:
                 SlicePos=True
             if CheckBoxes["Slice Thickness"][0].get() == 1 and str(CheckBoxes["Slice Thickness"][1]['state'])=="normal":
                 SliceThickness=True
-        
-        if DCMfolder_path.get()=="Not Set!":
-            messagebox.showerror("Error", "No DICOM Path Set")
-        if Resultsfolder_path.get()=="Not Set!":
-            messagebox.showerror("Error", "No Results Path Set")
+
         EnableOrDisableEverything(False)
 
         SetOptions()

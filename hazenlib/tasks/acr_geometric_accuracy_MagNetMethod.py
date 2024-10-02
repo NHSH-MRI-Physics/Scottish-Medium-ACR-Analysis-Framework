@@ -201,7 +201,7 @@ class ACRGeometricAccuracyMagNetMethod(HazenTask):
         # check that we have got the 10 rods!
         if num_features != 10:
         #    print(f'num_features = {num_features}')
-            sys.exit("Did not find the 9 rods.")
+            sys.exit("Did not find the 10 rods.")
 
         # list of tuples of x,y coordinates for the centres
         rod_centres = ndimage.center_of_mass(arr, labeled_array, range(2, 11))
@@ -366,7 +366,7 @@ class ACRGeometricAccuracyMagNetMethod(HazenTask):
                 displace=-VertDist[count]/4
             plt.annotate( str(VertDist[count])+"mm", xy = ( MidPointx+8,MidPointy+displace),ha='center',va='center',color=color[count],fontsize=size, rotation=90) 
             count+=1
-
+        
         for idx, rod in enumerate(rods):
             # ax.plot(rods_initial[idx].x, rods_initial[idx].y, 'y.', markersize=2)  # center-of-mass method
             ax.plot(rod.x, rod.y, "r.", markersize=2)  # gauss 2D

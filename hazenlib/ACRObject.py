@@ -208,6 +208,7 @@ class ACRObject:
             radius = int(detected_circles[2])
 
         else: #Tried to improve this by implementing a circle fitting algo, seems to be more relaiable needs more testing though.
+            '''
             img_blur = cv2.medianBlur(img,5)
             img_grad = cv2.Sobel(img_blur, 0, dx=1, dy=1)
 
@@ -222,10 +223,12 @@ class ACRObject:
                 maxRadius=int(180 / (2 * dx)),
             ).flatten()
             centre = [int(i) for i in detected_circles[:2]]
+            centre = [int(round(i)) for i in detected_circles[:2]]
             radius = int(detected_circles[2])
-            
-            #The commented block below is a posible improvememnet but testing seems to suggest the above was ok
+            radius = int(round(detected_circles[2]))
             '''
+            #The commented block below is a posible improvememnet but testing seems to suggest the above was ok
+            
             values = img[img > np.mean(img)*0.1] 
             image = img > np.median(values)*0.5
             from skimage import io, color, measure, draw, img_as_bool
@@ -240,8 +243,8 @@ class ACRObject:
             x0, y0, r = optimize.fmin(cost, (int(image.shape[0]/2), int(image.shape[1]/2), 165 / (2 * dx)))
             detected_circles= [x0,y0,r]
             centre = [int(round(i)) for i in detected_circles[:2]] # This is better as round than just int otherwise its always rounding down.
-            #radius = int(round(detected_circles[2]))
-            '''
+            radius = int(round(detected_circles[2]))
+            
             
         return centre, radius
 
@@ -309,8 +312,8 @@ class ACRObject:
         y = np.linspace(0, dims[1]-1, dims[1])
 
         #This is the old code
-        x = np.linspace(1, dims[0], dims[0])
-        y = np.linspace(1, dims[1], dims[1])
+        #x = np.linspace(1, dims[0], dims[0])
+        #y = np.linspace(1, dims[1], dims[1])
 
         X, Y = np.meshgrid(x, y)
         mask = (X - centre[0]) ** 2 + (Y - centre[1]) ** 2 <= radius**2
