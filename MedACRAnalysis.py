@@ -176,12 +176,30 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
                 fig.suptitle(key + ' Manual Resolution Output',y=0.99)
                 fig.set_size_inches(20, 20)
                 ax1.imshow(ManualResData[key].Image)
+
+
                 ContrastResponse = []
                 for Direction in range(2):                    
                     xpointsPeaks = ManualResData[key].ChosenPointsXPeaks[Direction]
                     ypointsPeaks = ManualResData[key].ChosenPointsYPeaks[Direction]
                     xpointsTroughs = ManualResData[key].ChosenPointsXTroughs[Direction]
                     ypointsTroughs = ManualResData[key].ChosenPointsYTroughs[Direction]
+
+                    #if Direction==0:
+                    #    xpointsPeaks, ypointsPeaks = zip(*sorted(zip(xpointsPeaks, ypointsPeaks)))
+                    #    xpointsTroughs, ypointsTroughs = zip(*sorted(zip(xpointsTroughs, ypointsTroughs)))
+                    #else:
+                    #    ypointsPeaks, xpointsPeaks = zip(*sorted(zip(ypointsPeaks, xpointsPeaks)))
+                    #    ypointsTroughs, xpointsTroughs = zip(*sorted(zip(ypointsTroughs, xpointsTroughs)))
+
+                    pointsX = [xpointsPeaks[0],xpointsTroughs[0],xpointsPeaks[1],xpointsTroughs[1],xpointsPeaks[2],xpointsTroughs[2],xpointsPeaks[3]]
+                    pointsY = [ypointsPeaks[0],ypointsTroughs[0],ypointsPeaks[1],ypointsTroughs[1],ypointsPeaks[2],ypointsTroughs[2],ypointsPeaks[3]]
+                    if Direction==0:
+                        ax1.plot(pointsX, pointsY,marker="",ls='-',color="blue",markersize=10)
+                    else:
+                        ax1.plot(pointsX, pointsY,marker="",ls='-',color="red",markersize=10)
+
+
 
                     #Do Peaks
                     zPeaks = scipy.ndimage.map_coordinates(ManualResData[key].Image, np.vstack((ypointsPeaks,xpointsPeaks)),order=1, mode = "nearest",output=np.float32)
@@ -233,7 +251,6 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
                         ax3.plot(ypointsTroughs,zTroughs, marker="o",ls='',color="red",markersize=10,label ="Vertical Troughs")   
                         ax3.axhline(y=MeanTrough, color='red', linestyle='--',label ="Mean Trough")
                         ax3.legend()
-                    
                     
                     Amplitude = abs(MeanPeak - MeanTrough)
                     ContrastResponse.append(round(Amplitude/MeanPeak,3))
