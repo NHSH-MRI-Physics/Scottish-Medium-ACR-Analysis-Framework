@@ -184,7 +184,7 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
                     ypointsTroughs = ManualResData[key].ChosenPointsYTroughs[Direction]
 
                     #Do Peaks
-                    zPeaks = scipy.ndimage.map_coordinates(ManualResData[key].Image, np.vstack((ypointsPeaks,xpointsPeaks)),order=1, mode = "nearest")
+                    zPeaks = scipy.ndimage.map_coordinates(ManualResData[key].Image, np.vstack((ypointsPeaks,xpointsPeaks)),order=1, mode = "nearest",output=np.float32)
 
                     xLine = np.array([])
                     yLine = np.array([])                    
@@ -192,12 +192,13 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
                         endpoint = False
                         if i == 2:
                             endpoint=True
-                        xLine=np.append(xLine, np.linspace(xpointsPeaks[i],xpointsTroughs[i],endpoint=False))
-                        xLine=np.append(xLine, np.linspace(xpointsTroughs[i],xpointsPeaks[i+1],endpoint=endpoint))
+                        num = 50
+                        xLine=np.append(xLine, np.linspace(xpointsPeaks[i],xpointsTroughs[i],endpoint=False,num=num))
+                        xLine=np.append(xLine, np.linspace(xpointsTroughs[i],xpointsPeaks[i+1],endpoint=endpoint,num=num))
 
-                        yLine=np.append(yLine, np.linspace(ypointsPeaks[i],ypointsTroughs[i],endpoint=False))
-                        yLine=np.append(yLine, np.linspace(ypointsTroughs[i],ypointsPeaks[i+1],endpoint=endpoint))
-                    zLine = scipy.ndimage.map_coordinates(ManualResData[key].Image, np.vstack((yLine,xLine)),order=1, mode = "nearest")
+                        yLine=np.append(yLine, np.linspace(ypointsPeaks[i],ypointsTroughs[i],endpoint=False,num=num))
+                        yLine=np.append(yLine, np.linspace(ypointsTroughs[i],ypointsPeaks[i+1],endpoint=endpoint,num=num))
+                    zLine = scipy.ndimage.map_coordinates(ManualResData[key].Image, np.vstack((yLine,xLine)),output=np.float32,order=1, mode = "nearest")
            
                     MeanPeak = np.mean(zPeaks)
                     if Direction==0:
@@ -208,14 +209,16 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
                     if Direction==0: 
                         ax2.plot(xpointsPeaks,zPeaks, marker="X",ls='',color="blue",markersize=10,label ="Horizontal Peaks")  
                         ax2.axhline(y=MeanPeak, color='blue', linestyle='-',label ="Mean Peak")
-                        ax2.plot(xLine, zLine,marker="",ls='-.',color="blue",label="Sample Line")
+                        #sorted_x, sorted_y = zip(*sorted(zip(xLine, zLine)))
+                        ax2.plot(xLine,zLine ,marker="",ls='-.',color="blue",label="Sample Line")
                     else:
                         ax3.plot(ypointsPeaks,zPeaks, marker="X",ls='',color="red",markersize=10,label ="Vertical Peaks")   
-                        ax3.axhline(y=MeanPeak, color='red', linestyle='-',label ="Mean Peak")      
+                        ax3.axhline(y=MeanPeak, color='red', linestyle='-',label ="Mean Peak")  
+                        #sorted_x, sorted_y = zip(*sorted(zip(yLine, zLine)))    
                         ax3.plot(yLine, zLine,marker="",ls='-.',color="red",label="Sample Line") 
 
                     #Do Troughs
-                    zTroughs = scipy.ndimage.map_coordinates(ManualResData[key].Image, np.vstack((ypointsTroughs,xpointsTroughs)),order=1, mode = "nearest")
+                    zTroughs = scipy.ndimage.map_coordinates(ManualResData[key].Image, np.vstack((ypointsTroughs,xpointsTroughs)),order=1, mode = "nearest",output=np.float32)
                     MeanTrough = np.mean(zTroughs)
                     if Direction==0:
                         ax1.plot(xpointsTroughs, ypointsTroughs,marker="o",ls='',color="blue",markersize=10)

@@ -334,8 +334,6 @@ try:
                 pass
             VarHolder.NewWindow.protocol("WM_DELETE_WINDOW", disable_event)
 
-            
-
             root.wait_window(VarHolder.NewWindow)
             plt.close()
 
@@ -440,9 +438,9 @@ try:
 
 
             #DEBUGGING STUFF
-            #del ROIS[list(ROIS.keys())[1]]
-            #del ROIS[list(ROIS.keys())[1]]
-            #del ROIS[list(ROIS.keys())[1]]
+            del ROIS[list(ROIS.keys())[0]]
+            del ROIS[list(ROIS.keys())[0]]
+            del ROIS[list(ROIS.keys())[0]]
 
             plt.close('all')#Making sure no rogue plots are sitting in the background...
             ManualRes(ROIS)
