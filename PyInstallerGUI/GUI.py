@@ -39,7 +39,7 @@ try:
     root = tkinter.Tk()
     sv_ttk.set_theme("dark")
     root.geometry('1200x500')
-    root.title('Medium ACR Phantom QA Analysis Pre-Release')
+    root.title('Medium ACR Phantom QA Analysis Pre-Release V1.0')
     root.iconbitmap("_internal\ct-scan.ico")
 
     def Tidyup():
@@ -433,14 +433,14 @@ try:
 
         SetOptions()
         MedACRAnalysis.ManualResTestText=None
-        if SpatalResOption.get()=="Manual":
+        if SpatalResOption.get()=="Manual" and SpatialRes==True or RunAll==True:
             ROIS = MedACRAnalysis.GetROIFigs(selected_option.get(),DCMfolder_path.get())
 
 
             #DEBUGGING STUFF
-            del ROIS[list(ROIS.keys())[0]]
-            del ROIS[list(ROIS.keys())[0]]
-            del ROIS[list(ROIS.keys())[0]]
+            #del ROIS[list(ROIS.keys())[0]]
+            #del ROIS[list(ROIS.keys())[0]]
+            #del ROIS[list(ROIS.keys())[0]]
 
             plt.close('all')#Making sure no rogue plots are sitting in the background...
             ManualRes(ROIS)

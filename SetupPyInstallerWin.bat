@@ -11,7 +11,7 @@ pyinstaller .\PyInstallerGUI\GUI.py --distpath ".\PyInstallerGUI" -n "ACR QA Ana
 --collect-data sv_ttk ^
 --collect-submodules hazenlib ^
 --paths . ^
---add-data "_internal\ct-scan.ico;ct-scan.ico" 
+--add-data "_internal\ct-scan.ico;." 
 
 xcopy "ToleranceTable" "PyInstallerGUI\ACR QA Analysis\ToleranceTable\*" /E /Y
 cd ".\PyInstallerGUI\"

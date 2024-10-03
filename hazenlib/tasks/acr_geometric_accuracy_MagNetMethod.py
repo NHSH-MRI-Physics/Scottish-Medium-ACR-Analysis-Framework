@@ -344,10 +344,12 @@ class ACRGeometricAccuracyMagNetMethod(HazenTask):
             MidPointx = (rods[i].x+rods[i+2].x)/2
             MidPointy = (rods[i].y+rods[i+2].y)/2
 
-            displace =-HorDist[count]/4
+            Ratio = self.ACR_obj.images[0].shape[0]/256
+
+            displace =-HorDist[count]/4*Ratio
             if i == 3:
-                displace=+HorDist[count]/4
-            plt.annotate( str(HorDist[count])+"mm", xy = ( MidPointx+displace,MidPointy+10),ha='center',color=color[count],fontsize=size) 
+                displace=+HorDist[count]/4*Ratio
+            plt.annotate( str(HorDist[count])+"mm", xy = ( MidPointx+displace,MidPointy+10*Ratio),ha='center',color=color[count],fontsize=size) 
             count+=1
 
             float(rods[0].y - rods[6].y),
@@ -361,10 +363,10 @@ class ACRGeometricAccuracyMagNetMethod(HazenTask):
             plt.plot([rods[i].x,rods[i+6].x],[rods[i].y,rods[i+6].y],color=color[count])
 
             
-            displace = +VertDist[count]/4
+            displace = +VertDist[count]/4*Ratio
             if i == 1:
-                displace=-VertDist[count]/4
-            plt.annotate( str(VertDist[count])+"mm", xy = ( MidPointx+8,MidPointy+displace),ha='center',va='center',color=color[count],fontsize=size, rotation=90) 
+                displace=-VertDist[count]/4*Ratio
+            plt.annotate( str(VertDist[count])+"mm", xy = ( MidPointx+8*Ratio,MidPointy+displace),ha='center',va='center',color=color[count],fontsize=size, rotation=90) 
             count+=1
         
         for idx, rod in enumerate(rods):

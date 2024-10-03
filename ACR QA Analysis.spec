@@ -2,7 +2,7 @@
 from PyInstaller.utils.hooks import collect_data_files
 from PyInstaller.utils.hooks import collect_submodules
 
-datas = [('_internal\\ct-scan.ico', 'ct-scan.ico')]
+datas = [('_internal\\ct-scan.ico', '.')]
 hiddenimports = ['docopt', 'cv2', 'pydicom.encoders.gdcm', 'pydicom.encoders.pylibjpeg', 'imutils', 'skimage', 'skimage.filters', 'colorlog', 'skimage.segmentation']
 datas += collect_data_files('sv_ttk')
 hiddenimports += collect_submodules('hazenlib')

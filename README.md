@@ -1,6 +1,6 @@
 ![UnitTests](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/actions/workflows/Run_UnitTests.yml/badge.svg)
 
-Version: Pre-Release
+Version: Pre-Release v1.0
 
 ### Scottish Medium ACR Phantom QA project. 
 Derived from the [Hazen MRI QA framework](https://github.com/GSTT-CSC/hazen) project, this is a extension which is designed to work with the medium ACR phantom. Some other additions have also been made such as the GUI although the framework remains intact with the original hazen project.
