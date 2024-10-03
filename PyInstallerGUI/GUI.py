@@ -600,7 +600,7 @@ try:
 
     MiniFrame = ttk.Frame(Optionsframe)
     label = ttk.Label(MiniFrame, text="Spatial Res Method", anchor='w')
-    options = ["Dot Matrix","Dot Matrix", "MTF", "Contrast Response", "Manual", ] 
+    options = ["Contrast Response","Contrast Response", "MTF", "Dot Matrix", "Manual", ] 
     SpatalResOption = StringVar() 
     drop = ttk.OptionMenu( MiniFrame , SpatalResOption , *options ) 
     drop.config(width = 13)
@@ -610,7 +610,7 @@ try:
 
     MiniFrame = ttk.Frame(Optionsframe)
     label = ttk.Label(MiniFrame, text="Geo Acc Method", anchor='w')
-    options = [ "ACR Method", "ACR Method", "MagNet Method", ] 
+    options = [  "MagNet Method", "MagNet Method", "ACR Method",] 
     GeoAccOption = StringVar() 
     drop = ttk.OptionMenu( MiniFrame , GeoAccOption , *options ) 
     drop.config(width = 13)
