@@ -433,7 +433,7 @@ try:
 
         SetOptions()
         MedACRAnalysis.ManualResTestText=None
-        if SpatalResOption.get()=="Manual" and SpatialRes==True or RunAll==True:
+        if SpatalResOption.get()=="Manual" and SpatialRes==True or RunAll==True and SpatalResOption.get()=="Manual":
             ROIS = MedACRAnalysis.GetROIFigs(selected_option.get(),DCMfolder_path.get())
 
 
@@ -447,7 +447,12 @@ try:
             MedACRAnalysis.ManualResData = VarHolder.ManualResData
             #SpatialRes=False
         MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
+        
         EnableOrDisableEverything(True)
+        if RunAll==True:
+            for keys in CheckBoxes:
+                CheckBoxes[keys][1].config(state="disabled")
+            CheckBoxes["RunAll"][1].config(state="normal")
 
         textResults.configure(state="normal")
         textResults.delete(1.0, END)
