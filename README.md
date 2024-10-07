@@ -63,9 +63,9 @@ The ACR phantom contains two ramps which depending on the slice thickness will a
 Signal to noise ratio is computed by firstly taken the mean pixel value in 5 regions of interest to produce 5 signal values. The image is convoluted with a 9x9 boxcar kernal to produce a smoothed image. The convoluted image is subtracted from the original signal image to produce a noise image. The standard deviation is taken in each region of interest in the noise image. This allows a signal to noise ratio be computed for each region of interest. Finally the mean over all region of interests is computed giving the final result.
 
 ### Geometric Accuracy
-### ACR Method
+#### ACR Method
 The horizontal and vertical size of the phantom is measured on slice 1. The diagonal, horizontal and vertical size of the phantom is measured on slice 5. These values are then compared with the expected size of the phantom,  
-### MagNET Method (Recommended option)
+#### MagNET Method (Recommended option)
 On slice 5, 9 pegs are used to determine geometric accuracy. The distances between each peg is measured and compared against the expected distance between the pegs.
 
 
