@@ -30,7 +30,8 @@ Derived from the [Hazen MRI QA framework](https://github.com/GSTT-CSC/hazen) pro
 - Click "Start Analysis"
 - On completion the results are displaeyd and you can view individual results by selecting the dropdown (below the "Start Analysis" button) following the "View Results" button.
 
-![bitmap](https://github.com/user-attachments/assets/d980cfdd-2142-46ae-942e-a1e206b8ac48)
+![drawing](https://github.com/user-attachments/assets/97b2042b-d5eb-4004-87e9-da4f027cd4db)
+
 
 ## Scanning Protocol
 Scan the ACR Phantom as laid our in the [ACR Large and medium guidance document](https://www.acraccreditation.org/-/media/ACRAccreditation/Documents/MRI/ACR-Large--Med-Phantom-Guidance-102022.pdf). It is possible to scan in other orientations than axial but the phantom must be rotated correctly (see below). It is also possible to use other coils than the head but this has not been fully tested. 
