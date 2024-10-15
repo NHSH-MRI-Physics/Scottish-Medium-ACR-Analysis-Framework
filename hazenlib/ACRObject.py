@@ -7,6 +7,7 @@ import sys
 import matplotlib.pyplot as plt 
 from hazenlib.utils import get_image_orientation
 from pydicom.pixel_data_handlers.util import apply_modality_lut
+import os 
 
 class ACRObject:
     def __init__(self, dcm_list,kwargs={}):
@@ -26,7 +27,14 @@ class ACRObject:
         # Load files as DICOM and their pixel arrays into 'images'
         self.images, self.dcms = self.sort_images()
         # Store the pixel spacing value from the first image (expected to be the same for all)
-        self.pixel_spacing = self.dcms[0].PixelSpacing
+
+        if 'PixelSpacing' in self.dcms[0]:
+            self.pixel_spacing = self.dcms[0].PixelSpacing
+        else:
+            for elem in self.dcms[0].iterall():
+                if elem.tag == (0x28,0x30):
+                    self.pixel_spacing = elem.value
+        
         # Check whether images of the phantom are the correct orientation
         self.orientation_checks()
         # Determine whether image rotation is necessary
@@ -58,18 +66,38 @@ class ACRObject:
             A sorted stack of dicoms
         """
 
-        orientation=get_image_orientation(self.dcm_list[0].ImageOrientationPatient)
-        x = np.array([dcm.ImagePositionPatient[0] for dcm in self.dcm_list])
-        y = np.array([dcm.ImagePositionPatient[1] for dcm in self.dcm_list])
-        z = np.array([dcm.ImagePositionPatient[2] for dcm in self.dcm_list])
+        if "ImageOrientationPatient" in self.dcm_list[0]:
+            ImageOrientationPatient = self.dcm_list[0].ImageOrientationPatient
+        else:
+            for elem in self.dcm_list[0].iterall():
+                if elem.tag == (0x20,0x37):
+                    ImageOrientationPatient = elem.value
+        
+        #orientation=get_image_orientation(self.dcm_list[0].ImageOrientationPatient)
+        orientation=get_image_orientation(ImageOrientationPatient)
+        
+        if "ImagePositionPatient" in self.dcm_list[0]:
+            x = np.array([dcm.ImagePositionPatient[0] for dcm in self.dcm_list])
+            y = np.array([dcm.ImagePositionPatient[1] for dcm in self.dcm_list])
+            z = np.array([dcm.ImagePositionPatient[2] for dcm in self.dcm_list])
+            if orientation=='Transverse':
+                dicom_stack = [self.dcm_list[i] for i in np.argsort(z)]
+            elif orientation=='Coronal':
+                dicom_stack = [self.dcm_list[i] for i in np.argsort(y)]
+            elif orientation=='Sagittal':
+                dicom_stack = [self.dcm_list[i] for i in np.argsort(x)]
+        else:
+            print("WARNING: Incompatible or missing image position patient tag, ordering based on filenames, this may lead to incompatible data structures!")
+            files = []
+            for dcm in self.dcm_list:
+                files.append(os.path.basename(dcm.filename))
+            files.sort()
 
-
-        if orientation=='Transverse':
-            dicom_stack = [self.dcm_list[i] for i in np.argsort(z)]
-        elif orientation=='Coronal':
-            dicom_stack = [self.dcm_list[i] for i in np.argsort(y)]
-        elif orientation=='Sagittal':
-            dicom_stack = [self.dcm_list[i] for i in np.argsort(x)]
+            dicom_stack=[]
+            for i in range(len(files)):
+                for dcm in self.dcm_list:
+                    if os.path.basename(dcm.filename) == files[i]:
+                        dicom_stack.append(dcm)
 
         img_stack = [dicom.pixel_array for dicom in dicom_stack]
         img_stack = [apply_modality_lut(dicom.pixel_array,dicom).astype('uint16') for dicom in dicom_stack]

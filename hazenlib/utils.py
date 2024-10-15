@@ -12,6 +12,10 @@ import hazenlib.exceptions as exc
 
 matplotlib.use("Agg")
 
+def GetDicomTag(dcm,tag):
+    for elem in dcm.iterall():
+            if elem.tag == tag:
+                return elem.value
 
 def get_dicom_files(folder: str, sort=False) -> list:
     if sort:
@@ -88,9 +92,9 @@ def get_manufacturer(dcm: pydicom.Dataset) -> str:
 
 def get_average(dcm: pydicom.Dataset) -> float:
     if is_enhanced_dicom(dcm):
-        averages = (
-            dcm.SharedFunctionalGroupsSequence[0].MRAveragesSequence[0].NumberOfAverages
-        )
+            averages = (
+                dcm.SharedFunctionalGroupsSequence[0].MRAveragesSequence[0].NumberOfAverages
+            )
     else:
         averages = dcm.NumberOfAverages
 
@@ -109,7 +113,10 @@ def get_bandwidth(dcm: pydicom.Dataset) -> float:
     -------
     bandwidth: float
     """
-    bandwidth = dcm.PixelBandwidth
+    if 'PixelBandwith' in dcm:
+        bandwidth = dcm.PixelBandwidth
+    else:
+        bandwidth = GetDicomTag(dcm,(0x18,0x95))
     return bandwidth
 
 
