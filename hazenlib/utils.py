@@ -91,12 +91,15 @@ def get_manufacturer(dcm: pydicom.Dataset) -> str:
 
 
 def get_average(dcm: pydicom.Dataset) -> float:
-    if is_enhanced_dicom(dcm):
-            averages = (
-                dcm.SharedFunctionalGroupsSequence[0].MRAveragesSequence[0].NumberOfAverages
-            )
-    else:
-        averages = dcm.NumberOfAverages
+    try:
+        if is_enhanced_dicom(dcm):
+                averages = (
+                    dcm.SharedFunctionalGroupsSequence[0].MRAveragesSequence[0].NumberOfAverages
+                )
+        else:
+            averages = dcm.NumberOfAverages
+    except:
+        averages = GetDicomTag(dcm,(0x18,0x83))
 
     return averages
 

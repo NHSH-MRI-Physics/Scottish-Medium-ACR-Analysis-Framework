@@ -193,7 +193,13 @@ class ACRSliceThickness(HazenTask):
             float: measured slice thickness
         """
         img = dcm.pixel_array
-        res = dcm.PixelSpacing  # In-plane resolution from metadata
+
+        if 'PixelSpacing' in dcm:
+            res = dcm.PixelSpacing  # In-plane resolution from metadata
+        else:
+            import hazenlib.utils
+            res = hazenlib.utils.GetDicomTag(dcm,(0x28,0x30))
+            
         cxy = self.ACR_obj.centre
         x_pts, y_pts = self.find_ramps(img, cxy, res)
 
@@ -240,7 +246,14 @@ class ACRSliceThickness(HazenTask):
             dz = 0.2 * (np.prod(ramp_length, axis=0)) / np.sum(ramp_length, axis=0)
         
         dz = dz[~np.isnan(dz)]
-        z_ind = np.argmin(np.abs(dcm.SliceThickness - dz))
+
+        if 'SliceThickness' in dcm:
+            Slice_Thick = dcm.SliceThickness  # In-plane resolution from metadata
+        else:
+            import hazenlib.utils
+            Slice_Thick = hazenlib.utils.GetDicomTag(dcm,(0x18,0x50))
+
+        z_ind = np.argmin(np.abs(Slice_Thick - dz))
 
         slice_thickness = dz[z_ind]
 

@@ -199,7 +199,7 @@ class ACRGeometricAccuracy(HazenTask):
         cxy = self.ACR_obj.centre
 
         length_dict = self.ACR_obj.measure_orthogonal_lengths(mask)
-        sw_dict, se_dict = self.diagonal_lengths(mask, cxy)
+        sw_dict, se_dict = self.diagonal_lengths(mask, cxy, dcm)
 
         if self.report:
             import matplotlib.pyplot as plt
@@ -281,7 +281,7 @@ class ACRGeometricAccuracy(HazenTask):
             se_dict["Distance"],
         )
 
-    def diagonal_lengths(self, img, cxy):
+    def diagonal_lengths(self, img, cxy, dcm):
         """Measure diagonal lengths
 
         Args:
@@ -291,7 +291,14 @@ class ACRGeometricAccuracy(HazenTask):
         Returns:
             tuple of dictionaries: _description_
         """
-        res = self.ACR_obj.pixel_spacing
+        #res = self.ACR_obj.pixel_spacing
+        if 'PixelSpacing' in dcm:
+            res = dcm.PixelSpacing  # In-plane resolution from metadata
+        else:
+            import hazenlib.utils
+            res = hazenlib.utils.GetDicomTag(dcm,(0x28,0x30))
+
+
         eff_res = np.sqrt(np.mean(np.square(res)))
         img_rotate = skimage.transform.rotate(img, 45, center=(cxy[0], cxy[1]))
 

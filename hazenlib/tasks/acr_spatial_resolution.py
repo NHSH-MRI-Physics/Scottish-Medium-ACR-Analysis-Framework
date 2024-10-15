@@ -494,7 +494,11 @@ class ACRSpatialResolution(HazenTask):
             tuple: _description_
         """
         img = dcm.pixel_array
-        res = dcm.PixelSpacing
+        if 'PixelSpacing' in dcm:
+            res = dcm.PixelSpacing  # In-plane resolution from metadata
+        else:
+            import hazenlib.utils
+            res = hazenlib.utils.GetDicomTag(dcm,(0x28,0x30))
         cxy = self.ACR_obj.centre
 
         ramp_x = int(cxy[0])
@@ -604,7 +608,11 @@ class ACRSpatialResolution(HazenTask):
     #Function to extract the squares we are interested in
     def GetResSquares(self,dcm):
         PixelArray = dcm.pixel_array
-        res = dcm.PixelSpacing
+        if 'PixelSpacing' in dcm:
+            res = dcm.PixelSpacing  # In-plane resolution from metadata
+        else:
+            import hazenlib.utils
+            res = hazenlib.utils.GetDicomTag(dcm,(0x28,0x30))
         
         Centre = self.ACR_obj.centre
         radius = self.ACR_obj.radius

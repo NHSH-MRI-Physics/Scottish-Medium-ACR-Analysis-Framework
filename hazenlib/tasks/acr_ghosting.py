@@ -72,7 +72,13 @@ class ACRGhosting(HazenTask):
             float: percentage ghosting value
         """
         img = dcm.pixel_array
-        res = dcm.PixelSpacing  # In-plane resolution from metadata
+        #res = dcm.PixelSpacing  # In-plane resolution from metadata
+        if 'PixelSpacing' in dcm:
+            res = dcm.PixelSpacing  # In-plane resolution from metadata
+        else:
+            import hazenlib.utils
+            res = hazenlib.utils.GetDicomTag(dcm,(0x28,0x30))
+        
         r_large = np.ceil(80 / res[0]).astype(
             int
         )  # Required pixel radius to produce ~200cm2 ROI

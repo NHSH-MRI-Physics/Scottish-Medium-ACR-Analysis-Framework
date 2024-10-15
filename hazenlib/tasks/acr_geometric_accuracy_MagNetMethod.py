@@ -41,7 +41,14 @@ class ACRGeometricAccuracyMagNetMethod(HazenTask):
         super().__init__(**kwargs)
         self.ACR_obj = ACRObject(self.dcm_list,kwargs)
         self.single_dcm = self.ACR_obj.dcms[4]
-        self.pixel_size = self.single_dcm.PixelSpacing[0]
+
+        if 'PixelSpacing' in self.single_dcm:
+            self.pixel_size = self.single_dcm.PixelSpacing[0]
+        else:
+            import hazenlib.utils
+            self.pixel_size = hazenlib.utils.GetDicomTag(self.single_dcm,(0x28,0x30))[0]
+
+        #self.pixel_size = self.single_dcm.PixelSpacing[0]
         self.img_size = self.single_dcm.Rows
         print(f'img_size is {self.img_size}')
         

@@ -215,7 +215,13 @@ class ACRSlicePosition(HazenTask):
             float: bar length difference
         """
         img = dcm.pixel_array
-        res = dcm.PixelSpacing  # In-plane resolution from metadata
+        
+        if 'PixelSpacing' in dcm:
+            res = dcm.PixelSpacing  # In-plane resolution from metadata
+        else:
+            import hazenlib.utils
+            res = hazenlib.utils.GetDicomTag(dcm,(0x28,0x30))
+        
         mask = self.ACR_obj.mask_image
         x_pts, y_pts = self.find_wedges(img, mask, res)
 
