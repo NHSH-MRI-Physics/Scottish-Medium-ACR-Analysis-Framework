@@ -28,7 +28,7 @@ Derived from the [Hazen MRI QA framework](https://github.com/GSTT-CSC/hazen) pro
 - Select what sequence to analyse using the dropdown.
 - Select whats tests you want to run from the checkboxes.
 - Click "Start Analysis"
-- On completion the results are displaeyd and you can view individual results by selecting the dropdown (below the "Start Analysis" button) following the "View Results" button.
+- On completion the results are displayed and you can view individual results by selecting the dropdown (below the "Start Analysis" button) following the "View Results" button.
 
 ![drawing](https://github.com/user-attachments/assets/97b2042b-d5eb-4004-87e9-da4f027cd4db)
 
