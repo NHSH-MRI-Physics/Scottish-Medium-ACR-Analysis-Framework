@@ -19,6 +19,7 @@ import MedACR_ToleranceTableCheckerV2 as MedACR_ToleranceTableChecker
 import numpy as np
 import scipy.ndimage
 import matplotlib.pyplot as plt
+from hazenlib._version import __version__
 #from hazenlib.tasks.acr_spatial_resolution import ResOptions
 
 ReportText = ""
@@ -73,6 +74,7 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
 
     ReportFile.write("Date Analysed: " + str(date.today()) + "\n")
     ReportFile.write("Sequence Analysed: " + Seq + "\n")
+    ReportFile.write("Version: " + __version__)
 
     TestCounter=0
     ReportFile.write("\nSNR Module\n")

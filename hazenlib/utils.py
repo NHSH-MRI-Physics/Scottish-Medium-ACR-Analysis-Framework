@@ -44,6 +44,9 @@ def is_dicom_file(filename):
     :type filename: str
     :returns: True if it is a dicom file
     """
+    if os.path.isfile(filename) == False:
+        return False
+
     file_stream = open(filename, "rb")
     file_stream.seek(128)
     data = file_stream.read(4)

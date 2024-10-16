@@ -22,6 +22,7 @@ from MedACRAnalysis import *
 import datetime
 import numpy as np
 import VariableHolder
+from hazenlib._version import __version__
 
 try:
     class TextRedirector(object):
@@ -39,7 +40,7 @@ try:
     root = tkinter.Tk()
     sv_ttk.set_theme("dark")
     root.geometry('1200x500')
-    root.title('Medium ACR Phantom QA Analysis Pre-Release V1.0')
+    root.title('Medium ACR Phantom QA Analysis ' + __version__)
     root.iconbitmap("_internal\ct-scan.ico")
 
     def Tidyup():
