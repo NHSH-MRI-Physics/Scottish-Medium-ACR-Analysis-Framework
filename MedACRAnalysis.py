@@ -153,16 +153,16 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
 
         elif SpatialResMethod == ResOptions.ContrastResponseMethod:
             ReportFile.write( '\tHorizontal Contrast Response\n')
-            ReportFile.write( '\t\t1.1mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["1.1mm holes Horizontal"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["1.1mm holes Horizontal"],"Contrast Response Resolution","1.1mm holes Horizontal")))
-            ReportFile.write( '\t\t1.0mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["1.0mm holes Horizontal"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["1.0mm holes Horizontal"],"Contrast Response Resolution","1.0mm holes Horizontal")))
-            ReportFile.write( '\t\t0.9mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["0.9mm holes Horizontal"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["0.9mm holes Horizontal"],"Contrast Response Resolution","0.9mm holes Horizontal")))
-            ReportFile.write( '\t\t0.8mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["0.8mm holes Horizontal"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["0.8mm holes Horizontal"],"Contrast Response Resolution","0.8mm holes Horizontal")))
+            ReportFile.write( '\t\t1.1mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["1.1mm holes Horizontal"])+"%",MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["1.1mm holes Horizontal"],"Contrast Response Resolution","1.1mm holes Horizontal")))
+            ReportFile.write( '\t\t1.0mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["1.0mm holes Horizontal"])+"%",MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["1.0mm holes Horizontal"],"Contrast Response Resolution","1.0mm holes Horizontal")))
+            ReportFile.write( '\t\t0.9mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["0.9mm holes Horizontal"])+"%",MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["0.9mm holes Horizontal"],"Contrast Response Resolution","0.9mm holes Horizontal")))
+            ReportFile.write( '\t\t0.8mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["0.8mm holes Horizontal"])+"%",MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["0.8mm holes Horizontal"],"Contrast Response Resolution","0.8mm holes Horizontal")))
 
             ReportFile.write( '\tVertical Contrast Response\n')
-            ReportFile.write( '\t\t1.1mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["1.1mm holes Vertical"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["1.1mm holes Vertical"],"Contrast Response Resolution","1.1mm holes Vertical")))
-            ReportFile.write( '\t\t1.0mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["1.0mm holes Vertical"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["1.0mm holes Vertical"],"Contrast Response Resolution","1.0mm holes Vertical")))
-            ReportFile.write( '\t\t0.9mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["0.9mm holes Vertical"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["0.9mm holes Vertical"],"Contrast Response Resolution","0.9mm holes Vertical")))
-            ReportFile.write( '\t\t0.8mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["0.8mm holes Vertical"]),MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["0.8mm holes Vertical"],"Contrast Response Resolution","0.8mm holes Vertical")))
+            ReportFile.write( '\t\t1.1mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["1.1mm holes Vertical"])+"%",MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["1.1mm holes Vertical"],"Contrast Response Resolution","1.1mm holes Vertical")))
+            ReportFile.write( '\t\t1.0mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["1.0mm holes Vertical"])+"%",MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["1.0mm holes Vertical"],"Contrast Response Resolution","1.0mm holes Vertical")))
+            ReportFile.write( '\t\t0.9mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["0.9mm holes Vertical"])+"%",MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["0.9mm holes Vertical"],"Contrast Response Resolution","0.9mm holes Vertical")))
+            ReportFile.write( '\t\t0.8mm Contrast Response: %-12s%-12s\n' % (str(Res["measurement"]["0.8mm holes Vertical"])+"%",MedACR_ToleranceTableChecker.GetPassResult(Res["measurement"]["0.8mm holes Vertical"],"Contrast Response Resolution","0.8mm holes Vertical")))
         elif SpatialResMethod == ResOptions.Manual:
             pass
         else:
@@ -255,7 +255,7 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
                         ax3.legend()
                     
                     Amplitude = abs(MeanPeak - MeanTrough)
-                    ContrastResponse.append(round(Amplitude/MeanPeak,3))
+                    ContrastResponse.append(round( (Amplitude/MeanPeak)*100.0,2))
                 
                 fig.tight_layout()
                 if not os.path.exists(OutputPath+"/ACRSpatialResolution"):
@@ -264,8 +264,8 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
                 plt.close()
                 #plt.show()
 
-                ReportFile.write( '\tManual '+key+' Resolution Hor: %-15s%-12s\n' % (str(ContrastResponse[0]),MedACR_ToleranceTableChecker.GetPassResult(ContrastResponse[0],"Manual Resolution",key +" Horizontal")))
-                ReportFile.write( '\tManual '+key+' Resolution Vert: %-15s%-12s\n' % (str(ContrastResponse[1]),MedACR_ToleranceTableChecker.GetPassResult(ContrastResponse[1],"Manual Resolution",key +" Vertical")))
+                ReportFile.write( '\tManual '+key+' Resolution Hor: %-15s%-12s\n' % (str(ContrastResponse[0]) +"%",MedACR_ToleranceTableChecker.GetPassResult(ContrastResponse[0],"Manual Resolution",key +" Horizontal")))
+                ReportFile.write( '\tManual '+key+' Resolution Vert: %-15s%-12s\n' % (str(ContrastResponse[1]) +"%",MedACR_ToleranceTableChecker.GetPassResult(ContrastResponse[1],"Manual Resolution",key +" Vertical")))
         TestCounter+=1
 
 

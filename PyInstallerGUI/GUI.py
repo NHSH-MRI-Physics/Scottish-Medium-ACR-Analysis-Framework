@@ -434,6 +434,7 @@ try:
 
         SetOptions()
         MedACRAnalysis.ManualResTestText=None
+        MedACRAnalysis.ManualResData = None
         if SpatalResOption.get()=="Manual" and SpatialRes==True or RunAll==True and SpatalResOption.get()=="Manual":
             ROIS = MedACRAnalysis.GetROIFigs(selected_option.get(),DCMfolder_path.get())
 

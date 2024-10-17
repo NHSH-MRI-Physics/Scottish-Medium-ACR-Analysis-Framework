@@ -119,7 +119,7 @@ def get_bandwidth(dcm: pydicom.Dataset) -> float:
     -------
     bandwidth: float
     """
-    if 'PixelBandwith' in dcm:
+    if 'PixelBandwidth' in dcm:
         bandwidth = dcm.PixelBandwidth
     else:
         bandwidth = GetDicomTag(dcm,(0x18,0x95))
