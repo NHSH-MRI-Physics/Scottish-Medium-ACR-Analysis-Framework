@@ -24,6 +24,13 @@ import numpy as np
 import VariableHolder
 from hazenlib._version import __version__
 
+if getattr(sys, 'frozen', False):
+    import pyi_splash
+
+if getattr(sys, 'frozen', False):
+    pyi_splash.close()
+
+
 try:
     class TextRedirector(object):
         def __init__(self, widget, tag="stdout"):
@@ -516,7 +523,7 @@ try:
     WidgetsToToggle.append(ResultsPathButton)
     Resultsfolder_path = StringVar()
     Resultsfolder_path.set("Not Set!")
-    #Resultsfolder_path.set("C:\\Users\John\Desktop\OutputTest") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
+    Resultsfolder_path.set("C:\\Users\Johnt\Desktop\OutputTest") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
     ResultsPathLabel = ttk.Label(master=root,textvariable=Resultsfolder_path)
     ResultsPathLabel.grid(row=1, column=1,padx=10,pady=2,sticky=W,columnspan=6)
 
