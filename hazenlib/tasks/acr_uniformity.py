@@ -158,30 +158,36 @@ class ACRUniformity(HazenTask):
             return mean_array
         
         min_data = uniformity_iterator(min_image, base_mask, min_rows, min_cols)
-        max_data = uniformity_iterator(max_image, base_mask, max_rows, max_cols)      
+        max_data = uniformity_iterator(max_image, base_mask, max_rows, max_cols)     
 
-        sig_max = np.max(max_data)
-        sig_min = np.min(min_data[np.nonzero(min_data)])
 
-        max_loc = np.where(max_data == sig_max)
-        min_loc = np.where(min_data == sig_min)
-        
-        '''
+        if np.count_nonzero(min_data==0) == 0 and np.count_nonzero(max_data==0)  == 0: #if the array is all 0s
+            sig_max = np.max(max_data)
+            sig_min = np.min(min_data[np.nonzero(min_data)])
+            max_loc = np.where(max_data == sig_max)
+            min_loc = np.where(min_data == sig_min)
+        else: #If the image doenst give a nice blob (like the ACR wants, revert to jsut a asliding window approach which should work regardless of the noise) but its not really the ACR way...
+            print("Warning: Reverting to sliding window over whole image, this sometimes happens when there is quite noisy images!")
+            rows, cols = np.nonzero(img_masked)[0], np.nonzero(img_masked)[1]
+            mean_array = np.zeros(img_masked.shape)
 
-        max_locs = np.where(max_data == np.max(max_data))
-        max_loc = round(np.mean(max_locs[0])),round(np.mean(max_locs[1]))
+            coords = np.nonzero(base_mask)  # Coordinates of mask
+            for idx, (row, col) in enumerate(zip(rows, cols)):
+                centre = [row, col]
+                translate_mask = [
+                    coords[0] + centre[0] - cxy[0] - d_void,
+                    coords[1] + centre[1] - cxy[1],
+                ]
+                values = img_masked[translate_mask[0], translate_mask[1]]
+                if np.count_nonzero(values==0) ==0: #Incase we clip out of hte mask so lets just dont include those bits... (ie 1cm^2 must be completely in the large ROI)
+                    mean_val = np.mean(values)
+                    mean_array[row, col] = mean_val
 
-        min_locs = np.where(min_data == np.min(min_data[np.nonzero(min_data)]))
-        min_loc = round(np.mean(min_locs[0])),round(np.mean(min_locs[1]))
+            sig_max = np.max(mean_array)
+            sig_min = np.min(mean_array[np.nonzero(mean_array)]) #We initalise the array with 0s but we don't acccept any 0s in the above. Hence we should just ignore 0s here.
 
-        #max_roi = img_masked[int(max_loc[0])-5:int(max_loc[0])+5,int(max_loc[1])-5:int(max_loc[1])+5]
-        max_roi = img_masked[int(max_loc[0])-round(5/res[0]):int(max_loc[0])+round(5/res[0]),int(max_loc[1])-round(5/res[0]):int(max_loc[1])+round(5/res[0])]
-        sig_max = np.mean(max_roi)
-
-        #min_roi = img_masked[int(min_loc[0])-5:int(min_loc[0])+5,int(min_loc[1])-5:int(min_loc[1])+5]
-        min_roi = img_masked[int(min_loc[0])-round(5/res[0]):int(min_loc[0])+round(5/res[0]),int(min_loc[1])-round(5/res[0]):int(min_loc[1])+round(5/res[0])]
-        sig_min = np.mean(min_roi)
-        '''
+            max_loc = np.where(mean_array == sig_max)
+            min_loc = np.where(mean_array == sig_min)
 
         piu = 100 * (1 - (sig_max - sig_min) / (sig_max + sig_min))
 
