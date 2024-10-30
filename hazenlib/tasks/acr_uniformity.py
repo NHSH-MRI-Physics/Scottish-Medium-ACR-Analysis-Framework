@@ -161,12 +161,12 @@ class ACRUniformity(HazenTask):
         max_data = uniformity_iterator(max_image, base_mask, max_rows, max_cols)     
 
 
-        if np.count_nonzero(min_data==0) == 0 and np.count_nonzero(max_data==0)  == 0: #if the array is all 0s
+        if np.all(min_data==0) == 0 and np.all(max_data==0)  == 0: #if the array is all 0s skip
             sig_max = np.max(max_data)
             sig_min = np.min(min_data[np.nonzero(min_data)])
             max_loc = np.where(max_data == sig_max)
             min_loc = np.where(min_data == sig_min)
-        else: #If the image doenst give a nice blob (like the ACR wants, revert to jsut a asliding window approach which should work regardless of the noise) but its not really the ACR way...
+        else: #If the image doenst give a nice blob (like the ACR wants, revert to jsut a asliding window approach which should work regardless of the noise) but its not really the ACR way...        
             print("Warning: Reverting to sliding window over whole image, this sometimes happens when there is quite noisy images!")
             rows, cols = np.nonzero(img_masked)[0], np.nonzero(img_masked)[1]
             mean_array = np.zeros(img_masked.shape)
@@ -179,10 +179,10 @@ class ACRUniformity(HazenTask):
                     coords[1] + centre[1] - cxy[1],
                 ]
                 values = img_masked[translate_mask[0], translate_mask[1]]
-                if np.count_nonzero(values==0) ==0: #Incase we clip out of hte mask so lets just dont include those bits... (ie 1cm^2 must be completely in the large ROI)
+                if np.count_nonzero(values==0) ==0: #Incase we clip out of hte mask so lets just dont include those bits (ie we have areas of 0 signal)... (ie 1cm^2 must be completely in the large ROI)
                     mean_val = np.mean(values)
                     mean_array[row, col] = mean_val
-
+            
             sig_max = np.max(mean_array)
             sig_min = np.min(mean_array[np.nonzero(mean_array)]) #We initalise the array with 0s but we don't acccept any 0s in the above. Hence we should just ignore 0s here.
 

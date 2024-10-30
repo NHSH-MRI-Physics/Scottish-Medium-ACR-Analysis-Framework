@@ -912,13 +912,17 @@ class ACRSpatialResolution(HazenTask):
             Thresh /= img.shape[1]
             
             BinaryImage = img>=Thresh
+            
             num = 0
             count =0
+            maxcount = 100
             while num != 3:
                 BinaryImage=skimage.morphology.binary_dilation(BinaryImage)
                 label_image,num = skimage.morphology.label(BinaryImage+1,return_num=True,connectivity=2)
                 count+=1
                 #print(num)
+                if count >=maxcount:
+                    raise Exception("Unable to find 3 regions in binary image, try the manual option")
             for i in range(0,count):
                 BinaryImage=skimage.morphology.binary_erosion(BinaryImage)
 
