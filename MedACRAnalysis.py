@@ -304,6 +304,10 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
         print("Running Slice Position")
         acr_slice_position_task = ACRSlicePosition(input_data=Data,report_dir=OutputPath,report=True,MediumACRPhantom=True)
         SlicePos = acr_slice_position_task.run()
+
+        #Divide by 2 to get the true error in slice position.
+        SlicePos['measurement'][SlicePos['file'][0]]['length difference'] = round(SlicePos['measurement'][SlicePos['file'][0]]['length difference']/2.0,2)
+        SlicePos['measurement'][SlicePos['file'][1]]['length difference'] = round(SlicePos['measurement'][SlicePos['file'][1]]['length difference']/2.0,2)
         print("Slice Pos difference " + SlicePos['file'][0] + " :" + str(SlicePos['measurement'][SlicePos['file'][0]]['length difference']) + "mm    " + SlicePos['file'][1] + " :" + str(SlicePos['measurement'][SlicePos['file'][1]]['length difference'])+"mm")
 
         ReportFile.write( '\tSlice 1 Position Error (mm):  %-12s%-12s\n' % (str(SlicePos['measurement'][SlicePos['file'][0]]['length difference']),MedACR_ToleranceTableChecker.GetPassResult(SlicePos['measurement'][SlicePos['file'][0]]['length difference'],"Slice Position") ))
