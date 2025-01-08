@@ -84,7 +84,7 @@ def is_enhanced_dicom(dcm: pydicom.Dataset) -> bool:
 
 
 def get_manufacturer(dcm: pydicom.Dataset) -> str:
-    supported = ["ge", "siemens", "philips", "toshiba", "canon"]
+    supported = ["ge", "siemens", "philips", "toshiba", "canon", "esaote"]
     manufacturer = dcm.Manufacturer.lower()
     for item in supported:
         if item in manufacturer:
@@ -275,6 +275,8 @@ def get_field_of_view(dcm: pydicom.Dataset):
         else:
             fov = dcm.Columns * dcm.PixelSpacing[0]
     elif "toshiba" in manufacturer:
+        fov = dcm.Columns * dcm.PixelSpacing[0]
+    elif "esaote" in manufacturer:
         fov = dcm.Columns * dcm.PixelSpacing[0]
     else:
         raise NotImplementedError(

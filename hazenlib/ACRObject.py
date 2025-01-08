@@ -9,6 +9,7 @@ from hazenlib.utils import get_image_orientation
 from pydicom.pixel_data_handlers.util import apply_modality_lut
 import os 
 
+
 class ACRObject:
     def __init__(self, dcm_list,kwargs={}):
         
@@ -16,6 +17,11 @@ class ACRObject:
         self.MediumACRPhantom = False
         if "MediumACRPhantom" in kwargs.keys():
             self.MediumACRPhantom = kwargs["MediumACRPhantom"]
+
+        import MedACROptions
+        ParamaterOverrideHolder=MedACROptions.ParamaterOveride()
+        if "Paramater_overide" in kwargs.keys():
+            ParamaterOverrideHolder = kwargs["Paramater_overide"]
             
         #Added in a flag to make use of the dot matrix instead of MTF for spatial res
         #self.UseDotMatrix=False
@@ -42,7 +48,11 @@ class ACRObject:
         # Store the DCM object of slice 7 as it is used often
         self.slice7_dcm = self.dcms[6]
         # Find the centre coordinates of the phantom (circle)
-        self.centre, self.radius = self.find_phantom_center()
+        if ParamaterOverrideHolder.CentreOverride != None and ParamaterOverrideHolder.RadiusOverride != None:
+            self.centre = ParamaterOverrideHolder.CentreOverride
+            self.radius = ParamaterOverrideHolder.RadiusOverride
+        else:
+            self.centre, self.radius = self.find_phantom_center()
         # Store a mask image of slice 7 for reusability
         self.mask_image = self.get_mask_image(self.images[6])
 
@@ -235,28 +245,7 @@ class ACRObject:
             centre = [int(i) for i in detected_circles[:2]]
             radius = int(detected_circles[2])
 
-        else: #Tried to improve this by implementing a circle fitting algo, seems to be more relaiable needs more testing though.
-            '''
-            img_blur = cv2.medianBlur(img,5)
-            img_grad = cv2.Sobel(img_blur, 0, dx=1, dy=1)
-
-            detected_circles = cv2.HoughCircles(
-                img_grad,
-                cv2.HOUGH_GRADIENT,
-                1,
-                param1=40,
-                param2=30,
-                minDist=int(180 / dy),
-                minRadius=int(155 / (2 * dy)),
-                maxRadius=int(180 / (2 * dx)),
-            ).flatten()
-            centre = [int(i) for i in detected_circles[:2]]
-            centre = [int(round(i)) for i in detected_circles[:2]]
-            radius = int(detected_circles[2])
-            radius = int(round(detected_circles[2]))
-            '''
-            #The commented block below is a posible improvememnet but testing seems to suggest the above was ok
-            
+        else: 
             values = img[img > np.mean(img)*0.1] 
             image = img > np.median(values)*0.5
             from skimage import io, color, measure, draw, img_as_bool

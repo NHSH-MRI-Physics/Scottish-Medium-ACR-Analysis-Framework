@@ -29,6 +29,7 @@ ManualResData=None
 GeoMethod = GeometryOptions.ACRMETHOD
 SpatialResMethod = ResOptions.MTFMethod
 
+ParamaterOverides = ParamaterOveride()
 
 #This is a file which simply contains a function to run the analysis. It is in a seperate file so i can reuse it for the various implementations.
 def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False):
@@ -80,7 +81,7 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
     ReportFile.write("\nSNR Module\n")
     if RunAll==True or RunSNR == True:
         print("Running SNR")
-        acr_snr_task = ACRSNR(input_data=Data, report_dir=OutputPath,report=True,MediumACRPhantom=True)
+        acr_snr_task = ACRSNR(input_data=Data, report_dir=OutputPath,report=True,MediumACRPhantom=True,Paramater_overide = ParamaterOverides)
         snr = acr_snr_task.run()
         print("SNR :" +str(snr["measurement"]["snr by smoothing"]["measured"]))
         print("Normalised SNR :" +str(snr["measurement"]["snr by smoothing"]["normalised"]))

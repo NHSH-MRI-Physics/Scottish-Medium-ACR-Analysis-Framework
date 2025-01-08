@@ -627,6 +627,8 @@ try:
     label.grid(row=0, column=1)
     MiniFrame.pack(anchor=W)
 
+    SubmitPointsBtn = ttk.Button(Optionsframe, text="Options",width=20)
+
     Optionsframe.grid(row=11, column=3,padx=10,pady=10,rowspan=3,sticky=NW)
     root.resizable(False,False)
 

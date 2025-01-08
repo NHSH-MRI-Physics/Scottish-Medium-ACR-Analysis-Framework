@@ -1,0 +1,24 @@
+Date Analysed: 2025-01-08
+Sequence Analysed: ACR_Axial_T1
+Version: Pre-Release V1.02
+SNR Module
+	SNR:            328.13      Result: No Tolerance Set
+	Normalised SNR: 4389.85     Result: No Tolerance Set
+
+Geometric Accuracy Module
+	Not Run
+
+Spatial Resoloution Module
+	Not Run
+
+Uniformity Module
+	Not Run
+
+Ghosting Module
+	Not Run
+
+Slice Position Module
+	Not Run
+
+Slice Thickness Module
+	Not Run

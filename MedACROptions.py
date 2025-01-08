@@ -6,3 +6,7 @@ from hazenlib.tasks.acr_spatial_resolution import ResOptions
 class GeometryOptions(Enum):
     ACRMETHOD=1
     MAGNETMETHOD=2
+
+class ParamaterOveride():
+    CentreOverride = None
+    RadiusOverride = None
