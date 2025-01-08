@@ -8,7 +8,7 @@ import sys
 sys.path.append(".")
 from hazenlib.utils import get_dicom_files
 import pydicom
-from tkinter import DISABLED, NORMAL, N, S, E, W, LEFT, RIGHT, TOP, BOTTOM, messagebox, END, NW
+from tkinter import DISABLED, NORMAL, N, S, E, W, LEFT, RIGHT, TOP, BOTTOM, messagebox, END, NW, CENTER
 import MedACRAnalysis
 import os 
 import HighlightText
@@ -23,6 +23,7 @@ import datetime
 import numpy as np
 import VariableHolder
 from hazenlib._version import __version__
+
 
 if getattr(sys, 'frozen', False):
     import pyi_splash
@@ -45,6 +46,9 @@ try:
             root.update()
             
     root = tkinter.Tk()
+    #This need to be done after the root is called
+    import OptionsPane
+    import Windows
     sv_ttk.set_theme("dark")
     root.geometry('1200x500')
     root.title('Medium ACR Phantom QA Analysis ' + __version__)
@@ -390,15 +394,15 @@ try:
 
     def SetOptions():
         MedACRAnalysis.GeoMethod = GeometryOptions.ACRMETHOD
-        if GeoAccOption.get() == "MagNet Method":
+        if OptionsPane.GetOptions()["GeoAccOption"] == "MagNet Method":
             MedACRAnalysis.GeoMethod=GeometryOptions.MAGNETMETHOD
 
         MedACRAnalysis.SpatialResMethod=ResOptions.DotMatrixMethod
-        if SpatalResOption.get() == "MTF":
+        if OptionsPane.GetOptions()["SpatialResOption"] == "MTF":
             MedACRAnalysis.SpatialResMethod=ResOptions.MTFMethod
-        elif SpatalResOption.get() == "Contrast Response":
+        elif OptionsPane.GetOptions()["SpatialResOption"] == "Contrast Response":
             MedACRAnalysis.SpatialResMethod=ResOptions.ContrastResponseMethod
-        elif SpatalResOption.get() == "Manual":
+        elif OptionsPane.GetOptions()["SpatialResOption"] == "Manual":
             MedACRAnalysis.SpatialResMethod=ResOptions.Manual
 
     def RunAnalysis():
@@ -442,7 +446,7 @@ try:
         SetOptions()
         MedACRAnalysis.ManualResTestText=None
         MedACRAnalysis.ManualResData = None
-        if SpatalResOption.get()=="Manual" and SpatialRes==True or RunAll==True and SpatalResOption.get()=="Manual":
+        if OptionsPane.GetOptions()["SpatialResOption"]=="Manual" and SpatialRes==True or RunAll==True and OptionsPane.GetOptions()["SpatialResOption"]=="Manual":
             ROIS = MedACRAnalysis.GetROIFigs(selected_option.get(),DCMfolder_path.get())
 
 
@@ -455,6 +459,10 @@ try:
             ManualRes(ROIS)
             MedACRAnalysis.ManualResData = VarHolder.ManualResData
             #SpatialRes=False
+
+        if OptionsPane.GetOptions()["OverrideRadiusAndCentre"] == 1:
+            Windows.OverrideCentreAndRadiusWindow(root,DCMfolder_path.get(),selected_option.get())
+        
         MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
         
         EnableOrDisableEverything(True)
@@ -598,11 +606,13 @@ try:
     sys.stderr = TextRedirector(TextLog, "stderr")
     frameLog.grid(row=11, column=1,padx=10,pady=10,rowspan=3,sticky=W,columnspan=2)
 
-    Optionsframe = ttk.Frame(root)
-    OptionsLabel = ttk.Label(master=Optionsframe,text="Options")
-    OptionsLabel.pack(anchor=W)
-    
 
+    
+    Optionsframe = ttk.Frame(root)
+    #OptionsLabel = ttk.Label(master=Optionsframe,text="Options")
+    #OptionsLabel.pack(anchor=W)
+    
+    '''
     #ManualResCheck = IntVar(value=0)
     #ManualResBox = ttk.Checkbutton(Optionsframe, text='Use Manual Resolution Check',variable=ManualResCheck, onvalue=1, offvalue=0,state=NORMAL,command=None)
     #ManualResBox.pack(anchor=W)
@@ -626,10 +636,40 @@ try:
     drop.grid(row=0, column=0,padx=5)
     label.grid(row=0, column=1)
     MiniFrame.pack(anchor=W)
+    '''
 
-    SubmitPointsBtn = ttk.Button(Optionsframe, text="Options",width=20)
+    def CloseOptionsPane(Window):
+        Window.destroy()
 
-    Optionsframe.grid(row=11, column=3,padx=10,pady=10,rowspan=3,sticky=NW)
+    def OpenOptionsPane():
+        OptionsPaneWin = tkinter.Toplevel(root)
+        OptionsPaneWin.iconbitmap("_internal\ct-scan.ico")
+        OptionsPaneWin.geometry("800x540")
+        OptionsPaneWin.resizable(False,False)
+        def disable_event():
+            pass
+        OptionsPaneWin.protocol("WM_DELETE_WINDOW", disable_event)
+
+        label = ttk.Label(OptionsPaneWin, text="Options Menu")
+        label.place(relx=0.5, rely=0.02, anchor=CENTER)
+
+        SelectionFrame = ttk.Frame(OptionsPaneWin)
+        SelectionFrame.pack(side="top", fill="x", expand=False,pady=50)
+
+        closeBtn = ttk.Button(OptionsPaneWin, text="Close Options",width=20,command = lambda: CloseOptionsPane(OptionsPaneWin))
+        closeBtn.place(relx=0.5, rely=0.96, anchor=CENTER)
+
+        OptionsPane.SetupOptions(SelectionFrame)
+        #OptionsPane.GetOptions()
+
+        root.wait_window(OptionsPaneWin)
+
+
+    OpenOptionsButton = ttk.Button(Optionsframe, text="Open Options",width=20,command = OpenOptionsPane)
+    OpenOptionsButton.pack(
+
+    )
+    Optionsframe.grid(row=11, column=3,padx=8,pady=10,rowspan=3)
     root.resizable(False,False)
 
     import hazenlib.logger
