@@ -53,8 +53,12 @@ class ACRObject:
             self.radius = ParamaterOverrideHolder.RadiusOverride
         else:
             self.centre, self.radius = self.find_phantom_center()
+            
         # Store a mask image of slice 7 for reusability
-        self.mask_image = self.get_mask_image(self.images[6])
+        if ParamaterOverrideHolder.MaskingOverride[6].any() != None:
+            self.mask_image = ParamaterOverrideHolder.MaskingOverride[6]
+        else:
+            self.mask_image = self.get_mask_image(self.images[6])
 
         if "Localiser" in kwargs.keys():
             self.LocalisierDCM=dcmread(kwargs["Localiser"])

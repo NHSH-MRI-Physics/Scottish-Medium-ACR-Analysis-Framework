@@ -117,7 +117,7 @@ class ACRUniformity(HazenTask):
 
         lroi = self.ACR_obj.circular_mask([cxy[0], cxy[1] + d_void], r_large, dims)
         img_masked = lroi * img
-
+        
         half_max = np.percentile(img_masked[np.nonzero(img_masked)], 50)
 
         min_image = img_masked * (img_masked < half_max)

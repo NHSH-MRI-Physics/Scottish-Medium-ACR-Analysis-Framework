@@ -423,23 +423,37 @@ try:
         SlicePos=False
         SliceThickness=False
 
+        AtLeatOneModuleSelected = False
+
         if CheckBoxes["RunAll"][0].get()==1 and str(CheckBoxes["RunAll"][1]['state'])=="normal":
             RunAll=True
+            AtLeatOneModuleSelected = True
         else:
             if CheckBoxes["SNR"][0].get() == 1 and str(CheckBoxes["SNR"][1]['state'])=="normal":
                 SNR=True
+                AtLeatOneModuleSelected = True
             if CheckBoxes["Geometric Accuracy"][0].get() == 1 and str(CheckBoxes["Geometric Accuracy"][1]['state'])=="normal":
                 GeoAcc=True
+                AtLeatOneModuleSelected = True
             if CheckBoxes["Spatial Resolution"][0].get() == 1 and str(CheckBoxes["Spatial Resolution"][1]['state'])=="normal":
                 SpatialRes=True
+                AtLeatOneModuleSelected = True
             if CheckBoxes["Uniformity"][0].get() == 1 and str(CheckBoxes["Uniformity"][1]['state'])=="normal":
                 Uniformity=True
+                AtLeatOneModuleSelected = True
             if CheckBoxes["Ghosting"][0].get() == 1 and str(CheckBoxes["Ghosting"][1]['state'])=="normal":
                 Ghosting=True
+                AtLeatOneModuleSelected = True
             if CheckBoxes["Slice Position"][0].get() == 1 and str(CheckBoxes["Slice Position"][1]['state'])=="normal":
                 SlicePos=True
+                AtLeatOneModuleSelected = True
             if CheckBoxes["Slice Thickness"][0].get() == 1 and str(CheckBoxes["Slice Thickness"][1]['state'])=="normal":
                 SliceThickness=True
+                AtLeatOneModuleSelected = True
+
+        if AtLeatOneModuleSelected == False:
+            messagebox.showerror("Error", "No Modules Selected")
+            return
 
         EnableOrDisableEverything(False)
 
@@ -460,9 +474,19 @@ try:
             MedACRAnalysis.ManualResData = VarHolder.ManualResData
             #SpatialRes=False
 
+        if OptionsPane.GetOptions()["OverrideRadiusAndCentre"] == 1 or OptionsPane.GetOptions()["OverrideMasking"] == 1:
+            OverrideCentreRadiusObj = Windows.CentreRadiusMaskingWindow(root,DCMfolder_path.get(),selected_option.get(),overridemasking=OptionsPane.GetOptions()["OverrideMasking"])
+            OverrideCentreRadiusObj.GetCentreRadiusMask()
+
         if OptionsPane.GetOptions()["OverrideRadiusAndCentre"] == 1:
-            Windows.OverrideCentreAndRadiusWindow(root,DCMfolder_path.get(),selected_option.get())
-        
+            print("Radius and Centre of phantom overriden")
+            MedACRAnalysis.ParamaterOveride.CentreOverride = [OverrideCentreRadiusObj.Centrex,OverrideCentreRadiusObj.Centrey]
+            MedACRAnalysis.ParamaterOveride.RadiusOverride = OverrideCentreRadiusObj.Radius
+
+        if OptionsPane.GetOptions()["OverrideMasking"] == 1:
+            print("Mask of phantom overriden")
+            MedACRAnalysis.ParamaterOveride.MaskingOverride[6] = OverrideCentreRadiusObj.Mask
+
         MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
         
         EnableOrDisableEverything(True)
@@ -531,9 +555,11 @@ try:
     WidgetsToToggle.append(ResultsPathButton)
     Resultsfolder_path = StringVar()
     Resultsfolder_path.set("Not Set!")
-    #Resultsfolder_path.set("C:\\Users\John\Desktop\OutputTest") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
     ResultsPathLabel = ttk.Label(master=root,textvariable=Resultsfolder_path)
     ResultsPathLabel.grid(row=1, column=1,padx=10,pady=2,sticky=W,columnspan=6)
+
+    Resultsfolder_path.set("C:\\Users\\Johnt\\Desktop\\out") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
+
 
     selected_option = StringVar(root)
     options = [] 
@@ -643,6 +669,7 @@ try:
 
     def OpenOptionsPane():
         OptionsPaneWin = tkinter.Toplevel(root)
+        OptionsPaneWin.grab_set()
         OptionsPaneWin.iconbitmap("_internal\ct-scan.ico")
         OptionsPaneWin.geometry("800x540")
         OptionsPaneWin.resizable(False,False)

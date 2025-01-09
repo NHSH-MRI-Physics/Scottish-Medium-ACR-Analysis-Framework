@@ -223,6 +223,7 @@ class ACRSlicePosition(HazenTask):
             res = hazenlib.utils.GetDicomTag(dcm,(0x28,0x30))
         
         mask = self.ACR_obj.mask_image
+
         x_pts, y_pts = self.find_wedges(img, mask, res)
 
         line_prof_L = skimage.measure.profile_line(
@@ -388,5 +389,6 @@ class ACRSlicePosition(HazenTask):
             )
             fig.savefig(img_path)
             self.report_files.append(img_path)
+            plt.close()
 
         return dL
