@@ -84,5 +84,5 @@ To confirm the scripts, match expected results a testing protocol was developed.
 Please make any bug reports or feature requests by logging an issue [here](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/issues) or send an email to the developers below. 
 
 ## Developers
-John Tracey NHS Highland (John.tracey@nhs.scot)
+John Tracey NHS Highland (John.tracey@nhs.scot)  <br />
 Hamish Richardson NHS Lothian (hamish.richardson@nhs.scot)
