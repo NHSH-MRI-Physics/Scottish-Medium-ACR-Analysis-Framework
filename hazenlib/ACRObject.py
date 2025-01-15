@@ -19,9 +19,9 @@ class ACRObject:
             self.MediumACRPhantom = kwargs["MediumACRPhantom"]
 
         import MedACROptions
-        ParamaterOverrideHolder=MedACROptions.ParamaterOveride()
+        self.ParamaterOverrideHolder=MedACROptions.ParamaterOveride()
         if "Paramater_overide" in kwargs.keys():
-            ParamaterOverrideHolder = kwargs["Paramater_overide"]
+            self.ParamaterOverrideHolder = kwargs["Paramater_overide"]
             
         #Added in a flag to make use of the dot matrix instead of MTF for spatial res
         #self.UseDotMatrix=False
@@ -48,15 +48,15 @@ class ACRObject:
         # Store the DCM object of slice 7 as it is used often
         self.slice7_dcm = self.dcms[6]
         # Find the centre coordinates of the phantom (circle)
-        if ParamaterOverrideHolder.CentreOverride != None and ParamaterOverrideHolder.RadiusOverride != None:
-            self.centre = ParamaterOverrideHolder.CentreOverride
-            self.radius = ParamaterOverrideHolder.RadiusOverride
+        if self.ParamaterOverrideHolder.CentreOverride != None and self.ParamaterOverrideHolder.RadiusOverride != None:
+            self.centre = self.ParamaterOverrideHolder.CentreOverride
+            self.radius = self.ParamaterOverrideHolder.RadiusOverride
         else:
             self.centre, self.radius = self.find_phantom_center()
             
         # Store a mask image of slice 7 for reusability
-        if ParamaterOverrideHolder.MaskingOverride[6].any() != None:
-            self.mask_image = ParamaterOverrideHolder.MaskingOverride[6]
+        if self.ParamaterOverrideHolder.MaskingOverride[6].any() != None:
+            self.mask_image = self.ParamaterOverrideHolder.MaskingOverride[6]
         else:
             self.mask_image = self.get_mask_image(self.images[6])
 
@@ -64,6 +64,11 @@ class ACRObject:
             self.LocalisierDCM=dcmread(kwargs["Localiser"])
         else:
             self.LocalisierDCM = None
+
+        for i in range(0,len(self.ParamaterOverrideHolder.MaskingOverride)):
+            if self.ParamaterOverrideHolder.MaskingOverride[i].any() != None:
+                if self.ParamaterOverrideHolder.MaskingOverride[i][self.centre[1],self.centre[0]] == 0:
+                    raise Exception("Radius not within the mask in slice " + str(i+1))
 
         self.kwargs = kwargs
         
@@ -268,6 +273,12 @@ class ACRObject:
             
             
         return centre, radius
+
+    def get_mask_image_from_slice(self,SliceNum, mag_threshold=0.05, open_threshold=500):
+        if self.ParamaterOverrideHolder.MaskingOverride[SliceNum].any() != None:
+            return self.ParamaterOverrideHolder.MaskingOverride[SliceNum]
+        else:
+            return self.get_mask_image(self.images[SliceNum],mag_threshold=mag_threshold, open_threshold=open_threshold)
 
     def get_mask_image(self, image, mag_threshold=0.05, open_threshold=500):
         """Create a masked pixel array

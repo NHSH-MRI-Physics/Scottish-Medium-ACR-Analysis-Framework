@@ -458,6 +458,49 @@ try:
         EnableOrDisableEverything(False)
 
         SetOptions()
+        SlicesToOverride = []
+        if RunAll==True:
+            SlicesToOverride = [1,5,7,11]
+        else:
+            if SNR==True or Ghosting == True or Uniformity == True:
+                SlicesToOverride.append(7)
+            if SpatialRes == True or SliceThickness==True:
+                SlicesToOverride.append(1)
+            if GeoAcc == True:
+                if MedACRAnalysis.GeoMethod == GeometryOptions.MAGNETMETHOD:
+                    SlicesToOverride.append(5)
+                if MedACRAnalysis.GeoMethod == GeometryOptions.ACRMETHOD:
+                    SlicesToOverride.append(1)
+                    SlicesToOverride.append(5)
+            if SlicePos==True:
+                SlicesToOverride.append(1)
+                SlicesToOverride.append(7)
+
+        if OptionsPane.GetOptions()["OverrideRadiusAndCentre"] == 1:
+            SlicesToOverride.append(7)
+        SlicesToOverride = sorted(set(SlicesToOverride))
+        #Make sure slice 7 is always done first so we can get the radius/centre
+        if 7 in SlicesToOverride:
+            SlicesToOverride.remove(7)
+            SlicesToOverride.insert(0,7)
+
+        
+        MedACRAnalysis.ParamaterOverides = ParamaterOveride()
+        for CurrentSlice in SlicesToOverride:
+            if OptionsPane.GetOptions()["OverrideRadiusAndCentre"] == 1 or OptionsPane.GetOptions()["OverrideMasking"] == 1:
+                OverrideCentreRadiusObj = Windows.CentreRadiusMaskingWindow(root,DCMfolder_path.get(),selected_option.get(),overridemasking=OptionsPane.GetOptions()["OverrideMasking"],slice=CurrentSlice,PreCalcdCentre=MedACRAnalysis.ParamaterOverides.CentreOverride)
+                OverrideCentreRadiusObj.GetCentreRadiusMask()
+
+            if OptionsPane.GetOptions()["OverrideRadiusAndCentre"] == 1 and CurrentSlice==7:
+                print("Radius and Centre of phantom overriden")
+                MedACRAnalysis.ParamaterOverides.CentreOverride = [OverrideCentreRadiusObj.Centrex,OverrideCentreRadiusObj.Centrey]
+                MedACRAnalysis.ParamaterOverides.RadiusOverride = OverrideCentreRadiusObj.Radius
+
+            if OptionsPane.GetOptions()["OverrideMasking"] == 1:
+                print("Mask of phantom overriden")
+                MedACRAnalysis.ParamaterOverides.MaskingOverride[CurrentSlice-1] = OverrideCentreRadiusObj.Mask
+
+
         MedACRAnalysis.ManualResTestText=None
         MedACRAnalysis.ManualResData = None
         if OptionsPane.GetOptions()["SpatialResOption"]=="Manual" and SpatialRes==True or RunAll==True and OptionsPane.GetOptions()["SpatialResOption"]=="Manual":
@@ -474,18 +517,6 @@ try:
             MedACRAnalysis.ManualResData = VarHolder.ManualResData
             #SpatialRes=False
 
-        if OptionsPane.GetOptions()["OverrideRadiusAndCentre"] == 1 or OptionsPane.GetOptions()["OverrideMasking"] == 1:
-            OverrideCentreRadiusObj = Windows.CentreRadiusMaskingWindow(root,DCMfolder_path.get(),selected_option.get(),overridemasking=OptionsPane.GetOptions()["OverrideMasking"])
-            OverrideCentreRadiusObj.GetCentreRadiusMask()
-
-        if OptionsPane.GetOptions()["OverrideRadiusAndCentre"] == 1:
-            print("Radius and Centre of phantom overriden")
-            MedACRAnalysis.ParamaterOveride.CentreOverride = [OverrideCentreRadiusObj.Centrex,OverrideCentreRadiusObj.Centrey]
-            MedACRAnalysis.ParamaterOveride.RadiusOverride = OverrideCentreRadiusObj.Radius
-
-        if OptionsPane.GetOptions()["OverrideMasking"] == 1:
-            print("Mask of phantom overriden")
-            MedACRAnalysis.ParamaterOveride.MaskingOverride[6] = OverrideCentreRadiusObj.Mask
 
         MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
         
@@ -558,7 +589,7 @@ try:
     ResultsPathLabel = ttk.Label(master=root,textvariable=Resultsfolder_path)
     ResultsPathLabel.grid(row=1, column=1,padx=10,pady=2,sticky=W,columnspan=6)
 
-    Resultsfolder_path.set("C:\\Users\\Johnt\\Desktop\\out") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
+    #Resultsfolder_path.set("C:\\Users\\John\\Desktop\\out") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
 
 
     selected_option = StringVar(root)

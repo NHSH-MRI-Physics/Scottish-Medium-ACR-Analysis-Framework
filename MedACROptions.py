@@ -8,6 +8,7 @@ class GeometryOptions(Enum):
     MAGNETMETHOD=2
 
 class ParamaterOveride():
-    CentreOverride = None
-    RadiusOverride = None
-    MaskingOverride = np.array( [None,None,None,None,None,None,None,None,None,None,None,] )
+    def __init__(self):
+        self.CentreOverride = None
+        self.RadiusOverride = None
+        self.MaskingOverride = np.array( [np.array(None),np.array(None),np.array(None),np.array(None),np.array(None),np.array(None),np.array(None),np.array(None),np.array(None),np.array(None),np.array(None)] )

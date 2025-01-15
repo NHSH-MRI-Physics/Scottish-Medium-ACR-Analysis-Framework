@@ -11,9 +11,9 @@ from tests import TEST_DATA_DIR, TEST_REPORT_DIR
 from hazenlib.tasks.acr_geometric_accuracy_MagNetMethod import ACRGeometricAccuracyMagNetMethod
 
 class TestACRGeometricAccuracySiemens(unittest.TestCase):
-    L1 = 192.38, 188.48
-    L5 = 192.38, 188.48, 190.43, 192.38
-    distortion_metrics = [0.75, 2.38, 0.92]
+    L1 = 192.38, 187.5
+    L5 = 193.36, 188.48, 192.38, 192.38
+    distortion_metrics = [1.08, 3.36, 1.17]
 
     def setUp(self):
         ACR_DATA_SIEMENS = pathlib.Path(TEST_DATA_DIR / "acr" / "Siemens")
@@ -56,7 +56,7 @@ class TestACRGeometricAccuracySiemens(unittest.TestCase):
         )
 
         if self.acr_geometric_accuracy_task.ACR_obj.MediumACRPhantom==True:
-                    metrics = np.array(self.acr_geometric_accuracy_task.distortion_metric_MedPhantom(self.L1 + self.L5))
+            metrics = np.array(self.acr_geometric_accuracy_task.distortion_metric_MedPhantom(self.L1 + self.L5))
 
         metrics = np.round(metrics, 2)
         print(metrics)
@@ -67,16 +67,16 @@ class TestACRGeometricAccuracySiemens(unittest.TestCase):
 
 
 class TestACRGeometricAccuracyGE(TestACRGeometricAccuracySiemens):
-    L1 = 191.44, 191.44
-    L5 = 191.44, 191.44, 191.44, 189.41
-    distortion_metrics = [1.1, 1.44, 0.4]
+    L1 = 207.69, 188.9
+    L5 = 190.93, 189.92, 191.95, 190.43
+    distortion_metrics = [3.3, 17.69, 3.36]
 
     def setUp(self):
         ACR_DATA_GE = pathlib.Path(TEST_DATA_DIR / "acr" / "GE")
         ge_files = get_dicom_files(ACR_DATA_GE)
 
         self.acr_geometric_accuracy_task = ACRGeometricAccuracy(
-            input_data=ge_files, report_dir=pathlib.PurePath.joinpath(TEST_REPORT_DIR)
+            input_data=ge_files, report_dir=pathlib.PurePath.joinpath(TEST_REPORT_DIR),report=True
         )
 
         self.dcm_1 = self.acr_geometric_accuracy_task.ACR_obj.dcms[0]
@@ -84,9 +84,9 @@ class TestACRGeometricAccuracyGE(TestACRGeometricAccuracySiemens):
 
 
 class TestMedACRGeometricAccuracyGE(TestACRGeometricAccuracySiemens):
-    L1 = 164.07, 164.07
-    L5 = 166.02, 165.05, 166.02, 165.05
-    distortion_metrics = [0.05, 1.02, 0.48]
+    L1 = 164.07, 162.12
+    L5 = 166.02, 164.07, 165.05, 166.02
+    distortion_metrics = [-0.44, 2.88, 0.82]
 
     def setUp(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")

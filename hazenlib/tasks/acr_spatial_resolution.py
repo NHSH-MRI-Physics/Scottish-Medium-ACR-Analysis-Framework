@@ -623,6 +623,11 @@ class ACRSpatialResolution(HazenTask):
         #Crop the ROI we need
         ROISize = [int(round(114/res[0],0)),int(round(37/res[1],0))]
         Crop = PixelArray[leftCorner[1]-ROISize[1]:leftCorner[1],leftCorner[0]:leftCorner[0]+ROISize[0]]
+
+        #plt.imshow(Crop)
+        #plt.savefig("test.png", dpi=300)
+        #plt.close("all")
+
         Binary_Crop = Crop > np.max(Crop)*0.1
 
         #This line gets rid of anything touching the border edge, super handy!
@@ -654,9 +659,7 @@ class ACRSpatialResolution(HazenTask):
                 Xpos.append(region.centroid[1])
                 CropsBB.append([minr+leftCorner[1]-ROISize[1], maxr+leftCorner[1]-ROISize[1], minc+leftCorner[0], maxc+leftCorner[0]])
                 ROIS.append(ROI)           
-        #plt.imshow(Crop)
-        #plt.savefig("test.png", dpi=300)
-        #plt.close("all")
+
 
         #take the 4 most right objects, ignoring anything after that. If the blocks on the left get seperated then this can cause issues which is solved by this appraoch.
         OrderedXpos = sorted(Xpos, reverse=True)

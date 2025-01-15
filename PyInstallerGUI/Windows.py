@@ -13,18 +13,16 @@ from enum import Enum
 import math
 from tkinter import ttk
 import numpy as np
-class Status(Enum):
-    Centre =1
-    Radius = 2
-
 
 class CentreRadiusMaskingWindow():
-    def __init__(self,root,dicomPath,seq,overridemasking = False, slice=6):
+    def __init__(self,root,dicomPath,seq,overridemasking = False, slice=7,PreCalcdCentre = None):
+        slice -=1 #Convert it back to index that starts at 0
         self.points = []
         self.Centrex = None
         self.Centrey = None
         self.Radius = None
         self.Mask = None
+        self.PreCalcdCentre = PreCalcdCentre
 
         files = glob.glob(os.path.join(dicomPath,"*"))
         Dcms = []
@@ -34,12 +32,11 @@ class CentreRadiusMaskingWindow():
                 Dcms.append(dicom)
         self.Dcms = sorted(Dcms, key=lambda d: d.SliceLocation)
         self.root = root
-        self.Title = "Choose 4 points on the edge of the circle"
+        self.Title = "Displaying Slice " + str(slice+1) + "\nChoose 4 points on the edge of the circle"
         self.overrideMasking = overridemasking
         self.slice = slice
 
     def  on_click_on_plot(self,event):
-
         if (self.canvas.toolbar.mode) != '':
             return
 
@@ -49,6 +46,9 @@ class CentreRadiusMaskingWindow():
 
             plt.clf()
             plt.imshow(self.Image)
+            if self.PreCalcdCentre != None:
+                plt.plot(self.PreCalcdCentre[0],self.PreCalcdCentre[1],marker="x",color="red")
+            plt.title(self.Title)
             for point in self.points:
                 plt.plot(point[0],point[1],'ro')
 
@@ -82,6 +82,9 @@ class CentreRadiusMaskingWindow():
 
                 plt.clf()
                 plt.imshow(self.Image)
+                plt.title(self.Title)
+                if self.PreCalcdCentre != None:
+                    plt.plot(self.PreCalcdCentre[0],self.PreCalcdCentre[1],marker="x",color="red")
                 for point in self.points:
                     plt.plot(point[0],point[1],'ro')    
                 self.canvas.draw()         
@@ -90,6 +93,8 @@ class CentreRadiusMaskingWindow():
     def Reset(self):
         plt.clf()
         plt.imshow(self.Image)
+        if self.PreCalcdCentre != None:
+            plt.plot(self.PreCalcdCentre[0],self.PreCalcdCentre[1],marker="x",color="red")
         plt.title(self.Title)
         self.canvas.draw() 
         self.Centrex = None
@@ -105,10 +110,16 @@ class CentreRadiusMaskingWindow():
         plt.clf()
         self.Centrex = int(round(self.Centrex,0))
         self.Centrey = int(round(self.Centrey,0))
+        self.Radius = int(round(self.Radius,0))
+        if self.PreCalcdCentre != None:
+            if self.Mask[self.PreCalcdCentre[1],self.PreCalcdCentre[0]] == 0:
+                messagebox.showerror("Error", "mask does not contain the centre of the phantom ")
+                self.Reset()
+                return
         Window.destroy()
 
     def GetCentreRadiusMask(self):
-        plt.close() # make sure all figures are closed
+        plt.close('all')
         Win = tkinter.Toplevel(self.root)
         Win.iconbitmap("_internal\ct-scan.ico")
         Win.geometry("500x540")
@@ -123,7 +134,8 @@ class CentreRadiusMaskingWindow():
         plt.title(self.Title)
         self.Image = self.Dcms[self.slice].pixel_array
         plt.imshow(self.Image)
-        
+        if self.PreCalcdCentre != None:
+            plt.plot(self.PreCalcdCentre[0],self.PreCalcdCentre[1],marker="x",color="red")
         self.canvas = FigureCanvasTkAgg(plt.gcf(), master = Win) 
         plt.gcf().canvas.callbacks.connect('button_press_event', self.on_click_on_plot)
         self.canvas.draw() 
