@@ -23,7 +23,8 @@ import datetime
 import numpy as np
 import VariableHolder
 from hazenlib._version import __version__
-
+import threading
+import webbrowser
 
 if getattr(sys, 'frozen', False):
     import pyi_splash
@@ -43,6 +44,19 @@ try:
             self.widget.insert("end", string, (self.tag,))
             self.widget.configure(state="disabled")
             self.widget.see("end")
+            root.update()
+
+    class TextRedirectorErr(object):
+        def __init__(self, widget, tag="stdout"):
+            self.widget = widget
+            self.tag = tag
+
+        def write(self, string):
+            self.widget.configure(state="normal")
+            self.widget.insert("end", string, (self.tag,))
+            self.widget.configure(state="disabled")
+            self.widget.see("end")
+            EnableOrDisableEverything(True) #I need to rethink this but it lets the program be used after a exception was thrown, might require a fair bit of reworking though...
             root.update()
             
     root = tkinter.Tk()
@@ -413,6 +427,10 @@ try:
         if Resultsfolder_path.get()=="Not Set!":
             messagebox.showerror("Error", "No Results Path Set")
             return
+        
+        if DCMfolder_path.get() == Resultsfolder_path.get():
+            messagebox.showerror("Error","Dicom and results folder cannot be the same")
+            return
 
         RunAll=False
         SNR=False
@@ -500,6 +518,11 @@ try:
                 print("Mask of phantom overriden")
                 MedACRAnalysis.ParamaterOverides.MaskingOverride[CurrentSlice-1] = OverrideCentreRadiusObj.Mask
 
+        if (OptionsPane.GetOptions()["OverideResBlockLoc"] == 1 and SpatialRes == True) or RunAll==True:
+            if MedACRAnalysis.SpatialResMethod == ResOptions.Manual or MedACRAnalysis.SpatialResMethod == ResOptions.DotMatrixMethod or MedACRAnalysis.SpatialResMethod == ResOptions.ContrastResponseMethod:
+                overrideRes = Windows.GetROIOfResBlock(root,DCMfolder_path.get(),selected_option.get())
+                overrideRes.GetROIs()
+                MedACRAnalysis.ParamaterOverides.ROIOverride=overrideRes.SelectedRects
 
         MedACRAnalysis.ManualResTestText=None
         MedACRAnalysis.ManualResData = None
@@ -589,8 +612,7 @@ try:
     ResultsPathLabel = ttk.Label(master=root,textvariable=Resultsfolder_path)
     ResultsPathLabel.grid(row=1, column=1,padx=10,pady=2,sticky=W,columnspan=6)
 
-    #Resultsfolder_path.set("C:\\Users\\John\\Desktop\\out") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
-
+    Resultsfolder_path.set("C:\\Users\\John\\Desktop\\out") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
 
     selected_option = StringVar(root)
     options = [] 
@@ -660,7 +682,7 @@ try:
     TextLog.pack(anchor=W)
 
     sys.stdout = TextRedirector(TextLog, "stdout")
-    sys.stderr = TextRedirector(TextLog, "stderr")
+    sys.stderr = TextRedirectorErr(TextLog, "stderr")
     frameLog.grid(row=11, column=1,padx=10,pady=10,rowspan=3,sticky=W,columnspan=2)
 
 
@@ -668,32 +690,7 @@ try:
     Optionsframe = ttk.Frame(root)
     #OptionsLabel = ttk.Label(master=Optionsframe,text="Options")
     #OptionsLabel.pack(anchor=W)
-    
-    '''
-    #ManualResCheck = IntVar(value=0)
-    #ManualResBox = ttk.Checkbutton(Optionsframe, text='Use Manual Resolution Check',variable=ManualResCheck, onvalue=1, offvalue=0,state=NORMAL,command=None)
-    #ManualResBox.pack(anchor=W)
 
-    MiniFrame = ttk.Frame(Optionsframe)
-    label = ttk.Label(MiniFrame, text="Spatial Res Method", anchor='w')
-    options = ["Contrast Response","Contrast Response", "MTF", "Dot Matrix", "Manual", ] 
-    SpatalResOption = StringVar() 
-    drop = ttk.OptionMenu( MiniFrame , SpatalResOption , *options ) 
-    drop.config(width = 13)
-    drop.grid(row=0, column=0,padx=5)
-    label.grid(row=0, column=1)
-    MiniFrame.pack(anchor=W)
-
-    MiniFrame = ttk.Frame(Optionsframe)
-    label = ttk.Label(MiniFrame, text="Geo Acc Method", anchor='w')
-    options = [  "MagNet Method", "MagNet Method", "ACR Method",] 
-    GeoAccOption = StringVar() 
-    drop = ttk.OptionMenu( MiniFrame , GeoAccOption , *options ) 
-    drop.config(width = 13)
-    drop.grid(row=0, column=0,padx=5)
-    label.grid(row=0, column=1)
-    MiniFrame.pack(anchor=W)
-    '''
 
     def CloseOptionsPane(Window):
         Window.destroy()
@@ -722,11 +719,15 @@ try:
 
         root.wait_window(OptionsPaneWin)
 
+    def OpenManual():
+        webbrowser.open('https://github.com/NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework/blob/main/README.md', new=0)
 
     OpenOptionsButton = ttk.Button(Optionsframe, text="Open Options",width=20,command = OpenOptionsPane)
-    OpenOptionsButton.pack(
+    OpenOptionsButton.pack()
 
-    )
+    ManualButton = ttk.Button(Optionsframe, text="Open Manual",width=20,command = OpenManual)
+    ManualButton.pack(pady=20)
+
     Optionsframe.grid(row=11, column=3,padx=8,pady=10,rowspan=3)
     root.resizable(False,False)
 
@@ -734,6 +735,7 @@ try:
 
     hazenlib.logger.ConfigureLoggerForGUI()
     MedACR_ToleranceTableChecker.SetUpToleranceTable()
+
 
     root.mainloop()
 except Exception as e:

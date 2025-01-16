@@ -151,3 +151,121 @@ class CentreRadiusMaskingWindow():
         ResetButton.place(relx=0.75, rely=0.89, anchor='center')
 
         self.root.wait_window(Win)
+
+
+class GetROIOfResBlock():
+    def __init__(self,root,dicomPath,seq):
+        self.root = root
+        files = glob.glob(os.path.join(dicomPath,"*"))
+        Dcms = []
+        for file in files: 
+            dicom = dcmread(file)
+            if dicom.SeriesDescription == seq:
+                Dcms.append(dicom)
+        self.Dcms = sorted(Dcms, key=lambda d: d.SliceLocation)
+        self.MakingRect = False
+        self.Rect = [None,None,None,None]
+        self.SelectedRects = [None,None,None,None]
+        self.colours = [ "red", "green", "blue", "yellow"]
+        self.ResTitle = ["1.1mm","1.0mm", "0.9mm", "0.8mm"]
+        self.RectID = 0
+
+    def Reset(self):
+        self.Rect = [None,None,None,None]
+        for i in range(4):
+            if self.SelectedRects[i] != None:
+                self.SelectedRects[i].remove()
+
+        self.SelectedRects = [None,None,None,None]
+        self.RectID = 0
+        self.canvas.draw() 
+        
+    def Submit(self,Window):
+        for rect in self.SelectedRects:
+            if rect == None:
+                messagebox.showerror("Error", "Please draw a box round all 4 resolution grids")
+                return
+        #Make Crops and return them
+        Window.destroy()
+
+    def onmove(self,event):
+        if self.MakingRect == True:
+            if self.SelectedRects[self.RectID] != None:
+                self.SelectedRects[self.RectID].remove()
+            self.Rect[2] = event.xdata
+            self.Rect[3] = event.ydata
+            self.SelectedRects[self.RectID] = plt.Rectangle((self.Rect[0],self.Rect[1]),self.Rect[2]-self.Rect[0],self.Rect[3]-self.Rect[1],color=self.colours[self.RectID],fill=False)
+            plt.gca().add_patch(self.SelectedRects[self.RectID])
+            self.canvas.draw()   
+
+    def on_click_on_plot(self,event):
+        if event.button == 1 and self.RectID < 4:
+            self.MakingRect=True
+            self.Rect[0] = event.xdata
+            self.Rect[1] = event.ydata
+
+        if event.button == 3:
+            for i in range(4):
+                if self.SelectedRects[i] != None:
+                    rect = self.SelectedRects[i]
+                    x0, y0 = rect.get_xy()
+                    x1 = x0 + rect.get_width()
+                    y1 = y0 + rect.get_height()
+                    if x0 <= event.xdata <= x1 and y0 <= event.ydata <= y1:
+                        self.SelectedRects[i].remove()
+                        self.SelectedRects[i] = None
+                        self.RectID = self.SelectedRects.index(None)
+              
+            plt.title("Draw a box around the " + str(self.ResTitle[self.RectID])+" grid")
+            self.canvas.draw() 
+
+            
+
+    def release_click_on_plot(self,event):
+        if self.MakingRect == True:
+            self.MakingRect=False
+            if None in self.SelectedRects:
+                self.RectID = self.SelectedRects.index(None)
+            else:
+                self.RectID = 4
+            if self.RectID<=3:
+                plt.title("Draw a box around the " + str(self.ResTitle[self.RectID])+" grid")
+                self.canvas.draw() 
+            else:
+                plt.title("All boxes drawn")
+                self.canvas.draw() 
+
+
+
+    def GetROIs(self):
+        plt.close('all')
+        Win = tkinter.Toplevel(self.root)
+        Win.iconbitmap("_internal\ct-scan.ico")
+        Win.geometry("500x540")
+        Win.configure(background='white')
+        Win.resizable(False,False)
+
+        def disable_event():
+            pass
+        Win.protocol("WM_DELETE_WINDOW", disable_event)
+        plt.title("Draw a box around the " + str(self.ResTitle[self.RectID])+" grid")
+        self.Image = self.Dcms[0].pixel_array
+        plt.imshow(self.Image)
+        self.canvas = FigureCanvasTkAgg(plt.gcf(), master = Win) 
+        plt.gcf().canvas.callbacks.connect('button_press_event', self.on_click_on_plot)
+        plt.gcf().canvas.callbacks.connect('button_release_event', self.release_click_on_plot)
+        plt.gcf().canvas.callbacks.connect("motion_notify_event", self.onmove)
+        
+        self.canvas.draw() 
+        self.canvas.get_tk_widget().pack(side=TOP)
+        toolbar = NavigationToolbar2Tk(self.canvas, Win) 
+        toolbar.update() 
+        self.canvas.get_tk_widget().pack() 
+
+        ResetButton = ttk.Button(Win,text="Reset",width=22,command=self.Reset)
+        ResetButton.place(relx=0.25, rely=0.89, anchor='center')
+
+        ResetButton = ttk.Button(Win,text="Submit",width=22,command=lambda: self.Submit(Win))
+        ResetButton.place(relx=0.75, rely=0.89, anchor='center')
+
+        self.root.wait_window(Win)

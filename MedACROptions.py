@@ -12,3 +12,4 @@ class ParamaterOveride():
         self.CentreOverride = None
         self.RadiusOverride = None
         self.MaskingOverride = np.array( [np.array(None),np.array(None),np.array(None),np.array(None),np.array(None),np.array(None),np.array(None),np.array(None),np.array(None),np.array(None),np.array(None)] )
+        self.ROIOverride = None

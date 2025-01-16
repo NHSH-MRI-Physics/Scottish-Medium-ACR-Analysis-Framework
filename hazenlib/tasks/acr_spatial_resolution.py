@@ -78,6 +78,7 @@ class ACRSpatialResolution(HazenTask):
         self.ResOption = ResOptions.MTFMethod
     
     def GetROICrops(self):
+        #Update this so if the ACR Object has a ROI then we use that instead of the default ROI
         ResSquare,CropsLoc,ROIS = self.GetResSquares(self.ACR_obj.dcms[0])
         ROI_Plots= {
             "1.1mm holes": ROIS[0],
