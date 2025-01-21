@@ -32,7 +32,8 @@ Derived from the [Hazen MRI QA framework](https://github.com/GSTT-CSC/hazen) pro
 - Click "Start Analysis"
 - On completion the results are displayed and you can view individual results by selecting the dropdown (below the "Start Analysis" button) following the "View Results" button.
 
-![drawing](https://github.com/user-attachments/assets/97b2042b-d5eb-4004-87e9-da4f027cd4db)
+![path30](https://github.com/user-attachments/assets/0ef4008e-d647-4fdc-a12a-e94b0dac3a79)
+
 
 
 ## Scanning Protocol
