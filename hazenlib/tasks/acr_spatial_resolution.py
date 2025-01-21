@@ -78,8 +78,8 @@ class ACRSpatialResolution(HazenTask):
         self.ResOption = ResOptions.MTFMethod
     
     def GetROICrops(self):
-        #Update this so if the ACR Object has a ROI then we use that instead of the default ROI
         ResSquare,CropsLoc,ROIS = self.GetResSquares(self.ACR_obj.dcms[0])
+            
         ROI_Plots= {
             "1.1mm holes": ROIS[0],
             "1.0mm holes": ROIS[1],
@@ -111,6 +111,10 @@ class ACRSpatialResolution(HazenTask):
 
         try:
             if (self.ResOption==ResOptions.DotMatrixMethod):
+                if self.ACR_obj.ParamaterOverrideHolder.ROIOverride != None:
+                    if self.ResOption == ResOptions.DotMatrixMethod:
+                        raise Exception("Error: The Manual Spatial Resoloution ROI override is not supported for the DotMatrixMethod.")
+
                 res = self.get_dotpairs(mtf_dcm)
                 results["measurement"] = {
                     "1.1mm holes": res[0],
@@ -608,6 +612,10 @@ class ACRSpatialResolution(HazenTask):
 
     #Function to extract the squares we are interested in
     def GetResSquares(self,dcm):
+        
+        if self.ACR_obj.ParamaterOverrideHolder.ROIOverride != None:
+            return None,None, self.ACR_obj.ParamaterOverrideHolder.ROIOverride
+
         PixelArray = dcm.pixel_array
         if 'PixelSpacing' in dcm:
             res = dcm.PixelSpacing  # In-plane resolution from metadata

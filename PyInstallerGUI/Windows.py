@@ -23,7 +23,6 @@ class CentreRadiusMaskingWindow():
         self.Radius = None
         self.Mask = None
         self.PreCalcdCentre = PreCalcdCentre
-
         files = glob.glob(os.path.join(dicomPath,"*"))
         Dcms = []
         for file in files: 
@@ -41,11 +40,14 @@ class CentreRadiusMaskingWindow():
             return
 
         if event.button == 1:
+            if event.xdata == None or event.ydata == None:
+                return
+
             if len(self.points) < 4:
                 self.points.append((event.xdata, event.ydata))
 
             plt.clf()
-            plt.imshow(self.Image)
+            plt.imshow(self.Image, cmap='gray')
             if self.PreCalcdCentre != None:
                 plt.plot(self.PreCalcdCentre[0],self.PreCalcdCentre[1],marker="x",color="red")
             plt.title(self.Title)
@@ -81,7 +83,7 @@ class CentreRadiusMaskingWindow():
                 del self.points[min_index]
 
                 plt.clf()
-                plt.imshow(self.Image)
+                plt.imshow(self.Image, cmap='gray')
                 plt.title(self.Title)
                 if self.PreCalcdCentre != None:
                     plt.plot(self.PreCalcdCentre[0],self.PreCalcdCentre[1],marker="x",color="red")
@@ -92,7 +94,7 @@ class CentreRadiusMaskingWindow():
 
     def Reset(self):
         plt.clf()
-        plt.imshow(self.Image)
+        plt.imshow(self.Image, cmap='gray')
         if self.PreCalcdCentre != None:
             plt.plot(self.PreCalcdCentre[0],self.PreCalcdCentre[1],marker="x",color="red")
         plt.title(self.Title)
@@ -133,7 +135,7 @@ class CentreRadiusMaskingWindow():
 
         plt.title(self.Title)
         self.Image = self.Dcms[self.slice].pixel_array
-        plt.imshow(self.Image)
+        plt.imshow(self.Image, cmap='gray')
         if self.PreCalcdCentre != None:
             plt.plot(self.PreCalcdCentre[0],self.PreCalcdCentre[1],marker="x",color="red")
         self.canvas = FigureCanvasTkAgg(plt.gcf(), master = Win) 
@@ -169,15 +171,16 @@ class GetROIOfResBlock():
         self.colours = [ "red", "green", "blue", "yellow"]
         self.ResTitle = ["1.1mm","1.0mm", "0.9mm", "0.8mm"]
         self.RectID = 0
+        self.crops = [None,None,None,None]
 
     def Reset(self):
         self.Rect = [None,None,None,None]
         for i in range(4):
             if self.SelectedRects[i] != None:
                 self.SelectedRects[i].remove()
-
         self.SelectedRects = [None,None,None,None]
         self.RectID = 0
+        plt.title("Draw a box around the " + str(self.ResTitle[self.RectID])+" grid")
         self.canvas.draw() 
         
     def Submit(self,Window):
@@ -185,10 +188,44 @@ class GetROIOfResBlock():
             if rect == None:
                 messagebox.showerror("Error", "Please draw a box round all 4 resolution grids")
                 return
+
+        def get_rectangle_center(rect):
+            x0, y0 = rect.get_xy()
+            x1 = x0 + rect.get_width()
+            center_x = (x0 + x1) / 2
+            return center_x
+        OrderedRect = sorted(self.SelectedRects, key=lambda rect: get_rectangle_center(rect))
+
+        #keys = list(self.crops.keys())
+        for i in range(4):
+            rect = OrderedRect[i]
+            #print(i,rect.get_xy(), rect.get_xy()[0] + rect.get_width(),rect.get_xy()[1] + rect.get_height())
+            x0, y0 = rect.get_xy()
+            x1 = x0 + rect.get_width()
+            y1 = y0 + rect.get_height()
+            if rect.get_width() >= 0:
+                x0,x1 = int(math.floor(x0)), int(math.ceil(x1))
+            else:
+                x1,x0 = int(math.ceil(x0)), int(math.floor(x1))
+
+            if rect.get_height() >= 0:
+                y0,y1 = int(math.floor(y0)), int(math.ceil(y1))
+            else:
+                y1,y0 = int(math.ceil(y0)), int(math.floor(y1))
+
+            #x0, y0, x1, y1 = int(math.floor(x0)), int(math.floor(y0)), int(math.ceil(x1))+1, int(math.ceil(y1))+1
+            self.crops[i] = self.Image[y0:y1, x0:x1]
+            #self.Image[y0:y1, x0:x1] = 0
+            plt.imshow(self.Image,cmap="gray")
+            self.canvas.draw()   
+
         #Make Crops and return them
         Window.destroy()
 
     def onmove(self,event):
+        if event.xdata == None or event.ydata == None:
+                return
+
         if self.MakingRect == True:
             if self.SelectedRects[self.RectID] != None:
                 self.SelectedRects[self.RectID].remove()
@@ -199,6 +236,10 @@ class GetROIOfResBlock():
             self.canvas.draw()   
 
     def on_click_on_plot(self,event):
+        if (self.canvas.toolbar.mode) != '':
+            return
+
+
         if event.button == 1 and self.RectID < 4:
             self.MakingRect=True
             self.Rect[0] = event.xdata
@@ -211,6 +252,17 @@ class GetROIOfResBlock():
                     x0, y0 = rect.get_xy()
                     x1 = x0 + rect.get_width()
                     y1 = y0 + rect.get_height()
+
+                    if rect.get_width() < 0:
+                        xtemp = x1
+                        x1 = x0
+                        x0 = xtemp
+
+                    if rect.get_height() < 0:
+                        ytemp = y1
+                        y1 = y0
+                        y0 = ytemp
+
                     if x0 <= event.xdata <= x1 and y0 <= event.ydata <= y1:
                         self.SelectedRects[i].remove()
                         self.SelectedRects[i] = None
@@ -250,7 +302,7 @@ class GetROIOfResBlock():
         Win.protocol("WM_DELETE_WINDOW", disable_event)
         plt.title("Draw a box around the " + str(self.ResTitle[self.RectID])+" grid")
         self.Image = self.Dcms[0].pixel_array
-        plt.imshow(self.Image)
+        plt.imshow(self.Image,cmap="gray")
         self.canvas = FigureCanvasTkAgg(plt.gcf(), master = Win) 
         plt.gcf().canvas.callbacks.connect('button_press_event', self.on_click_on_plot)
         plt.gcf().canvas.callbacks.connect('button_release_event', self.release_click_on_plot)

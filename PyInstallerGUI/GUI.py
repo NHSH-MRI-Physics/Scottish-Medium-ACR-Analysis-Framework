@@ -519,10 +519,12 @@ try:
                 MedACRAnalysis.ParamaterOverides.MaskingOverride[CurrentSlice-1] = OverrideCentreRadiusObj.Mask
 
         if (OptionsPane.GetOptions()["OverideResBlockLoc"] == 1 and SpatialRes == True) or RunAll==True:
-            if MedACRAnalysis.SpatialResMethod == ResOptions.Manual or MedACRAnalysis.SpatialResMethod == ResOptions.DotMatrixMethod or MedACRAnalysis.SpatialResMethod == ResOptions.ContrastResponseMethod:
+            if MedACRAnalysis.SpatialResMethod != ResOptions.MTFMethod:
                 overrideRes = Windows.GetROIOfResBlock(root,DCMfolder_path.get(),selected_option.get())
                 overrideRes.GetROIs()
-                MedACRAnalysis.ParamaterOverides.ROIOverride=overrideRes.SelectedRects
+                MedACRAnalysis.ParamaterOverides.ROIOverride=overrideRes.crops
+
+
 
         MedACRAnalysis.ManualResTestText=None
         MedACRAnalysis.ManualResData = None
