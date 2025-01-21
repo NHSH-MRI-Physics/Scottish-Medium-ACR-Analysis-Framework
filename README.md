@@ -72,7 +72,22 @@ On slice 5, 9 pegs are used to determine geometric accuracy. The distances betwe
 
 
 ### Ghosting
-A region of interest is placed within the phantom and 4 further are placed above, below, left and right of the phantom. By considering the fraction between the signal in the peripheral regions with that of the centre, the percentage value of ghosting can be deteremined. 
+A region of interest is placed within the phantom and 4 further are placed above, below, left and right of the phantom. By considering the fraction between the signal in the peripheral regions with that of the centre, the percentage value of ghosting can be deteremined.
+
+### Manual Overrides
+In some instances the algorithms which find the phantom centre, mask or the resolution blocks may fail or be inaccurate. It is possible to manually override these factors, these options can be found by clicking "Open Options". Please note depending on the moodule, several slices may need to be overridden.
+
+####Override Radius and Centre 
+The centre and radius of the phantom is used in various modules. By selecting this option the radius and centre of the phantom is computed from the manual override. When this option is selected one or several (depending on what modules are selected are shown) is displayed. Left click on the perimitter 4 times at the top, bottom, left and right of the phantom. A circle is fitted to these points and is displayed as a red line, the phantom centre and radius is computed based on this fitted circle and used in future calculations. If alterations are wished to be made, right clicking on each point will delete them allowing you to replace them. Please note, at the bottom of the image there is an option to zoom in which will help with accurate marking. 
+![image](https://github.com/user-attachments/assets/ab99c037-aec2-480b-ab26-0935e18ab931)
+
+####Override Masking
+Some modules require a binary mask of the phantom, this is usually computed based on a thresholding method. This on occasion can fail, hence can be manually overridden. The process is identical to the "Override Radius and Centre" described above. Although in this case the fitted circle is used to determine the location of the binary mask used in modules. The mask can be viewed as a yellow shaded region.
+![image](https://github.com/user-attachments/assets/3ee6ff30-2ae3-4286-b25d-c8cd204bad1d)
+
+####Override Res Blocks Location
+Most of the spatial resolution algorithms try to find the position of the four sets of resolution grids located in the ACR phantom, for various reasons the algorithm may struggle to find these. Hence, the location of these can be overridden. To do this, simply draw 4 rectangles (by left clicking) which surround each of the 4 resolution grids. It is important that the correct grid is drawn round, you should work from left to right with the 1.1mm grid being surrounded by the red box, 1.0mm by the green box, 0.9mm by the blue box and 0.8mm by the yellow box. In practice this simple means draw boxes from left to right on the image. If you wish to redraw a box, simply right click within it and redraw it. Please note, at the bottom of the image there is an option to zoom in which will help with accurate drawing. 
+![image](https://github.com/user-attachments/assets/b879a956-f182-4e9a-ad3d-169325ad83b3)
 
 ## Tolerance Table
 The tolerance table is used to quickly identify if a test is within tolerance. The tolerance table is in the ToleranceTable/ToleranceTable.xml file. In order to add a test to the tolerance table, you must add an XML element called module with the name field set to be the same as the module in question. For each module you can then add test tolerances, a child element is then added named Test. In each element the name field must be set to be equal to the specific test result (for example "1.1mm holes Horizontal").  You can then set a Min, Max or Equals value in this element. If the value is greater than min, lower than max or equal to the tolerance then it is considered within tolerance. If a module or test is not found in the tolerance table, then the script returns "No Tolerance Set". If no name is set on the test element, then the same tolerance is used for every test in that module.
