@@ -26,7 +26,11 @@ class CentreRadiusMaskingWindow():
         files = glob.glob(os.path.join(dicomPath,"*"))
         Dcms = []
         for file in files: 
-            dicom = dcmread(file)
+            try:
+                dicom = dcmread(file)
+            except:
+                print ("WARNING: " + file + " was not able to be loaded, this file will be skipped!")
+                
             if dicom.SeriesDescription == seq:
                 Dcms.append(dicom)
         self.Dcms = sorted(Dcms, key=lambda d: d.SliceLocation)
@@ -161,7 +165,10 @@ class GetROIOfResBlock():
         files = glob.glob(os.path.join(dicomPath,"*"))
         Dcms = []
         for file in files: 
-            dicom = dcmread(file)
+            try:
+                dicom = dcmread(file)
+            except:
+                print ("WARNING: " + file + " was not able to be loaded, this file will be skipped!")
             if dicom.SeriesDescription == seq:
                 Dcms.append(dicom)
         self.Dcms = sorted(Dcms, key=lambda d: d.SliceLocation)
