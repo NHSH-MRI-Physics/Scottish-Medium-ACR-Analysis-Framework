@@ -127,6 +127,10 @@ class ACRSliceThickness(HazenTask):
             mode="constant",
         ).flatten()
 
+        import matplotlib.pyplot as plt
+        plt.plot(c)
+        plt.savefig("test.png")
+
         abs_diff_y_profile = np.absolute(np.diff(c))
 
         y_peaks, _ = self.ACR_obj.find_n_highest_peaks(abs_diff_y_profile, 2)

@@ -1,4 +1,0 @@
-Date Analysed: 2025-01-14
-Sequence Analysed: ACR_Axial_T1
-Version: Pre-Release V1.02
-SNR Module
