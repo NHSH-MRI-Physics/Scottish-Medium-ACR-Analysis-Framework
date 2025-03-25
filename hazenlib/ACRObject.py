@@ -1,5 +1,6 @@
 import cv2
 import scipy
+import scipy.version
 import skimage
 import numpy as np
 from pydicom import dcmread
@@ -203,7 +204,15 @@ class ACRObject:
         h, theta, d = skimage.transform.hough_line(diff)
         _, angles, _ = skimage.transform.hough_line_peaks(h, theta, d)
 
-        angle = np.rad2deg(scipy.stats.mode(angles)[0][0]) #This needs as specific version of scipy or you get an error (drop the last [0])
+        
+        from packaging.version import Version
+        if Version(str(scipy.version.version)) == Version('1.10.0'):
+            angle = np.rad2deg(scipy.stats.mode(angles)[0][0]) #This needs as specific version of scipy or you get an error (drop the last [0])
+        elif Version(str(scipy.version.version)) >= Version('1.11.0'): 
+            angle = np.rad2deg(scipy.stats.mode(angles)[0])
+        else:
+            raise ModuleNotFoundError("This version of scipy is not supported, please use 1.10.0 or >= 1.11.0")
+
         rot_angle = angle + 90 if angle < 0 else angle - 90
         return rot_angle
 
