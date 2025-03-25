@@ -10,12 +10,14 @@ GeoAccOption.set("MagNet Method")
 OverrideRadiusAndCentre = IntVar(value=0)
 OverrideMasking = IntVar(value=0)
 OverideResBlockLoc=IntVar(value=0)
+UseLegacySliceThicknessAlgo=IntVar(value=0)
 
 def SetupOptions(OptionsPane):
     #Im sure this can be done better but i think al leave it for now
     global SpatialResOption
     global GeoAccOption
     global OverrideRadiusAndCentre
+    global UseLegacySliceThicknessAlgo
 
     label = ttk.Label(OptionsPane, text="Spatial Res Method", anchor='w')
 
@@ -42,6 +44,9 @@ def SetupOptions(OptionsPane):
     CheckBox = ttk.Checkbutton(OptionsPane, text='Override Res Blocks Location',variable=OverideResBlockLoc, onvalue=1, offvalue=0,state=NORMAL)
     CheckBox.grid(row=4, column=0,padx=5,sticky=W,columnspan=2)
 
+    CheckBox = ttk.Checkbutton(OptionsPane, text='Use Legacy Slice Thickness Bar Algorithm',variable=UseLegacySliceThicknessAlgo, onvalue=1, offvalue=0,state=NORMAL)
+    CheckBox.grid(row=5, column=0,padx=5,sticky=W,columnspan=2)
+
 def GetOptions():
     #global SpatialResOption
     #global GeoAccOption
@@ -51,5 +56,6 @@ def GetOptions():
     OptionsDict["OverrideRadiusAndCentre"] = OverrideRadiusAndCentre.get()
     OptionsDict["OverrideMasking"] = OverrideMasking.get()
     OptionsDict["OverideResBlockLoc"] = OverideResBlockLoc.get()
+    OptionsDict["UseLegacySliceThicknessAlgo"] = UseLegacySliceThicknessAlgo.get()
 
     return OptionsDict

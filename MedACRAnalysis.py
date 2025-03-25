@@ -28,6 +28,7 @@ ManualResData=None
 #Default options
 GeoMethod = GeometryOptions.ACRMETHOD
 SpatialResMethod = ResOptions.MTFMethod
+UseLegacySliceThicknessAlgo = False
 
 ParamaterOverides = ParamaterOveride()
 
@@ -322,7 +323,7 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
     ReportFile.write("\nSlice Thickness Module\n")
     if RunAll==True or RunSliceThickness == True:
         print("Running Slice Thickness")
-        acr_slice_thickness_task = ACRSliceThickness(input_data=Data,report_dir=OutputPath,report=True,MediumACRPhantom=True,Paramater_overide = ParamaterOverides)
+        acr_slice_thickness_task = ACRSliceThickness(input_data=Data,report_dir=OutputPath,report=True,MediumACRPhantom=True,Paramater_overide = ParamaterOverides, UseLegacySliceThicknessAlgo=UseLegacySliceThicknessAlgo)
         SliceThick = acr_slice_thickness_task.run()
         print("Slice Width (mm): " + str(SliceThick['measurement']['slice width mm']))
         #ReportFile.write("\tSlice Width (mm): " + str(SliceThick['measurement']['slice width mm'])+"\t" + MedACR_ToleranceTableChecker.GetPassResult(SliceThick['measurement']['slice width mm'],"Slice Thickness") +"\n")

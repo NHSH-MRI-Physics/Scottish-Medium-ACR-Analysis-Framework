@@ -465,3 +465,21 @@ class ACRObject:
         peak_locs = pk_ind[(-pk_heights).argsort()[:n]]  # find n highest peak locations
 
         return np.sort(peak_locs), np.sort(peak_heights)
+
+    @staticmethod
+    def find_Peaks_Within_Thresh(data,thresh,height=1):
+        #This is similar to the above function. The above function fails if there is >2 peaks found which can happen with some phantoms.
+        #It will return all peaks within a specific threshold of the max peak
+        peaks = scipy.signal.find_peaks(data, height)
+        pk_heights = peaks[1]["peak_heights"]
+        pk_ind = peaks[0]
+        
+        LowerWindow = np.max(pk_heights)*(1.0-thresh)
+        pk_ind = pk_ind[np.where(pk_heights >= LowerWindow)]
+        pk_heights = pk_heights[np.where(pk_heights >= LowerWindow)]
+
+        peak_heights = pk_heights[
+            (pk_ind).argsort()
+        ]  # find n highest peak amplitudes
+        peak_locs = pk_ind[(pk_ind).argsort()]
+        return np.sort(peak_locs), np.sort(peak_heights)

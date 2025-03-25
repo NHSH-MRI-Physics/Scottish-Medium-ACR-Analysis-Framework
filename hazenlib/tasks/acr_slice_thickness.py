@@ -129,12 +129,20 @@ class ACRSliceThickness(HazenTask):
 
         abs_diff_y_profile = np.absolute(np.diff(c))
 
-        y_peaks, _ = self.ACR_obj.find_n_highest_peaks(abs_diff_y_profile, 2)
+        UseLegacyAlgo = False
+        if "UseLegacySliceThicknessAlgo" in self.ACR_obj.kwargs.keys():
+            UseLegacyAlgo = self.ACR_obj.kwargs["UseLegacySliceThicknessAlgo"]
+        if UseLegacyAlgo == True:
+            y_peaks, _ = self.ACR_obj.find_n_highest_peaks(abs_diff_y_profile, 2) 
+        else:
+            y_peaks, _ = self.ACR_obj.find_Peaks_Within_Thresh(abs_diff_y_profile,0.4 ,2)
+            if len(y_peaks > 2):
+                y_peaks=y_peaks[:2]
+
         y_locs = centre[1] - 2 * investigate_region + 1 + y_peaks
         height = np.max(y_locs) - np.min(y_locs)
 
         y = np.round([np.max(y_locs) - 0.25 * height, np.min(y_locs) + 0.25 * height])
-
         return x, y
 
     def FWHM(self, data):

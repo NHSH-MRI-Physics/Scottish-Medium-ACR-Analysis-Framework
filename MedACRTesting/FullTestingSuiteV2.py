@@ -8,7 +8,12 @@ import shutil
 import os
 import MedACROptions
 import MedACR_ToleranceTableCheckerV2 as MedACR_ToleranceTableChecker
-inputdata = "MedACRTestingSetAndResults\Forth Valley ACR Blair T1"
+
+inputdata = "C:\\Users\John\Desktop\Artist_ACR_goodshim_210225\ACR_TRA_T1\\0Z2BQKUZ\\2LYYSSBV"
+ChosenSeq = "ACR_TRA_T1"
+
+#inputdata = "MedACRTestingSetAndResults\Blair Gartnavel"
+#ChosenSeq="ACR_ax_T1"
 
 #Get a list of all sequences for batch testing
 files = get_dicom_files(inputdata)
@@ -21,14 +26,12 @@ for file in files:
 sequences= list(set(sequences))
 print(sequences)
 OuptutFolder = "OutputFolder"
-ChosenSeq = "ACR_Axial_T1"
+
 
 
 MedACR_ToleranceTableChecker.SetUpToleranceTable()
 MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
 MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.MAGNETMETHOD
 
-MedACRAnalysis.ParamaterOverides.CentreOverride = [130,130]
-MedACRAnalysis.ParamaterOveride.RadiusOverride = 80
 
-MedACRAnalysis.RunAnalysis(ChosenSeq,inputdata,OuptutFolder,RunAll=False, RunSNR=True, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
+MedACRAnalysis.RunAnalysis(ChosenSeq,inputdata,OuptutFolder,RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=True)

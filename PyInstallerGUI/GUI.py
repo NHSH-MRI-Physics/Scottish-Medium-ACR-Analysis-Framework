@@ -419,6 +419,9 @@ try:
         elif OptionsPane.GetOptions()["SpatialResOption"] == "Manual":
             MedACRAnalysis.SpatialResMethod=ResOptions.Manual
 
+        if OptionsPane.GetOptions()["UseLegacySliceThicknessAlgo"] == 1:
+            MedACRAnalysis.UseLegacySliceThicknessAlgo = True
+
     def RunAnalysis():
 
         if DCMfolder_path.get()=="Not Set!":

@@ -694,8 +694,8 @@ class ACRSpatialResolution(HazenTask):
     def get_dotpairs(self,dcm):
         ResSquare,CropsLoc,ROIS = self.GetResSquares(dcm)
         import matplotlib.pyplot as plt
-        plt.imshow(ROIS[0])
-        plt.savefig("test.png")
+        #plt.imshow(ROIS[0])
+        #plt.savefig("test.png")
 
 
         Results = []
