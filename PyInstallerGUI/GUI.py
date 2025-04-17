@@ -421,6 +421,13 @@ try:
 
         if OptionsPane.GetOptions()["UseLegacySliceThicknessAlgo"] == 1:
             MedACRAnalysis.UseLegacySliceThicknessAlgo = True
+        else:
+            MedACRAnalysis.UseLegacySliceThicknessAlgo = False
+
+        if OptionsPane.GetOptions()["DumpToExcel"] == 1:
+            MedACRAnalysis.DumpToExcel = True
+        else:
+            MedACRAnalysis.DumpToExcel = False
 
     def RunAnalysis():
 

@@ -20,6 +20,7 @@ import numpy as np
 import scipy.ndimage
 import matplotlib.pyplot as plt
 from hazenlib._version import __version__
+import PyInstallerGUI.DumpToExcel
 #from hazenlib.tasks.acr_spatial_resolution import ResOptions
 
 ReportText = ""
@@ -29,6 +30,7 @@ ManualResData=None
 GeoMethod = GeometryOptions.ACRMETHOD
 SpatialResMethod = ResOptions.MTFMethod
 UseLegacySliceThicknessAlgo = False
+DumpToExcel = False
 
 ParamaterOverides = ParamaterOveride()
 
@@ -133,9 +135,9 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
     else:
         ReportFile.write("\tNot Run\n")
 
-    ReportFile.write("\nSpatial Resoloution Module\n")
+    ReportFile.write("\nSpatial Resolution Module\n")
     if RunAll==True or RunSpatialRes == True:
-        print("Running Spatial Resoloution")
+        print("Running Spatial Resolution")
         #Run the dot matrix version
         if SpatialResMethod != ResOptions.Manual:
             acr_spatial_resolution_task = ACRSpatialResolution(input_data=Data,report_dir=OutputPath,report=True,MediumACRPhantom=True,Paramater_overide = ParamaterOverides)
@@ -335,9 +337,15 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
         ReportFile.write("\tNot Run\n")
     ReportFile.close()
 
+
+    
     ReportFile = open(FileName,"r")
     ReportText =  ''.join(ReportFile.readlines())
     ReportFile.close()
+    if DumpToExcel == True:
+        if os.path.exists(FileName):
+            os.remove(FileName)
+        PyInstallerGUI.DumpToExcel.DumpToExcel(ReportText,FileName)
 
 
 #This could be done better by making the whole thing a class, that way it only needs loaded in once. 
