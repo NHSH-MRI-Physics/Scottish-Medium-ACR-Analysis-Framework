@@ -64,7 +64,7 @@ try:
     import OptionsPane
     import Windows
     sv_ttk.set_theme("dark")
-    root.geometry('1200x500')
+    root.geometry('1200x550')
     root.title('Medium ACR Phantom QA Analysis ' + __version__)
     root.iconbitmap("_internal\ct-scan.ico")
 
@@ -545,7 +545,10 @@ try:
             MedACRAnalysis.ManualResData = VarHolder.ManualResData
             #SpatialRes=False
 
-
+        textResults.configure(state="normal")
+        MedACRAnalysis.ReportText = ''
+        textResults.delete(1.0, END)
+        textResults.configure(state="disabled")
         MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
         
         EnableOrDisableEverything(True)
@@ -617,7 +620,7 @@ try:
     ResultsPathLabel = ttk.Label(master=root,textvariable=Resultsfolder_path)
     ResultsPathLabel.grid(row=1, column=1,padx=10,pady=2,sticky=W,columnspan=6)
 
-    #Resultsfolder_path.set("C:\\Users\\John\\Desktop\\out") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
+    Resultsfolder_path.set("C:\\Users\\Johnt\\Desktop\\out") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
 
     selected_option = StringVar(root)
     options = [] 
