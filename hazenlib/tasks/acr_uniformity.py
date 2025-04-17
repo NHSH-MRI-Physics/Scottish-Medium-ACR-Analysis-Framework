@@ -166,6 +166,12 @@ class ACRUniformity(HazenTask):
             sig_min = np.min(min_data[np.nonzero(min_data)])
             max_loc = np.where(max_data == sig_max)
             min_loc = np.where(min_data == sig_min)
+
+            if len(max_loc[0])>1:
+                max_loc= np.array([[max_loc[0][0]],[max_loc[1][0]]])
+            if len(min_loc[0])>1:
+                min_loc= np.array([[min_loc[0,0]],[min_loc[1,0]]])
+
         else: #If the image doenst give a nice blob (like the ACR wants, revert to jsut a asliding window approach which should work regardless of the noise) but its not really the ACR way...        
             print("Warning: Reverting to sliding window over whole image, this sometimes happens when there is quite noisy images!")
             rows, cols = np.nonzero(img_masked)[0], np.nonzero(img_masked)[1]
