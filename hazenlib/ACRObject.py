@@ -349,8 +349,8 @@ class ACRObject:
         # Define a circular logical mask
 
         #BugFix, should this not start at 0?
-        x = np.linspace(0, dims[0]-1, dims[0])
-        y = np.linspace(0, dims[1]-1, dims[1])
+        y = np.linspace(0, dims[0]-1, dims[0])
+        x = np.linspace(0, dims[1]-1, dims[1])
 
         #This is the old code
         #x = np.linspace(1, dims[0], dims[0])

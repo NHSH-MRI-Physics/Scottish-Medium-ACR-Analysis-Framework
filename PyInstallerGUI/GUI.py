@@ -140,6 +140,7 @@ try:
         if Enable==True:
             for widgets in WidgetsToToggle:
                 widgets.config(state="normal")
+                AdjustCheckBoxes()
         else:
             for widgets in WidgetsToToggle:
                 widgets.config(state="disabled")
