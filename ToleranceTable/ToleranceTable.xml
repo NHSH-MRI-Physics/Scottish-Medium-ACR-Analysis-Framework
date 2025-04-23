@@ -4,7 +4,7 @@
     </Module>
     <Module name = "Geometric Accuracy">
         <Test name = "ACRMethod" Min="163" Max="167"/>
-        <Test name = "MagNetMethod" Min="78" Max="82"/>
+        <Test name = "MagNetMethod" Min="79" Max="81"/>
     </Module>
     <Module name = "Contrast Response Resolution">
         <Test name = "1.1mm holes Horizontal" Min="50"/>
