@@ -628,7 +628,7 @@ try:
     ResultsPathLabel = ttk.Label(master=root,textvariable=Resultsfolder_path)
     ResultsPathLabel.grid(row=1, column=1,padx=10,pady=2,sticky=W,columnspan=6)
 
-    Resultsfolder_path.set("/Users/john/Desktop/out") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
+    #Resultsfolder_path.set("/Users/john/Desktop/out") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
 
     selected_option = StringVar(root)
     options = [] 
