@@ -9,6 +9,7 @@ sys.path.append(".")
 from hazenlib.utils import get_dicom_files
 import pydicom
 from tkinter import DISABLED, NORMAL, N, S, E, W, LEFT, RIGHT, TOP, BOTTOM, messagebox, END, NW, CENTER
+import MedACRAnalysis
 import os 
 import HighlightText
 import glob 
