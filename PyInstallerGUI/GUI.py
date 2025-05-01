@@ -317,7 +317,7 @@ try:
             print ("Displaying Res Pattern: " +key)
             VarHolder.NewWindow =  tkinter.Toplevel(root)
             VarHolder.NewWindow.iconbitmap("_internal\ct-scan.ico")
-            VarHolder.NewWindow.geometry("500x540")
+            VarHolder.NewWindow.geometry("500x560")
             VarHolder.NewWindow.configure(background='white')
             VarHolder.NewWindow.resizable(False,False)
             plt.title(key) 
@@ -345,7 +345,7 @@ try:
             ResetWindowingBtn.place(relx=0.4, rely=0.89, anchor="center")
 
             VarHolder.WinDirectionLabel = ttk.Label(VarHolder.NewWindow, text="Current Direction: Horizontal", background="white", foreground="black")
-            VarHolder.WinDirectionLabel.place(relx=0.3, rely=0.85,anchor="center")
+            VarHolder.WinDirectionLabel.place(relx=0.3, rely=0.82,anchor="center")
 
             VarHolder.WinLevelLabel = ttk.Label(VarHolder.NewWindow, text="Window Level: " + str(VarHolder.CurrentLevel), background="white", foreground="black")
             VarHolder.WinLevelLabel.place(relx=0.8, rely=0.86,anchor="center")
