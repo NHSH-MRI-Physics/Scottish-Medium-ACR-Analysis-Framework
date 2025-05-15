@@ -1,0 +1,41 @@
+Date Analysed: 2025-05-15
+Sequence Analysed: ACR_ax_T1
+Version: Pre-Release V1.03d
+SNR Module
+	SNR:            262.01      Result: No Tolerance Set
+	Normalised SNR: 4683.84     Result: No Tolerance Set
+
+Geometric Accuracy Module
+		Horizontal CoV:     0.4         Result: No Tolerance Set
+		Vertical CoV:       0.3         Result: No Tolerance Set
+		Row Bottom (mm):       79.94       Result: Pass      Tolerance: >79.0 and <81.0
+		Row Middle (mm):    79.3        Result: Pass      Tolerance: >79.0 and <81.0
+		Row Top (mm):    79.66       Result: Pass      Tolerance: >79.0 and <81.0
+		Col Left (mm):       80.11       Result: Pass      Tolerance: >79.0 and <81.0
+		Col Middle (mm):    79.63       Result: Pass      Tolerance: >79.0 and <81.0
+		Col Right (mm):    79.97       Result: Pass      Tolerance: >79.0 and <81.0
+
+Spatial Resolution Module
+	Horizontal Contrast Response
+		1.1mm Contrast Response: 69.21%      Result: Pass      Tolerance: >50.0
+		1.0mm Contrast Response: 19.11%      Result: Fail      Tolerance: >50.0
+		0.9mm Contrast Response: 4.21%       Result: Fail      Tolerance: >50.0
+		0.8mm Contrast Response: 7.31%       Result: Fail      Tolerance: >50.0
+	Vertical Contrast Response
+		1.1mm Contrast Response: 65.72%      Result: Pass      Tolerance: >50.0
+		1.0mm Contrast Response: 18.14%      Result: Fail      Tolerance: >50.0
+		0.9mm Contrast Response: 14.2%       Result: Fail      Tolerance: >50.0
+		0.8mm Contrast Response: 11.38%      Result: Fail      Tolerance: >50.0
+
+Uniformity Module
+	Uniformity:  97.4%       Result: Pass      Tolerance: >90.0
+
+Ghosting Module
+	Ghosting:    0.042%      Result: Pass      Tolerance: <3.0
+
+Slice Position Module
+	Slice 1 Position Error (mm):  0.78        Result: Pass      Tolerance: <7.0
+	Slice 11 Position Error (mm): -0.2        Result: Pass      Tolerance: <7.0
+
+Slice Thickness Module
+	Slice Width (mm): 4.94        Result: Pass      Tolerance: >4.0 and <6.0

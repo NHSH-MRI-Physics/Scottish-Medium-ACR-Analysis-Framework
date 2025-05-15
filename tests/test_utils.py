@@ -5,7 +5,7 @@ import pydicom
 import pathlib
 import hazenlib.utils as hazen_tools
 from tests import TEST_DATA_DIR
-import MedACRAnalysis
+import MedACRAnalysisV2 as MedACRAnalysis
 import MedACROptions
 import MedACR_ToleranceTableCheckerV2 as MedACR_ToleranceTableChecker
 from tests import TEST_DATA_DIR, TEST_REPORT_DIR
