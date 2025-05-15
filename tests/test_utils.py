@@ -1,12 +1,14 @@
 import unittest
 import os
-
 import numpy as np
 import pydicom
-
+import pathlib
 import hazenlib.utils as hazen_tools
 from tests import TEST_DATA_DIR
-
+import MedACRAnalysis
+import MedACROptions
+import MedACR_ToleranceTableCheckerV2 as MedACR_ToleranceTableChecker
+from tests import TEST_DATA_DIR, TEST_REPORT_DIR
 
 class ShapeSetUp(unittest.TestCase):
     SMALL_CIRCLE_PHANTOM_FILE = str(
@@ -270,6 +272,27 @@ class TestUtils(unittest.TestCase):
         TEST_OUT = TEST_OUT.tolist()
         self.assertListEqual(test_array, TEST_OUT)
 
+class TestMedACRAnalysis(unittest.TestCase):
+    def Check_MedACRAnalysisOutput(self):
 
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+
+        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
+        MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.MAGNETMETHOD
+        MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
+
+        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results.txt"),"r")
+        Expectedlines = f.readlines()[3:]
+        f.close()
+
+        most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        f =open(most_recent_file,"r")
+        Outputlines = f.readlines()[3:]
+        f.close()
+
+        self.assertListEqual(Expectedlines,Outputlines)
+
+        
 if __name__ == "__main__":
     unittest.main()
