@@ -1,0 +1,23 @@
+Date Analysed: 2025-05-19
+Sequence Analysed: ACR AxT1
+Version: Pre-Release V1.03d
+SNR Module
+	Not Run
+
+Geometric Accuracy Module
+	Not Run
+
+Spatial Resolution Module
+	Not Run
+
+Uniformity Module
+	Not Run
+
+Ghosting Module
+	Ghosting:    0.137%      Result: Pass      Tolerance: <3.0
+
+Slice Position Module
+	Not Run
+
+Slice Thickness Module
+	Not Run

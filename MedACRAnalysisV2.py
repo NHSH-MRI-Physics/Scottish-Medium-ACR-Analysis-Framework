@@ -60,7 +60,7 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
 
     TestsToRun= {}
     TestsToRun["SNR"] = EmptyModule("SNR")
-    TestsToRun["GeoDist"] = EmptyModule("Geometric Distortion")
+    TestsToRun["GeoDist"] = EmptyModule("Geometric Accuracy")
     TestsToRun["SpatialRes"] = EmptyModule("Spatial Resolution")
     TestsToRun["Uniformity"] = EmptyModule("Uniformity")
     TestsToRun["Ghosting"] = EmptyModule("Ghosting")

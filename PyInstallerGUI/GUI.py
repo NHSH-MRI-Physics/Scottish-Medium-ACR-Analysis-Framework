@@ -551,6 +551,7 @@ try:
             plt.close('all')#Making sure no rogue plots are sitting in the background...
             ManualRes(ROIS)
             MedACRAnalysis.ManualResData = VarHolder.ManualResData
+            np.save("ManualResData.npy",VarHolder.ManualResData,allow_pickle=True)
             #SpatialRes=False
 
         textResults.configure(state="normal")

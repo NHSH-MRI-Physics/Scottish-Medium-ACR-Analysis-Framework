@@ -10,7 +10,7 @@ class EmptyModule(MedACRModule):
         pass
 
     def GetReportText(self):
-        return "Not Run"
+        return "\tNot Run"
     
     def GetModuleName(self):
         return self.name

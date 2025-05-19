@@ -1,0 +1,30 @@
+Date Analysed: 2025-05-19
+Sequence Analysed: ACR AxT1
+Version: Pre-Release V1.03d
+SNR Module
+	Not Run
+
+Geometric Accuracy Module
+	Slice 1:
+		Hor Dist (mm):             164.07      Result: Pass      Tolerance: >163.0 and <167.0
+		Vert Dist (mm):            162.12      Result: Fail      Tolerance: >163.0 and <167.0
+	Slice 5:
+		Hor Dist (mm):             166.02      Result: Pass      Tolerance: >163.0 and <167.0
+		Vert Dist (mm):            164.07      Result: Pass      Tolerance: >163.0 and <167.0
+		Diagonal distance SW (mm): 165.05      Result: Pass      Tolerance: >163.0 and <167.0
+		Diagonal distance SE (mm): 166.02      Result: Pass      Tolerance: >163.0 and <167.0
+
+Spatial Resolution Module
+	Not Run
+
+Uniformity Module
+	Not Run
+
+Ghosting Module
+	Not Run
+
+Slice Position Module
+	Not Run
+
+Slice Thickness Module
+	Not Run

@@ -1,0 +1,32 @@
+Date Analysed: 2025-05-19
+Sequence Analysed: ACR AxT1
+Version: Pre-Release V1.03d
+SNR Module
+	Not Run
+
+Geometric Accuracy Module
+	Not Run
+
+Spatial Resolution Module
+	Horizontal Contrast Response
+		1.1mm Contrast Response: 65.21%      Result: Pass      Tolerance: >50.0
+		1.0mm Contrast Response: 65.07%      Result: Pass      Tolerance: >50.0
+		0.9mm Contrast Response: 18.25%      Result: Fail      Tolerance: >50.0
+		0.8mm Contrast Response: 2.75%       Result: Fail      Tolerance: >50.0
+	Vertical Contrast Response
+		1.1mm Contrast Response: 33.85%      Result: Fail      Tolerance: >50.0
+		1.0mm Contrast Response: 14.78%      Result: Fail      Tolerance: >50.0
+		0.9mm Contrast Response: 7.39%       Result: Fail      Tolerance: >50.0
+		0.8mm Contrast Response: 3.61%       Result: Fail      Tolerance: >50.0
+
+Uniformity Module
+	Not Run
+
+Ghosting Module
+	Not Run
+
+Slice Position Module
+	Not Run
+
+Slice Thickness Module
+	Not Run

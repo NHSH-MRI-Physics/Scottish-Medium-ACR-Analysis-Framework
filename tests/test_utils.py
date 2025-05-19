@@ -5,10 +5,11 @@ import pydicom
 import pathlib
 import hazenlib.utils as hazen_tools
 from tests import TEST_DATA_DIR
-import MedACRAnalysisV2 as MedACRAnalysis
+import MedACRAnalysis as MedACRAnalysis
 import MedACROptions
 import MedACR_ToleranceTableCheckerV2 as MedACR_ToleranceTableChecker
 from tests import TEST_DATA_DIR, TEST_REPORT_DIR
+import sys
 
 class ShapeSetUp(unittest.TestCase):
     SMALL_CIRCLE_PHANTOM_FILE = str(
@@ -273,7 +274,7 @@ class TestUtils(unittest.TestCase):
         self.assertListEqual(test_array, TEST_OUT)
 
 class TestMedACRAnalysis(unittest.TestCase):
-    def Check_MedACRAnalysisOutput(self):
+    def Check_MedACRAnalysisRunAllDefault(self):
 
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
@@ -282,7 +283,7 @@ class TestMedACRAnalysis(unittest.TestCase):
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.MAGNETMETHOD
         MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
 
-        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results.txt"),"r")
+        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_AllRun_Default.txt"),"r")
         Expectedlines = f.readlines()[3:]
         f.close()
 
@@ -293,6 +294,235 @@ class TestMedACRAnalysis(unittest.TestCase):
 
         self.assertListEqual(Expectedlines,Outputlines)
 
+    def Check_MedACRAnalysisRunSNR(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+
+        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
+        MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.MAGNETMETHOD
+        MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=True, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
+
+
+        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_SNR.txt"),"r")
+        Expectedlines = f.readlines()[3:]
+        f.close()
+
+        most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        f =open(most_recent_file,"r")
+        Outputlines = f.readlines()[3:]
+        f.close()
+
+        self.assertListEqual(Expectedlines,Outputlines)
         
+    def Check_MedACRAnalysisGeoAcc_MagNet(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+
+        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
+        MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.MAGNETMETHOD
+        MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=True, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
+
+
+        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_GeoAccMagNet.txt"),"r")
+        Expectedlines = f.readlines()[3:]
+        f.close()
+
+        most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        f =open(most_recent_file,"r")
+        Outputlines = f.readlines()[3:]
+        f.close()
+
+        self.assertListEqual(Expectedlines,Outputlines)
+
+    def Check_MedACRAnalysisGeoAcc_ACRMethod(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+
+        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
+        MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
+        MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=True, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
+
+
+        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_GeoAccACRMethod.txt"),"r")
+        Expectedlines = f.readlines()[3:]
+        f.close()
+
+        most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        f =open(most_recent_file,"r")
+        Outputlines = f.readlines()[3:]
+        f.close()
+
+        self.assertListEqual(Expectedlines,Outputlines)
+
+    def Check_MedACRAnalysis_Uniformity(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+
+        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
+        MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
+        MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=True, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
+
+
+        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_Uniformity.txt"),"r")
+        Expectedlines = f.readlines()[3:]
+        f.close()
+
+        most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        f =open(most_recent_file,"r")
+        Outputlines = f.readlines()[3:]
+        f.close()
+
+        self.assertListEqual(Expectedlines,Outputlines)
+
+    def Check_MedACRAnalysis_Ghosting(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+
+        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
+        MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
+        MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=True, RunSlicePos=False, RunSliceThickness=False)
+
+
+        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_Ghosting.txt"),"r")
+        Expectedlines = f.readlines()[3:]
+        f.close()
+
+        most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        f =open(most_recent_file,"r")
+        Outputlines = f.readlines()[3:]
+        f.close()
+
+        self.assertListEqual(Expectedlines,Outputlines)
+
+    def Check_MedACRAnalysis_SlicePos(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+
+        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
+        MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
+        MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=True, RunSliceThickness=False)
+
+
+        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_SlicePos.txt"),"r")
+        Expectedlines = f.readlines()[3:]
+        f.close()
+
+        most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        f =open(most_recent_file,"r")
+        Outputlines = f.readlines()[3:]
+        f.close()
+
+        self.assertListEqual(Expectedlines,Outputlines)
+
+    def Check_MedACRAnalysis_SliceThickness(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+
+        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
+        MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
+        MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=True)
+
+
+        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_SliceThickness.txt"),"r")
+        Expectedlines = f.readlines()[3:]
+        f.close()
+
+        most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        f =open(most_recent_file,"r")
+        Outputlines = f.readlines()[3:]
+        f.close()
+
+        self.assertListEqual(Expectedlines,Outputlines)
+
+    def Check_MedACRAnalysis_SpatialRes_ContrastResponse(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+
+        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
+        MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
+        MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=True, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
+
+
+        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_SpatialRes_Contrast.txt"),"r")
+        Expectedlines = f.readlines()[3:]
+        f.close()
+
+        most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        f =open(most_recent_file,"r")
+        Outputlines = f.readlines()[3:]
+        f.close()
+
+        self.assertListEqual(Expectedlines,Outputlines)
+
+
+    def Check_MedACRAnalysis_SpatialRes_DotMatrix(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+
+        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.DotMatrixMethod
+        MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
+        MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=True, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
+
+
+        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_SpatialRes_DotMatrix.txt"),"r")
+        Expectedlines = f.readlines()[3:]
+        f.close()
+
+        most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        f =open(most_recent_file,"r")
+        Outputlines = f.readlines()[3:]
+        f.close()
+
+        self.assertListEqual(Expectedlines,Outputlines)
+
+    def Check_MedACRAnalysis_SpatialRes_MTF(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+
+        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.MTFMethod
+        MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
+        MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=True, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
+
+
+        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_SpatialRes_MTF.txt"),"r")
+        Expectedlines = f.readlines()[3:]
+        f.close()
+
+        most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        f =open(most_recent_file,"r")
+        Outputlines = f.readlines()[3:]
+        f.close()
+
+        self.assertListEqual(Expectedlines,Outputlines)
+
+    def Check_MedACRAnalysis_SpatialRes_Manual(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+
+        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.Manual
+        MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
+
+        #Load in Manual Res
+        from PyInstallerGUI import VariableHolder
+        
+        ManualResData = np.load(os.path.join(TEST_DATA_DIR,"MedACR","ManualResData.npy"),allow_pickle=True).item()
+        print(ManualResData)
+
+        sys.exit()
+
+        MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=True, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=True)
+
+
+        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_SpatialRes_MTF.txt"),"r")
+        Expectedlines = f.readlines()[3:]
+        f.close()
+
+        most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        f =open(most_recent_file,"r")
+        Outputlines = f.readlines()[3:]
+        f.close()
+
+        self.assertListEqual(Expectedlines,Outputlines)
+    
 if __name__ == "__main__":
     unittest.main()
