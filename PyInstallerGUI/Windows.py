@@ -171,7 +171,30 @@ class GetROIOfResBlock():
                 print ("WARNING: " + file + " was not able to be loaded, this file will be skipped!")
             if dicom.SeriesDescription == seq:
                 Dcms.append(dicom)
-        self.Dcms = sorted(Dcms, key=lambda d: d.SliceLocation)
+        #self.Dcms = sorted(Dcms, key=lambda d: d.SliceLocation)
+
+
+        if "ImageOrientationPatient" in Dcms[0]:
+            ImageOrientationPatient = Dcms[0].ImageOrientationPatient
+        else:
+            for elem in Dcms[0].iterall():
+                if elem.tag == (0x20,0x37):
+                    ImageOrientationPatient = elem.value
+
+        from hazenlib.utils import get_image_orientation
+        orientation=get_image_orientation(ImageOrientationPatient)
+        
+        if "ImagePositionPatient" in Dcms[0]:
+            x = np.array([dcm.ImagePositionPatient[0] for dcm in Dcms])
+            y = np.array([dcm.ImagePositionPatient[1] for dcm in Dcms])
+            z = np.array([dcm.ImagePositionPatient[2] for dcm in Dcms])
+            if orientation=='Transverse':
+                self.Dcms = [Dcms[i] for i in np.argsort(z)]
+            elif orientation=='Coronal':
+                self.Dcms = [Dcms[i] for i in np.argsort(y)]
+            elif orientation=='Sagittal':
+                self.Dcms = [Dcms[i] for i in np.argsort(x)]
+
         self.MakingRect = False
         self.Rect = [None,None,None,None]
         self.SelectedRects = [None,None,None,None]
