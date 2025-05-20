@@ -3,10 +3,6 @@ from MedACRModules.MedACRModuleAbstract import MedACRModule
 from hazenlib.tasks.acr_spatial_resolution import ACRSpatialResolution
 import MedACR_ToleranceTableCheckerV2 as MedACR_ToleranceTableChecker
 from MedACROptions import *
-
-import matplotlib
-matplotlib.use('Agg')
-
 import matplotlib.pyplot as plt
 import scipy.ndimage
 import os
@@ -73,8 +69,15 @@ class SpatialResModule(MedACRModule):
         if ManualResData != None:
             for key in ManualResData:
                 Result = "Not Tested"
-                import matplotlib
-                matplotlib.use( 'tkagg' )
+
+                if os.environ.get("GITHUB_ACTIONS") == "true":
+                    print("Running on GitHub")
+                    import matplotlib
+                    matplotlib.use('Agg')
+                else:
+                    import matplotlib
+                    matplotlib.use( 'tkagg' )
+
                 fig, (ax1, ax2, ax3) = plt.subplots(3,1)
                 fig.suptitle(key + ' Manual Resolution Output',y=0.99)
                 fig.set_size_inches(20, 20)
