@@ -3,9 +3,14 @@ from MedACRModules.MedACRModuleAbstract import MedACRModule
 from hazenlib.tasks.acr_spatial_resolution import ACRSpatialResolution
 import MedACR_ToleranceTableCheckerV2 as MedACR_ToleranceTableChecker
 from MedACROptions import *
+
+import matplotlib
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 import scipy.ndimage
 import os
+
 class SpatialResModule(MedACRModule):
 
     def __init__(self,name,settings):
