@@ -9,7 +9,7 @@ sys.path.append(".")
 from hazenlib.utils import get_dicom_files
 import pydicom
 from tkinter import DISABLED, NORMAL, N, S, E, W, LEFT, RIGHT, TOP, BOTTOM, messagebox, END, NW, CENTER
-import MedACRAnalysis
+import MedACRAnalysisV2 as MedACRAnalysis
 import os 
 import HighlightText
 import glob 
@@ -18,7 +18,7 @@ import platform
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,NavigationToolbar2Tk) 
 from hazenlib.tasks.acr_spatial_resolution import ACRSpatialResolution
-from MedACRAnalysis import *
+from MedACRAnalysisV2 import *
 import datetime
 import numpy as np
 import VariableHolder
@@ -535,6 +535,12 @@ try:
                 overrideRes.GetROIs()
                 MedACRAnalysis.ParamaterOverides.ROIOverride=overrideRes.crops
 
+        #ArrayToSave = []
+        #ArrayToSave.append(MedACRAnalysis.ParamaterOverides.CentreOverride)
+        #ArrayToSave.append(MedACRAnalysis.ParamaterOverides.RadiusOverride)
+        #ArrayToSave.append(MedACRAnalysis.ParamaterOverides.MaskingOverride)
+        #ArrayToSave.append(MedACRAnalysis.ParamaterOverides.ROIOverride)
+        #np.savez("Override",ArrayToSave[0],ArrayToSave[1],ArrayToSave[2],ArrayToSave[3][0],ArrayToSave[3][1],ArrayToSave[3][2],ArrayToSave[3][3],allow_pickle=True)
 
 
         MedACRAnalysis.ManualResTestText=None
@@ -551,7 +557,7 @@ try:
             plt.close('all')#Making sure no rogue plots are sitting in the background...
             ManualRes(ROIS)
             MedACRAnalysis.ManualResData = VarHolder.ManualResData
-            np.save("ManualResData.npy",VarHolder.ManualResData,allow_pickle=True)
+
             #SpatialRes=False
 
         textResults.configure(state="normal")
@@ -629,7 +635,7 @@ try:
     ResultsPathLabel = ttk.Label(master=root,textvariable=Resultsfolder_path)
     ResultsPathLabel.grid(row=1, column=1,padx=10,pady=2,sticky=W,columnspan=6)
 
-    #Resultsfolder_path.set("/Users/john/Desktop/out") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
+    #Resultsfolder_path.set("/Users/johnt/Desktop/out") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
 
     selected_option = StringVar(root)
     options = [] 

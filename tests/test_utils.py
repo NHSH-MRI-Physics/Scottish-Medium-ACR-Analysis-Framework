@@ -5,11 +5,12 @@ import pydicom
 import pathlib
 import hazenlib.utils as hazen_tools
 from tests import TEST_DATA_DIR
-import MedACRAnalysis as MedACRAnalysis
+import MedACRAnalysisV2 as MedACRAnalysis
 import MedACROptions
 import MedACR_ToleranceTableCheckerV2 as MedACR_ToleranceTableChecker
 from tests import TEST_DATA_DIR, TEST_REPORT_DIR
 import sys
+from PyInstallerGUI import VariableHolder
 
 class ShapeSetUp(unittest.TestCase):
     SMALL_CIRCLE_PHANTOM_FILE = str(
@@ -274,7 +275,7 @@ class TestUtils(unittest.TestCase):
         self.assertListEqual(test_array, TEST_OUT)
 
 class TestMedACRAnalysis(unittest.TestCase):
-    def Check_MedACRAnalysisRunAllDefault(self):
+    def test_01_Check_MedACRAnalysisRunAllDefault(self):
 
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
@@ -294,7 +295,7 @@ class TestMedACRAnalysis(unittest.TestCase):
 
         self.assertListEqual(Expectedlines,Outputlines)
 
-    def Check_MedACRAnalysisRunSNR(self):
+    def test_02_Check_MedACRAnalysisRunSNR(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
         MedACR_ToleranceTableChecker.SetUpToleranceTable()
@@ -314,7 +315,7 @@ class TestMedACRAnalysis(unittest.TestCase):
 
         self.assertListEqual(Expectedlines,Outputlines)
         
-    def Check_MedACRAnalysisGeoAcc_MagNet(self):
+    def test_03_Check_MedACRAnalysisGeoAcc_MagNet(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
         MedACR_ToleranceTableChecker.SetUpToleranceTable()
@@ -334,7 +335,7 @@ class TestMedACRAnalysis(unittest.TestCase):
 
         self.assertListEqual(Expectedlines,Outputlines)
 
-    def Check_MedACRAnalysisGeoAcc_ACRMethod(self):
+    def test_04_Check_MedACRAnalysisGeoAcc_ACRMethod(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
         MedACR_ToleranceTableChecker.SetUpToleranceTable()
@@ -354,7 +355,7 @@ class TestMedACRAnalysis(unittest.TestCase):
 
         self.assertListEqual(Expectedlines,Outputlines)
 
-    def Check_MedACRAnalysis_Uniformity(self):
+    def test_05_Check_MedACRAnalysis_Uniformity(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
         MedACR_ToleranceTableChecker.SetUpToleranceTable()
@@ -374,7 +375,7 @@ class TestMedACRAnalysis(unittest.TestCase):
 
         self.assertListEqual(Expectedlines,Outputlines)
 
-    def Check_MedACRAnalysis_Ghosting(self):
+    def test_06_Check_MedACRAnalysis_Ghosting(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
         MedACR_ToleranceTableChecker.SetUpToleranceTable()
@@ -394,7 +395,7 @@ class TestMedACRAnalysis(unittest.TestCase):
 
         self.assertListEqual(Expectedlines,Outputlines)
 
-    def Check_MedACRAnalysis_SlicePos(self):
+    def test_07_Check_MedACRAnalysis_SlicePos(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
         MedACR_ToleranceTableChecker.SetUpToleranceTable()
@@ -414,7 +415,7 @@ class TestMedACRAnalysis(unittest.TestCase):
 
         self.assertListEqual(Expectedlines,Outputlines)
 
-    def Check_MedACRAnalysis_SliceThickness(self):
+    def test_08_Check_MedACRAnalysis_SliceThickness(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
         MedACR_ToleranceTableChecker.SetUpToleranceTable()
@@ -434,7 +435,7 @@ class TestMedACRAnalysis(unittest.TestCase):
 
         self.assertListEqual(Expectedlines,Outputlines)
 
-    def Check_MedACRAnalysis_SpatialRes_ContrastResponse(self):
+    def test_09_Check_MedACRAnalysis_SpatialRes_ContrastResponse(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
         MedACR_ToleranceTableChecker.SetUpToleranceTable()
@@ -455,7 +456,7 @@ class TestMedACRAnalysis(unittest.TestCase):
         self.assertListEqual(Expectedlines,Outputlines)
 
 
-    def Check_MedACRAnalysis_SpatialRes_DotMatrix(self):
+    def test_10_Check_MedACRAnalysis_SpatialRes_DotMatrix(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
         MedACR_ToleranceTableChecker.SetUpToleranceTable()
@@ -475,7 +476,7 @@ class TestMedACRAnalysis(unittest.TestCase):
 
         self.assertListEqual(Expectedlines,Outputlines)
 
-    def Check_MedACRAnalysis_SpatialRes_MTF(self):
+    def test_11_Check_MedACRAnalysis_SpatialRes_MTF(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
         MedACR_ToleranceTableChecker.SetUpToleranceTable()
@@ -495,7 +496,7 @@ class TestMedACRAnalysis(unittest.TestCase):
 
         self.assertListEqual(Expectedlines,Outputlines)
 
-    def Check_MedACRAnalysis_SpatialRes_Manual(self):
+    def test_12_Check_MedACRAnalysis_SpatialRes_Manual(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
         MedACR_ToleranceTableChecker.SetUpToleranceTable()
@@ -503,17 +504,57 @@ class TestMedACRAnalysis(unittest.TestCase):
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
 
         #Load in Manual Res
-        from PyInstallerGUI import VariableHolder
         
-        ManualResData = np.load(os.path.join(TEST_DATA_DIR,"MedACR","ManualResData.npy"),allow_pickle=True).item()
-        print(ManualResData)
+        VarHolder = VariableHolder.VarHolder()
+        ManualResData = np.load(os.path.join(TEST_DATA_DIR,"MedACR","manualres.npy"),allow_pickle=True).item()
+        for key in ManualResData.keys():
+            ManualRes = VariableHolder.ManualResData()
+            ManualRes.ChosenPointsXPeaks = ManualResData[key][0]
+            ManualRes.ChosenPointsYPeaks = ManualResData[key][1]
+            ManualRes.ChosenPointsXTroughs = ManualResData[key][2]
+            ManualRes.ChosenPointsYTroughs = ManualResData[key][3]
+            ManualRes.HoleSize = ManualResData[key][4]
+            ManualRes.Image = ManualResData[key][5]
 
-        sys.exit()
+            VarHolder.ManualResData[key] = ManualRes
 
+        MedACRAnalysis.ManualResData = VarHolder.ManualResData
         MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=True, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=True)
+        
+
+        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_SpatialRes_Manual.txt"),"r")
+        Expectedlines = f.readlines()[3:]
+        f.close()
+
+        most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        f =open(most_recent_file,"r")
+        Outputlines = f.readlines()[3:]
+        f.close()
+
+        self.assertListEqual(Expectedlines,Outputlines)
 
 
-        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_SpatialRes_MTF.txt"),"r")
+    def test_13_Check_MedACRAnalysis_TestOverrides(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+
+        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
+        MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.MAGNETMETHOD
+        MedACRAnalysis.ManualResData = None
+
+        OverRideData =np.load(os.path.join(TEST_DATA_DIR,"MedACR", "Override.npz"),allow_pickle=True)
+
+        MedACRAnalysis.ParamaterOverides = MedACRAnalysis.ParamaterOveride()
+
+        MedACRAnalysis.ParamaterOverides.CentreOverride = list(OverRideData["arr_0"])
+        MedACRAnalysis.ParamaterOverides.RadiusOverride = OverRideData["arr_1"]
+        MedACRAnalysis.ParamaterOverides.MaskingOverride = OverRideData["arr_2"]
+        MedACRAnalysis.ParamaterOverides.ROIOverride = [OverRideData["arr_3"],OverRideData["arr_4"],OverRideData["arr_5"],OverRideData["arr_6"]]
+
+
+        MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
+
+        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_Overides.txt"),"r")
         Expectedlines = f.readlines()[3:]
         f.close()
 

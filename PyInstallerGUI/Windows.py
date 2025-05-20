@@ -28,11 +28,12 @@ class CentreRadiusMaskingWindow():
         for file in files: 
             try:
                 dicom = dcmread(file)
+                if dicom.SeriesDescription == seq:
+                    Dcms.append(dicom)
             except:
                 print ("WARNING: " + file + " was not able to be loaded, this file will be skipped!")
                 
-            if dicom.SeriesDescription == seq:
-                Dcms.append(dicom)
+
         self.Dcms = sorted(Dcms, key=lambda d: d.SliceLocation)
         self.root = root
         self.Title = "Displaying Slice " + str(slice+1) + "\nChoose 4 points on the edge of the circle"
@@ -167,10 +168,11 @@ class GetROIOfResBlock():
         for file in files: 
             try:
                 dicom = dcmread(file)
+                if dicom.SeriesDescription == seq:
+                    Dcms.append(dicom)
             except:
                 print ("WARNING: " + file + " was not able to be loaded, this file will be skipped!")
-            if dicom.SeriesDescription == seq:
-                Dcms.append(dicom)
+
         #self.Dcms = sorted(Dcms, key=lambda d: d.SliceLocation)
 
 

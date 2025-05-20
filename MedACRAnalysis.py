@@ -262,9 +262,11 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
                     ContrastResponse.append(round( (Amplitude/MeanPeak)*100.0,2))
                 
                 fig.tight_layout()
-                if not os.path.exists(OutputPath+"/ACRSpatialResolution"):
-                    os.makedirs(OutputPath+"/ACRSpatialResolution")
-                plt.savefig(OutputPath+"/ACRSpatialResolution/"+Seq+"_"+key+"_ManualRes.png")
+                path = os.path.join(OutputPath,"ACRSpatialResolution")
+                if not os.path.exists(path):
+                    os.makedirs(path)
+                
+                plt.savefig(os.path.join(OutputPath,"ACRSpatialResolution",Seq+"_"+key+"_ManualRes.png"))
                 plt.close()
                 #plt.show()
 

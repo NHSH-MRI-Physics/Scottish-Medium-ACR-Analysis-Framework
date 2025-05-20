@@ -1,0 +1,30 @@
+Date Analysed: 2025-05-20
+Sequence Analysed: ACR AxT1
+Version: Pre-Release V1.03d
+SNR Module
+	Not Run
+
+Geometric Accuracy Module
+	Not Run
+
+Spatial Resolution Module
+	Manual 1.1mm holes Resolution Hor: 2.97%          Result: Fail      Tolerance: >50.0
+	Manual 1.1mm holes Resolution Vert: 12.52%         Result: Fail      Tolerance: >50.0
+	Manual 1.0mm holes Resolution Hor: 34.54%         Result: Fail      Tolerance: >50.0
+	Manual 1.0mm holes Resolution Vert: 6.33%          Result: Fail      Tolerance: >50.0
+	Manual 0.9mm holes Resolution Hor: 3.99%          Result: Fail      Tolerance: >50.0
+	Manual 0.9mm holes Resolution Vert: 4.89%          Result: Fail      Tolerance: >50.0
+	Manual 0.8mm holes Resolution Hor: 14.26%         Result: Fail      Tolerance: >50.0
+	Manual 0.8mm holes Resolution Vert: 7.9%           Result: Fail      Tolerance: >50.0
+
+Uniformity Module
+	Not Run
+
+Ghosting Module
+	Not Run
+
+Slice Position Module
+	Not Run
+
+Slice Thickness Module
+	Slice Width (mm): 5.15        Result: Pass      Tolerance: >4.0 and <6.0

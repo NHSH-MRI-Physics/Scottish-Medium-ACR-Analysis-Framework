@@ -154,15 +154,19 @@ class SpatialResModule(MedACRModule):
                     ContrastResponse.append(round( (Amplitude/MeanPeak)*100.0,2))
                 
                 fig.tight_layout()
-                if not os.path.exists(OutputPath+"/ACRSpatialResolution"):
-                    os.makedirs(OutputPath+"/ACRSpatialResolution")
-                plt.savefig(OutputPath+"/ACRSpatialResolution/"+Seq+"_"+key+"_ManualRes.png")
+
+                path = os.path.join(OutputPath,"ACRSpatialResolution")
+                if not os.path.exists(path):
+                    os.makedirs(path)
+                plt.savefig(os.path.join(OutputPath,"ACRSpatialResolution",Seq+"_"+key+"_ManualRes.png"))
                 plt.close()
                 #plt.show()
 
                 Text+=( '\tManual '+key+' Resolution Hor: %-15s%-12s\n' % (str(ContrastResponse[0]) +"%",MedACR_ToleranceTableChecker.GetPassResult(ContrastResponse[0],"Manual Resolution",key +" Horizontal")))
-                Text+=( '\tManual '+key+' Resolution Vert: %-15s%-12s' % (str(ContrastResponse[1]) +"%",MedACR_ToleranceTableChecker.GetPassResult(ContrastResponse[1],"Manual Resolution",key +" Vertical")))
+                Text+=( '\tManual '+key+' Resolution Vert: %-15s%-12s\n' % (str(ContrastResponse[1]) +"%",MedACR_ToleranceTableChecker.GetPassResult(ContrastResponse[1],"Manual Resolution",key +" Vertical")))
 
+
+            Text = Text[:-1]
         return Text
 
     def GetModuleName(self):
