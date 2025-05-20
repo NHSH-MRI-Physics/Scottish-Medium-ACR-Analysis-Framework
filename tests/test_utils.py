@@ -12,7 +12,7 @@ from tests import TEST_DATA_DIR, TEST_REPORT_DIR
 import sys
 from PyInstallerGUI import VariableHolder
 import matplotlib
-matplotlib.use('TKAgg')
+matplotlib.use('Agg')
 
 class ShapeSetUp(unittest.TestCase):
     SMALL_CIRCLE_PHANTOM_FILE = str(
