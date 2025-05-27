@@ -157,8 +157,8 @@ class ACRObject:
                 param1=50,
                 param2=30,
                 minDist=int(180 / dx),
-                minRadius=int(10 / dx),
-                maxRadius=int(15 / dx),
+                minRadius=int(15 / dx),
+                maxRadius=int(20 / dx),
             )
             for norm_image in normalised_images
         ]
@@ -166,7 +166,8 @@ class ACRObject:
         if detected_circles[0] is not None:
             true_circle = detected_circles[0].flatten()
         else:
-            true_circle = detected_circles[1].flatten()
+            true_circle = detected_circles[1].flatten() 
+                
 
         if detected_circles[0] is None and detected_circles[1] is not None:
             print("Performing slice order inversion to restore correct slice order.")
