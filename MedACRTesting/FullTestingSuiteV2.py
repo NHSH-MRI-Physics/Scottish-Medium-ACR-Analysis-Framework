@@ -10,8 +10,11 @@ import os
 import MedACROptions
 import MedACR_ToleranceTableCheckerV2 as MedACR_ToleranceTableChecker
 
-inputdata = "MedACRTestingSetAndResults\Blair Gartnavel"
+inputdata = os.path.join("MedACRTestingSetAndResults","Blair Gartnavel")
+#inputdata = os.path.join("MedACRTestingSetAndResults","Raigmore ACR MRI 2 Test data")
+
 ChosenSeq="ACR_ax_T1"
+#ChosenSeq="Ax T1 SE"
 
 #Get a list of all sequences for batch testing
 files = get_dicom_files(inputdata)
@@ -32,4 +35,4 @@ MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
 MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.MAGNETMETHOD
 
 
-MedACRAnalysis.RunAnalysis(ChosenSeq,inputdata,OuptutFolder,RunAll=False , RunSNR=True, RunGeoAcc=True, RunSpatialRes=True, RunUniformity=True, RunGhosting=True, RunSlicePos=True, RunSliceThickness=True)
+MedACRAnalysis.RunAnalysis(ChosenSeq,inputdata,OuptutFolder,RunAll=False , RunSNR=True, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)

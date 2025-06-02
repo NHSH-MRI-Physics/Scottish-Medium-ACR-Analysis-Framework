@@ -23,7 +23,6 @@ from hazenlib._version import __version__
 import PyInstallerGUI.DumpToExcel
 from MedACRModules.Empty_Module import EmptyModule
 import pickle
-
 from MedACRModules.SNR_Module import SNRModule
 from MedACRModules.Geo_Acc_Module import GeoAccModule
 from MedACRModules.Uniformity_Module import UniformityModule
@@ -31,6 +30,7 @@ from MedACRModules.SlicePos_Module import SlicePosModule
 from MedACRModules.Ghosting_Module import GhostingModule
 from MedACRModules.SliceThickness_Module import SliceThicknessModule
 from MedACRModules.Spatial_res_Module import SpatialResModule
+import datetime
 #from hazenlib.tasks.acr_spatial_resolution import ResOptions
 
 #This is the upgraded version of thgis file which will be written in a far more modular and maintanable way.
@@ -144,9 +144,22 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
         PyInstallerGUI.DumpToExcel.DumpToExcel(ReportText,FileName)
 
 
+    TimeRan = datetime.datetime.now()
+    filename = os.path.join("Result_Database","Results_" + Seq +"_" + str(TimeRan.strftime("%Y-%m-%d %H-%M-%S"))+".pkl")
+    TestsToRun["date"] = TimeRan
+
+    ScannerInfo = {}
+    data = pydicom.dcmread(files[0])
+    ScannerInfo["Manufacturer"] = data.Manufacturer
+    ScannerInfo["Institution Name"] = data.InstitutionName
+    ScannerInfo["Model Name"] = data.ManufacturerModelName
+    ScannerInfo["Serial Number"] = data.DeviceSerialNumber
+    TestsToRun["ScannerDetails"] = ScannerInfo
     
 
-
+    with open(filename, 'wb') as f:  # open a text file
+        pickle.dump(TestsToRun, f) # serialize the list
+        
 #This could be done better by making the whole thing a class, that way it only needs loaded in once. 
 def GetROIFigs(Seq,DICOMPath):
     files = get_dicom_files(DICOMPath)
