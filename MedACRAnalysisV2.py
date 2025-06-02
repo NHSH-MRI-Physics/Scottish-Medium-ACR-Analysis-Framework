@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 from hazenlib._version import __version__
 import PyInstallerGUI.DumpToExcel
 from MedACRModules.Empty_Module import EmptyModule
+import pickle
 
 from MedACRModules.SNR_Module import SNRModule
 from MedACRModules.Geo_Acc_Module import GeoAccModule
@@ -141,6 +142,9 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
         if os.path.exists(FileName):
             os.remove(FileName)
         PyInstallerGUI.DumpToExcel.DumpToExcel(ReportText,FileName)
+
+
+    
 
 
 #This could be done better by making the whole thing a class, that way it only needs loaded in once. 

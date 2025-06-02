@@ -1,0 +1,41 @@
+{
+  "name": "DataDash",
+  "version": "0.80.5",
+  "license": "Apache-2.0",
+  "main": "./build/electron/main.js",
+  "scripts": {
+    "dump": "dump-stlite-desktop-artifacts",
+    "serve": "cross-env NODE_ENV=production electron .",
+    "app:dir": "electron-builder --dir",
+    "app:dist": "electron-builder"
+  },
+  "build": {
+    "files": [
+      "build/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
+  },
+  "devDependencies": {
+    "@stlite/desktop": "^0.80.5",
+    "cross-env": "^7.0.3",
+    "electron": "34.3.0",
+    "electron-builder": "^25.1.7"
+  },
+  "stlite": {
+    "desktop": {
+      "files": [
+        "DataDash.py",
+        "pages/*.py",
+        "data",
+        ".streamlit/config.toml",
+        "FileAnalysis.py"
+      ],
+      "entrypoint": "DataDash.py",
+      "requirementsTxtFiles": [
+        "requirements.txt"
+      ]
+    }
+  }
+}

@@ -1,0 +1,5 @@
+pandas
+matplotlib
+openpyxl
+plotly
+xlsxwriter
