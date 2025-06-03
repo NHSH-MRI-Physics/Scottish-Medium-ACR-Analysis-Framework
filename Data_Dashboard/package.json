@@ -28,9 +28,9 @@
       "files": [
         "DataDash.py",
         "pages/*.py",
-        "data",
         ".streamlit/config.toml",
-        "FileAnalysis.py"
+        "MedACRModules/*.py",
+        "Test.py"
       ],
       "entrypoint": "DataDash.py",
       "requirementsTxtFiles": [
