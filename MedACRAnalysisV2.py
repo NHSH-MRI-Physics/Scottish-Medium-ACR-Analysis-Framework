@@ -31,6 +31,7 @@ from MedACRModules.Ghosting_Module import GhostingModule
 from MedACRModules.SliceThickness_Module import SliceThicknessModule
 from MedACRModules.Spatial_res_Module import SpatialResModule
 import datetime
+import DICOM_Holder
 #from hazenlib.tasks.acr_spatial_resolution import ResOptions
 
 #This is the upgraded version of thgis file which will be written in a far more modular and maintanable way.

@@ -25,6 +25,7 @@ import VariableHolder
 from hazenlib._version import __version__
 import threading
 import webbrowser
+import DICOM_Holder
 
 if getattr(sys, 'frozen', False):
     import pyi_splash
@@ -95,23 +96,96 @@ try:
         Seqs={}
         files = get_dicom_files(DCMfolder_path.get())
         sequences = []
+        WarningMessages = []
+        DICOM_Holder_Objs = []
+
+        UseLegacyLoading = False #incase it doenst work this lets me quickly roll it back
+
         for file in files:
             data = pydicom.dcmread(file)
+        
             if "Loc" not in data.SeriesDescription and "loc" not in data.SeriesDescription:
-                #options.append(data.SeriesDescription)
-                if data.SeriesDescription not in Seqs:
-                    Seqs[data.SeriesDescription]=1
+                
+                if UseLegacyLoading == True:
+                    #options.append(data.SeriesDescription)
+                    #print( data.SeriesInstanceUID)
+                    if data.SeriesDescription not in Seqs:
+                        Seqs[data.SeriesDescription]=1
+                    else:
+                        Seqs[data.SeriesDescription]+=1
                 else:
-                    Seqs[data.SeriesDescription]+=1
+                    #new way of doing it which is better..
+                    if len(DICOM_Holder_Objs)==0: #Stick the first DICOM in the list so we can start checking
+                        DICOM_Holder_Objs.append(DICOM_Holder.DICOMSet(data))
+                    else:
+                        GotAtLeastOneMatch = False
+                        for OneHolder in DICOM_Holder_Objs:
+                            if OneHolder.Does_DICOM_Match(data) == True:
+                                OneHolder.AddDICOM(data)
+                                GotAtLeastOneMatch = True
+                        if GotAtLeastOneMatch == False:
+                            DICOM_Holder_Objs.append(DICOM_Holder.DICOMSet(data))
+            else:
+                WarningMessages.append("Series Description: " + data.SeriesDescription + " is assumed to be the localiser and not included")
+
         options=[]
-        for seq in Seqs.keys():
-            if Seqs[seq] == 11:
-                options.append(seq)
-        options= list(set(options))
+        if UseLegacyLoading == True:
+            for seq in Seqs.keys():
+                if Seqs[seq] == 11:
+                    options.append(seq)
+                else:
+                    WarningMessages.append("Series Description: " + seq + " has more than 11 slices and not included")
+        else:
+            #new way of doing it...
+            KeptDICOMHolders = []
+            for holder in DICOM_Holder_Objs:
+                if len(holder.DICOM_Data) == 11:
+                    options.append(holder.parmas["SeriesDescription"])
+                    KeptDICOMHolders.append(holder)
+                else:
+                    WarningMessages.append("Series Description: " + holder.parmas["SeriesDescription"] + " has more than 11 slices and not included")
+
+            Options_HolderDict = {}
+            #options= list(set(options))
+            duplicates = set([x for x in options if options.count(x) > 1])
+            for dupe in duplicates: 
+                DupeHolders = []
+                DupeParamHolders = []
+                for holder in KeptDICOMHolders:
+                    if holder.parmas["SeriesDescription"] == dupe:
+                        DupeHolders.append(holder)
+                        DupeParamHolders.append(holder.parmas)
+                keys = DupeParamHolders[0].keys()
+                diffs = {}
+                for key in keys:
+                    values = []
+                    for d in DupeParamHolders:
+                        values.append(d[key])
+                    if len(set(values)) > 1:
+                        diffs[key] = values
+                for i in range(len(DupeHolders)):
+                    Prefix = ""
+                    for key in diffs:
+                        if key != "SeriesInstanceUID":
+                            Prefix += key + ": " + str(diffs[key][i]) + ", "
+                        else: 
+                            if len(diffs.keys()) == 1:  # If the only key is SeriesInstanceUID, then use it otherwise dont
+                                Prefix += key + ": " + str(diffs[key][i]) + ", "
+                    Prefix = Prefix[:-2]  # Remove the last comma and space
+                    name = DupeHolders[i].parmas["SeriesDescription"] + " " +Prefix
+                    x=0
+                        
+                        
+
         options.sort()
         options.append(options[0])
         dropdown.set_menu(*options)
         dropdown.config(state="normal")
+
+        WarningMessages = set(WarningMessages)
+        if len(WarningMessages) > 0:
+            for warn in WarningMessages:
+                print(warn)
 
 
     def SetResultsOutput():
