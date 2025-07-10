@@ -44,12 +44,18 @@ GeoMethod = GeometryOptions.ACRMETHOD
 SpatialResMethod = ResOptions.MTFMethod
 UseLegacySliceThicknessAlgo = False
 DumpToExcel = False
+DICOM_Holder_Dict = None
 
 ParamaterOverides = ParamaterOveride()
 
+def RunAnalysisWithHolder(Holder,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False):
+    DICOMS_Holder_Obj = DICOM_Holder_Dict[Holder]
+    RunAnalysisWithData(DICOMS_Holder_Obj.paths,DICOMS_Holder_Obj.params["SeriesDescription"],OutputPath,RunAll=RunAll, RunSNR=RunSNR, RunGeoAcc=RunGeoAcc, RunSpatialRes=RunSpatialRes, RunUniformity=RunUniformity, RunGhosting=RunGhosting, RunSlicePos=RunSlicePos, RunSliceThickness=RunSliceThickness)
+
+
 #This is a file which simply contains a function to run the analysis. It is in a seperate file so i can reuse it for the various implementations.
 def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False):
-    global ReportText
+    
 
     files = get_dicom_files(DICOMPath)
     ACRDICOMSFiles = {}
@@ -59,7 +65,10 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
             ACRDICOMSFiles[data.SeriesDescription]=[]
         ACRDICOMSFiles[data.SeriesDescription].append(file)
     Data = ACRDICOMSFiles[Seq]
+    RunAnalysisWithData(Data,Seq,OutputPath,RunAll=RunAll, RunSNR=RunSNR, RunGeoAcc=RunGeoAcc, RunSpatialRes=RunSpatialRes, RunUniformity=RunUniformity, RunGhosting=RunGhosting, RunSlicePos=RunSlicePos, RunSliceThickness=RunSliceThickness)
 
+def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False):
+    global ReportText
     TestsToRun= {}
     TestsToRun["SNR"] = EmptyModule("SNR")
     TestsToRun["GeoDist"] = EmptyModule("Geometric Accuracy")
@@ -150,14 +159,13 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
     TestsToRun["date"] = TimeRan
 
     ScannerInfo = {}
-    data = pydicom.dcmread(files[0])
+    data = pydicom.dcmread(Data[0])
     ScannerInfo["Manufacturer"] = data.Manufacturer
     ScannerInfo["Institution Name"] = data.InstitutionName
     ScannerInfo["Model Name"] = data.ManufacturerModelName
     ScannerInfo["Serial Number"] = data.DeviceSerialNumber
     TestsToRun["ScannerDetails"] = ScannerInfo
     
-
     with open(filename, 'wb') as f:  # open a text file
         pickle.dump(TestsToRun, f) # serialize the list
         
