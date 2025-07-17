@@ -3,7 +3,7 @@ from tkinter import StringVar, IntVar
 from tkinter import DISABLED, NORMAL, N, S, E, W, LEFT, RIGHT, TOP, BOTTOM, messagebox, END, NW
 
 SpatialResOption=StringVar()
-SpatialResOption.set("Contrast Response")
+SpatialResOption.set("Manual")
 GeoAccOption=StringVar()
 GeoAccOption.set("MagNet Method")
 
