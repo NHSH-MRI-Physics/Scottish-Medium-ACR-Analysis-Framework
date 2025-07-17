@@ -53,7 +53,7 @@ On the ACR Phantom, the slice position can be determined by examining two bars l
 
 ### Spatial Resolution
 #### Contrast Response 
-On slice 1 there is a series of dot matrices designed to measure resoloution performance. For each grid, this module automatically attempts to determine what row and coloumn in each grid yeilds the highest contrast response. This is repeated for each grid yeilding a contrast response value as a function of grid size.
+On slice 1 there is a series of dot matrices designed to measure resoloution performance. For each grid, this module automatically attempts to determine what row and coloumn in each grid yeilds the highest contrast response. This is repeated for each grid yeilding a contrast response value as a function of grid size. For more information refer to [here](https://github.com/NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework/blob/main/docs/ContrastResponse.md)
 #### Modulation Transfer Function (MTF)
 On slice 1 an edge is found and a line profile extracted over it. This profile is differentated and the fourier transform taken, computing the MTF. For this to be effective the phantom is expected to be rotated by at least 3 degrees. 
 #### Manual (Recommended option)
