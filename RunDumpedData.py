@@ -11,6 +11,7 @@ from datetime import date
 #from MedACRModules.Spatial_res_Module import SpatialResModule
 from MedACRModules.Empty_Module import EmptyModule
 import MedACRAnalysisV2
+import shutil
 def RunDumpedData(DumpFile,OutFolder):
     with open(DumpFile, 'rb') as f:
         data = pickle.load(f)
@@ -41,4 +42,7 @@ def RunDumpedData(DumpFile,OutFolder):
 
     FileName = os.path.join(OutFolder,"Results_FromSerial_" + Seq +"_" + str(date.today())+".txt")
     MedACRAnalysisV2.WriteData(FileName,Seq,TextBlocks)
+
+    if os.path.exists("TempDICOM"):
+        shutil.rmtree("TempDICOM")
     

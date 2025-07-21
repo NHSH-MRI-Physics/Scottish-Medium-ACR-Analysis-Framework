@@ -569,27 +569,33 @@ class TestMedACRAnalysis(unittest.TestCase):
 
 
     def test_14_Check_DumpedDataRunning_Default(self):
-        
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
-
+        
         MedACR_ToleranceTableChecker.SetUpToleranceTable()
         MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.MAGNETMETHOD
+        MedACRAnalysis.ParamaterOverides = MedACRAnalysis.ParamaterOveride()
         MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
 
         f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_AllRun_Default.txt"),"r")
         Expectedlines = f.readlines()[3:]
         f.close()
         
+
         files = glob.glob(os.path.join("Result_Database", "*"))
         newest_file = max(files, key=os.path.getmtime)
         RunDumpedData.RunDumpedData(newest_file,pathlib.PurePath.joinpath(TEST_REPORT_DIR))
+
+
+
         most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        print(most_recent_file)
         f =open(most_recent_file,"r")
         Outputlines = f.readlines()[3:]
         f.close()
 
         self.assertListEqual(Expectedlines,Outputlines)
+        
 
     def test_15_Check_DumpedDataRunning_ParamOverides(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
@@ -624,7 +630,6 @@ class TestMedACRAnalysis(unittest.TestCase):
         f.close()
 
         self.assertListEqual(Expectedlines,Outputlines)
-
 
     def test_16_Check_DumpedDataRunning_ManualRes(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
