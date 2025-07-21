@@ -15,6 +15,9 @@ def RunDumpedData(DumpFile,OutFolder):
     with open(DumpFile, 'rb') as f:
         data = pickle.load(f)
 
+    if not os.path.exists("TempDICOM"):
+        os.makedirs("TempDICOM")
+
     DICOMData = data["DICOM"]
     Seq = DICOMData[0].SeriesDescription
     DICOMS = []
