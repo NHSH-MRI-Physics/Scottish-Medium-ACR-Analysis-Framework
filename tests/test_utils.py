@@ -11,6 +11,8 @@ import MedACR_ToleranceTableCheckerV2 as MedACR_ToleranceTableChecker
 from tests import TEST_DATA_DIR, TEST_REPORT_DIR
 import sys
 from PyInstallerGUI import VariableHolder
+import RunDumpedData
+import glob
 
 class ShapeSetUp(unittest.TestCase):
     SMALL_CIRCLE_PHANTOM_FILE = str(
@@ -564,6 +566,105 @@ class TestMedACRAnalysis(unittest.TestCase):
         f.close()
 
         self.assertListEqual(Expectedlines,Outputlines)
+
+
+    def test_14_Check_DumpedDataRunning_Default(self):
+        
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+
+        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
+        MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.MAGNETMETHOD
+        MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
+
+        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_AllRun_Default.txt"),"r")
+        Expectedlines = f.readlines()[3:]
+        f.close()
+        
+        files = glob.glob(os.path.join("Result_Database", "*"))
+        newest_file = max(files, key=os.path.getmtime)
+        RunDumpedData.RunDumpedData(newest_file,pathlib.PurePath.joinpath(TEST_REPORT_DIR))
+        most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        f =open(most_recent_file,"r")
+        Outputlines = f.readlines()[3:]
+        f.close()
+
+        self.assertListEqual(Expectedlines,Outputlines)
+
+    def test_15_Check_DumpedDataRunning_ParamOverides(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+
+        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
+        MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.MAGNETMETHOD
+        MedACRAnalysis.ManualResData = None
+
+        OverRideData =np.load(os.path.join(TEST_DATA_DIR,"MedACR", "Override.npz"),allow_pickle=True)
+
+        MedACRAnalysis.ParamaterOverides = MedACRAnalysis.ParamaterOveride()
+
+        MedACRAnalysis.ParamaterOverides.CentreOverride = list(OverRideData["arr_0"])
+        MedACRAnalysis.ParamaterOverides.RadiusOverride = OverRideData["arr_1"]
+        MedACRAnalysis.ParamaterOverides.MaskingOverride = OverRideData["arr_2"]
+        MedACRAnalysis.ParamaterOverides.ROIOverride = [OverRideData["arr_3"],OverRideData["arr_4"],OverRideData["arr_5"],OverRideData["arr_6"]]
+
+
+        MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
+
+        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_Overides.txt"),"r")
+        Expectedlines = f.readlines()[3:]
+        f.close()
     
+        files = glob.glob(os.path.join("Result_Database", "*"))
+        newest_file = max(files, key=os.path.getmtime)
+        RunDumpedData.RunDumpedData(newest_file,pathlib.PurePath.joinpath(TEST_REPORT_DIR))
+        most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        f =open(most_recent_file,"r")
+        Outputlines = f.readlines()[3:]
+        f.close()
+
+        self.assertListEqual(Expectedlines,Outputlines)
+
+
+    def test_16_Check_DumpedDataRunning_ManualRes(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+
+        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.Manual
+        MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
+
+        #Load in Manual Res
+        
+        VarHolder = VariableHolder.VarHolder()
+        ManualResData = np.load(os.path.join(TEST_DATA_DIR,"MedACR","manualres.npy"),allow_pickle=True).item()
+        for key in ManualResData.keys():
+            ManualRes = VariableHolder.ManualResData()
+            ManualRes.ChosenPointsXPeaks = ManualResData[key][0]
+            ManualRes.ChosenPointsYPeaks = ManualResData[key][1]
+            ManualRes.ChosenPointsXTroughs = ManualResData[key][2]
+            ManualRes.ChosenPointsYTroughs = ManualResData[key][3]
+            ManualRes.HoleSize = ManualResData[key][4]
+            ManualRes.Image = ManualResData[key][5]
+
+            VarHolder.ManualResData[key] = ManualRes
+
+        MedACRAnalysis.ManualResData = VarHolder.ManualResData
+        MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=True, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=True)
+        
+
+        f =open(os.path.join(TEST_DATA_DIR,"MedACR", "Results_SpatialRes_Manual.txt"),"r")
+        Expectedlines = f.readlines()[3:]
+        f.close()
+
+        files = glob.glob(os.path.join("Result_Database", "*"))
+        newest_file = max(files, key=os.path.getmtime)
+        RunDumpedData.RunDumpedData(newest_file,pathlib.PurePath.joinpath(TEST_REPORT_DIR))
+        most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        f =open(most_recent_file,"r")
+        Outputlines = f.readlines()[3:]
+        f.close()
+
+        self.assertListEqual(Expectedlines,Outputlines)
+
 if __name__ == "__main__":
     unittest.main()

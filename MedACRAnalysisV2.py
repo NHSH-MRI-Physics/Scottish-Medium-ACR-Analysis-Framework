@@ -127,23 +127,28 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
 
     if os.path.exists(OutputPath)==False:
         os.mkdir(OutputPath)
-    FileName = os.path.join(OutputPath,"Results_" + Seq +"_" + str(date.today())+".txt")
-    ReportFile = open(FileName,"w")
 
-    ReportFile.write("Date Analysed: " + str(date.today()) + "\n")
-    ReportFile.write("Sequence Analysed: " + Seq + "\n")
-    ReportFile.write("Version: " + __version__)
+    FileName = os.path.join(OutputPath,"Results_" + Seq +"_" + str(date.today())+".txt")
+    #ReportFile = open(FileName,"w")
+    #ReportFile.write("Date Analysed: " + str(date.today()) + "\n")
+    #ReportFile.write("Sequence Analysed: " + Seq + "\n")
+    #ReportFile.write("Version: " + __version__)
 
     TestCounter=0
-
+    TextBlocks=[]
     for test_name,module in TestsToRun.items():
-        ReportFile.write("\n"+ module.GetModuleName() +" Module\n")
+        #ReportFile.write("\n"+ module.GetModuleName() +" Module\n")
+        TextBlocks.append("\n"+ module.GetModuleName() +" Module\n")
         module.Run()
-        ReportFile.write(module.GetReportText() +"\n")
+        #ReportFile.write(module.GetReportText() +"\n")
+        TextBlocks[-1] += (module.GetReportText() +"\n")
+        #ReportText+=module.GetReportText() +"\n"
         if type(module) != EmptyModule:
             TestCounter+=1
             print("Progress " +str(TestCounter) +"/" +str(TotalTests))
-    ReportFile.close()
+    #ReportFile.close()
+
+    WriteData(FileName,Seq,TextBlocks)
     
     ReportFile = open(FileName,"r")
     ReportText =  ''.join(ReportFile.readlines())
@@ -155,19 +160,24 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
 
 
     TimeRan = datetime.datetime.now()
-    filename = os.path.join("Result_Database","Results_" + Seq +"_" + str(TimeRan.strftime("%Y-%m-%d %H-%M-%S"))+".pkl")
-    TestsToRun["date"] = TimeRan
-
     ScannerInfo = {}
     data = pydicom.dcmread(Data[0])
     ScannerInfo["Manufacturer"] = data.Manufacturer
     ScannerInfo["Institution Name"] = data.InstitutionName
     ScannerInfo["Model Name"] = data.ManufacturerModelName
     ScannerInfo["Serial Number"] = data.DeviceSerialNumber
-    TestsToRun["ScannerDetails"] = ScannerInfo
+
+    DumpData = {}
+    DumpData["Test"] = TestsToRun
+    DumpData["ScannerDetails"] = ScannerInfo
+    DumpData["date"] = TimeRan
+    DumpData["DICOM"] = []
+    for DicomData in Data:
+        DumpData["DICOM"].append(pydicom.dcmread(DicomData))
     
+    filename = os.path.join("Result_Database","Results_" + Seq +"_" + str(TimeRan.strftime("%Y-%m-%d %H-%M-%S"))+".pkl")
     with open(filename, 'wb') as f:  # open a text file
-        pickle.dump(TestsToRun, f) # serialize the list
+        pickle.dump(DumpData, f) # serialize the list
         
 #This could be done better by making the whole thing a class, that way it only needs loaded in once. 
 def GetROIFigs(Seq,DICOMPath):
@@ -181,3 +191,12 @@ def GetROIFigs(Seq,DICOMPath):
     Data = ACRDICOMSFiles[Seq]
     acr_spatial_resolution_task = ACRSpatialResolution(input_data=Data,MediumACRPhantom=True,Paramater_overide = ParamaterOverides)
     return acr_spatial_resolution_task.GetROICrops()
+
+def WriteData(FileName,Seq, TextBlocks):
+    ReportFile = open(FileName,"w")
+    ReportFile.write("Date Analysed: " + str(date.today()) + "\n")
+    ReportFile.write("Sequence Analysed: " + Seq + "\n")
+    ReportFile.write("Version: " + __version__)
+    for block in TextBlocks:
+        ReportFile.write(block)
+    ReportFile.close()

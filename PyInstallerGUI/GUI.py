@@ -826,11 +826,18 @@ try:
     def OpenManual():
         webbrowser.open('https://github.com/NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework/blob/main/README.md', new=0)
 
+    def OpenBugFeatureSite():
+        webbrowser.open('https://forms.cloud.microsoft/e/9ZsZNbTinT?origin=QRCode', new=0)
+
     OpenOptionsButton = ttk.Button(Optionsframe, text="Open Options",width=20,command = OpenOptionsPane)
     OpenOptionsButton.pack()
 
     ManualButton = ttk.Button(Optionsframe, text="Open Manual",width=20,command = OpenManual)
     ManualButton.pack(pady=20)
+
+    
+    ManualButton = ttk.Button(Optionsframe, text="Bug reporting and \n feature requesting",width=20,command = OpenBugFeatureSite)
+    ManualButton.pack(pady=0)
 
     Optionsframe.grid(row=11, column=3,padx=8,pady=10,rowspan=3)
     root.resizable(False,False)

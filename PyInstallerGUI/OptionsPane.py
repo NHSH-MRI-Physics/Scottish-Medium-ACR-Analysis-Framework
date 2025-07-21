@@ -4,6 +4,7 @@ from tkinter import DISABLED, NORMAL, N, S, E, W, LEFT, RIGHT, TOP, BOTTOM, mess
 
 SpatialResOption=StringVar()
 SpatialResOption.set("Manual")
+SpatialResOption.set("Contrast Response")
 GeoAccOption=StringVar()
 GeoAccOption.set("MagNet Method")
 
