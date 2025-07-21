@@ -174,6 +174,9 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
     DumpData["DICOM"] = []
     for DicomData in Data:
         DumpData["DICOM"].append(pydicom.dcmread(DicomData))
+
+    if os.path.exists("Result_Database")==False:
+        os.mkdir("Result_Database")
     
     filename = os.path.join("Result_Database","Results_" + Seq +"_" + str(TimeRan.strftime("%Y-%m-%d %H-%M-%S"))+".pkl")
     with open(filename, 'wb') as f:  # open a text file
