@@ -42,4 +42,3 @@ def RunDumpedData(DumpFile,OutFolder):
     FileName = os.path.join(OutFolder,"Results_FromSerial_" + Seq +"_" + str(date.today())+".txt")
     MedACRAnalysisV2.WriteData(FileName,Seq,TextBlocks)
     
-RunDumpedData("C:\\Users\Johnt\Documents\GitHub\Scottish-Medium-ACR-Analysis-Framework\Result_Database\Results_ACR_ax_T1_2025-07-21 16-30-25.pkl","C:\\Users\Johnt\Desktop\out2")
