@@ -21,7 +21,7 @@ jobs:
 
     - shell: bash
       run: |
-        "mkdir ./dist/windows/ACR QA Analysis/ToleranceTable"
+        "mkdir Z:\tmp\ACR QA Analysis\ToleranceTable"
 
     - uses: actions/upload-artifact@v4
       with:
