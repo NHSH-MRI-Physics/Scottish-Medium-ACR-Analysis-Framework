@@ -19,12 +19,12 @@ jobs:
       with:
         path: .
 
-    - uses: actions/upload-artifact@v4
-      with:
-        name: name-of-artifact
-        path: ./dist/windows
-
     - name: List files in the repository
       run: |
         mkdir "dist/windows/ACR QA Analysis/ToleranceTable"
         ls "dist/windows/ACR QA Analysis"
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: name-of-artifact
+        path: ./dist/windows
