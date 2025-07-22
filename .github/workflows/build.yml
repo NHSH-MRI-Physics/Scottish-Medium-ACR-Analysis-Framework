@@ -26,4 +26,4 @@ jobs:
 
     - name: List files in the repository
       run: |
-        ls dist/windows
+        "ls dist/windows/ACR QA Analysis"
