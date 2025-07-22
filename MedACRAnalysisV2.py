@@ -178,7 +178,7 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
     if os.path.exists("Result_Database")==False:
         os.mkdir("Result_Database")
     
-    filename = os.path.join("Result_Database","Results_" + Seq +"_" + str(TimeRan.strftime("%Y-%m-%d %H-%M-%S"))+".pkl")
+    filename = os.path.join("Result_Database","Results_" + Seq +"_" + str(TimeRan.strftime("%Y-%m-%d %H-%M-%S"))+".docx")
     with open(filename, 'wb') as f:  # open a text file
         pickle.dump(DumpData, f) # serialize the list
         

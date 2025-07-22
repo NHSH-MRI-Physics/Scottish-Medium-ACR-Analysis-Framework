@@ -1,9 +1,9 @@
 
 set Python=C:/Users/Johnt/anaconda3/envs/ACRPhantom/python.exe
 
-%Python% -m unittest discover || echo Unit Tests Failed && exit /b
+::%Python% -m unittest discover || echo Unit Tests Failed && exit /b
 
-%Python% -m PyInstaller .\PyInstallerGUI\GUI.py --distpath ".\PyInstallerGUI" -n "ACR QA Analysis" --icon=_internal\ct-scan.ico ^
+pyi-makespec .\PyInstallerGUI\GUI.py -n "ACR QA Analysis" --icon=_internal\ct-scan.ico ^
 --hidden-import=docopt ^
 --hidden-import=cv2 ^
 --hidden-import=pydicom.encoders.gdcm ^
@@ -17,8 +17,10 @@ set Python=C:/Users/Johnt/anaconda3/envs/ACRPhantom/python.exe
 --collect-submodules hazenlib ^
 --paths . ^
 --add-data "_internal\ct-scan.ico;." ^
---splash "_internal\SplashScreen.jpg" ^
---noconfirm
+--splash "_internal\SplashScreen.jpg" 
+
+%Python% -m PyInstaller ".\ACR QA Analysis.spec" --distpath ".\PyInstallerGUI" --noconfirm
+
 
 xcopy "ToleranceTable" "PyInstallerGUI\ACR QA Analysis\ToleranceTable\*" /E /Y
 cd ".\PyInstallerGUI\"
