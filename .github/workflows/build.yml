@@ -18,12 +18,3 @@ jobs:
       uses: JackMcKew/pyinstaller-action-windows@main
       with:
         path: .
-
-    - shell: bash
-      run: |
-        "mkdir Z:\tmp\ACR QA Analysis\ToleranceTable"
-
-    - uses: actions/upload-artifact@v4
-      with:
-        name: TESTBuild
-        path: ./dist/windows
