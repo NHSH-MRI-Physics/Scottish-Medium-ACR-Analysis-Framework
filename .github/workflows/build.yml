@@ -23,3 +23,7 @@ jobs:
       with:
         name: name-of-artifact
         path: ./dist/windows
+
+    - name: List files in the repository
+      run: |
+        ls ${{ github.workspace }}
