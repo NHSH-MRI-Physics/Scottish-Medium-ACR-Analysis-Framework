@@ -1,7 +1,7 @@
 
 set Python=C:/Users/Johnt/anaconda3/envs/ACRPhantom/python.exe
 
-::%Python% -m unittest discover || echo Unit Tests Failed && exit /b
+%Python% -m unittest discover || echo Unit Tests Failed && exit /b
 
 pyi-makespec .\PyInstallerGUI\GUI.py -n "ACR QA Analysis" --icon=_internal\ct-scan.ico ^
 --hidden-import=docopt ^
