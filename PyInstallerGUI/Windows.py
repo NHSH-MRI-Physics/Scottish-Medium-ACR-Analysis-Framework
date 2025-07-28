@@ -13,6 +13,30 @@ from enum import Enum
 import math
 from tkinter import ttk
 import numpy as np
+from hazenlib.ACRObject import ACRObject
+
+
+def GetDICOMS(dicomPath,seq):
+    files = glob.glob(os.path.join(dicomPath,"*"))
+    Dcms = []
+    for file in files: 
+        try:
+            dicom = dcmread(file)
+            if dicom.SeriesDescription == seq:
+                Dcms.append(dicom)
+        except:
+            print ("WARNING: " + file + " was not able to be loaded, this file will be skipped!")
+
+    Options = {}
+    Options["MediumACRPhantom"] = True
+    AcrObj = ACRObject(Dcms,Options)
+    Dcms = AcrObj.dcms
+
+    plt.imshow(Dcms[0].pixel_array)
+    plt.savefig("test.png")
+
+    return Dcms
+        
 
 class CentreRadiusMaskingWindow():
     def __init__(self,root,dicomPath,seq,overridemasking = False, slice=7,PreCalcdCentre = None):
@@ -23,6 +47,7 @@ class CentreRadiusMaskingWindow():
         self.Radius = None
         self.Mask = None
         self.PreCalcdCentre = PreCalcdCentre
+        '''
         files = glob.glob(os.path.join(dicomPath,"*"))
         Dcms = []
         for file in files: 
@@ -32,9 +57,9 @@ class CentreRadiusMaskingWindow():
                     Dcms.append(dicom)
             except:
                 print ("WARNING: " + file + " was not able to be loaded, this file will be skipped!")
-                
-
         self.Dcms = sorted(Dcms, key=lambda d: d.SliceLocation)
+        '''
+        self.Dcms = GetDICOMS(dicomPath,seq) #This is a better way of doing it, it just uses the ACRobject to make sure the ortientations etc are correct
         self.root = root
         self.Title = "Displaying Slice " + str(slice+1) + "\nChoose 4 points on the edge of the circle"
         self.overrideMasking = overridemasking
@@ -119,10 +144,11 @@ class CentreRadiusMaskingWindow():
         self.Centrey = int(round(self.Centrey,0))
         self.Radius = int(round(self.Radius,0))
         if self.PreCalcdCentre != None:
-            if self.Mask[self.PreCalcdCentre[1],self.PreCalcdCentre[0]] == 0:
-                messagebox.showerror("Error", "mask does not contain the centre of the phantom ")
-                self.Reset()
-                return
+            if self.overrideMasking == True:
+                if self.Mask[self.PreCalcdCentre[1],self.PreCalcdCentre[0]] == 0:
+                    messagebox.showerror("Error", "mask does not contain the centre of the phantom ")
+                    self.Reset()
+                    return
         Window.destroy()
 
     def GetCentreRadiusMask(self):
@@ -163,6 +189,7 @@ class CentreRadiusMaskingWindow():
 class GetROIOfResBlock():
     def __init__(self,root,dicomPath,seq):
         self.root = root
+        '''
         files = glob.glob(os.path.join(dicomPath,"*"))
         Dcms = []
         for file in files: 
@@ -175,7 +202,7 @@ class GetROIOfResBlock():
 
         #self.Dcms = sorted(Dcms, key=lambda d: d.SliceLocation)
 
-
+        
         if "ImageOrientationPatient" in Dcms[0]:
             ImageOrientationPatient = Dcms[0].ImageOrientationPatient
         else:
@@ -196,6 +223,8 @@ class GetROIOfResBlock():
                 self.Dcms = [Dcms[i] for i in np.argsort(y)]
             elif orientation=='Sagittal':
                 self.Dcms = [Dcms[i] for i in np.argsort(x)]
+        '''
+        self.Dcms = GetDICOMS(dicomPath,seq) #This is a better way of doing it, it just uses the ACRobject to make sure the ortientations etc are correct
 
         self.MakingRect = False
         self.Rect = [None,None,None,None]
