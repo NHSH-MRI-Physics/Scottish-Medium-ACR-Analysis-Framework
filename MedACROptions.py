@@ -1,7 +1,7 @@
 #Options for the MedACRAnalysis file
 
 from enum import Enum
-from hazenlib.tasks.acr_spatial_resolution import ResOptions
+#from hazenlib.tasks.acr_spatial_resolution import ResOptions
 import numpy as np
 class GeometryOptions(Enum):
     ACRMETHOD=1
@@ -13,3 +13,9 @@ class ParamaterOveride():
         self.RadiusOverride = None
         self.MaskingOverride = np.array( [np.array(None),np.array(None),np.array(None),np.array(None),np.array(None),np.array(None),np.array(None),np.array(None),np.array(None),np.array(None),np.array(None)] )
         self.ROIOverride = None
+
+class ResOptions(Enum):
+    DotMatrixMethod=1
+    MTFMethod=2
+    ContrastResponseMethod=3
+    Manual=4

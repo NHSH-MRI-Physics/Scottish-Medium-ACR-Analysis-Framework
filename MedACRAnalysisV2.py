@@ -34,7 +34,7 @@ import datetime
 import DICOM_Holder
 #from hazenlib.tasks.acr_spatial_resolution import ResOptions
 
-#This is the upgraded version of thgis file which will be written in a far more modular and maintanable way.
+#This is the upgraded version of this file which will be written in a far more modular and maintanable way.
 
 ReportText = ""
 ManualResData=None
@@ -206,4 +206,18 @@ def WriteData(FileName,Seq, TextBlocks):
     ReportFile.write("Version: " + __version__)
     for block in TextBlocks:
         ReportFile.write(block)
+
+    OverrideText = ""
+    if ParamaterOverides.CentreOverride != None:
+        OverrideText += "Center Override Position: " + str(ParamaterOverides.CentreOverride[0]) + "," + str(ParamaterOverides.CentreOverride[1]) + "\n"
+    if ParamaterOverides.RadiusOverride != None:
+        OverrideText += "Radius Override: " + str(ParamaterOverides.RadiusOverride) + "\n" 
+    if len(np.where(ParamaterOverides.MaskingOverride!=None)[0]) != 0:
+        OverrideText += "Making Override: True\n"
+    if ParamaterOverides.ROIOverride != None:
+        OverrideText += "ROI Position Override: True\n"
+    
+    if OverrideText != "":
+        ReportFile.write("\nOverrides Active\n")
+        ReportFile.write(OverrideText)
     ReportFile.close()

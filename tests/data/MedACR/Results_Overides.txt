@@ -6,6 +6,7 @@ SNR Module
 	Normalised SNR: 3915.8      Result: No Tolerance Set
 
 Geometric Accuracy Module
+		Method: MagNET Method
 		Horizontal CoV (%):     0.28        Result: No Tolerance Set
 		Vertical CoV (%):       0.15        Result: No Tolerance Set
 		Row Bottom (mm):       79.58       Result: Pass      Tolerance: >79.0 and <81.0
@@ -16,6 +17,7 @@ Geometric Accuracy Module
 		Col Right (mm):    80.05       Result: Pass      Tolerance: >79.0 and <81.0
 
 Spatial Resolution Module
+	Method: Contrast Response
 	Horizontal Contrast Response
 		1.1mm Contrast Response: 35.93%      Result: Fail      Tolerance: >50.0
 		1.0mm Contrast Response: 59.71%      Result: Pass      Tolerance: >50.0
@@ -39,3 +41,9 @@ Slice Position Module
 
 Slice Thickness Module
 	Slice Width (mm): 5.15        Result: Pass      Tolerance: >4.0 and <6.0
+
+Overrides Active
+Center Override Position: 126,130
+Radius Override: 84
+Making Override: True
+ROI Position Override: True

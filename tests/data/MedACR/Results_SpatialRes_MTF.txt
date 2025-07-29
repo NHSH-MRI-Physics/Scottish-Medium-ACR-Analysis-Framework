@@ -8,6 +8,7 @@ Geometric Accuracy Module
 	Not Run
 
 Spatial Resolution Module
+	Method: MTF
 	Raw MTF50 :        1.33        Result: No Tolerance Set
 	Fitted MTF50:      1.43        Result: No Tolerance Set
 

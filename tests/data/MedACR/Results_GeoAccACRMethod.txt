@@ -5,6 +5,7 @@ SNR Module
 	Not Run
 
 Geometric Accuracy Module
+	Method: ACR Method
 	Slice 1:
 		Hor Dist (mm):             164.07      Result: Pass      Tolerance: >163.0 and <167.0
 		Vert Dist (mm):            162.12      Result: Fail      Tolerance: >163.0 and <167.0

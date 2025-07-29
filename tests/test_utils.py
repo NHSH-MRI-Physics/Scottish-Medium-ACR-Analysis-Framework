@@ -652,7 +652,7 @@ class TestMedACRAnalysis(unittest.TestCase):
             ManualRes.Image = ManualResData[key][5]
 
             VarHolder.ManualResData[key] = ManualRes
-
+        MedACRAnalysis.ParamaterOverides = MedACRAnalysis.ParamaterOveride()
         MedACRAnalysis.ManualResData = VarHolder.ManualResData
         MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=True, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=True)
         

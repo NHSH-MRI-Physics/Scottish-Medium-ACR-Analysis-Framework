@@ -5,6 +5,7 @@ SNR Module
 	Not Run
 
 Geometric Accuracy Module
+		Method: MagNET Method
 		Horizontal CoV (%):     0.28        Result: No Tolerance Set
 		Vertical CoV (%):       0.15        Result: No Tolerance Set
 		Row Bottom (mm):       79.58       Result: Pass      Tolerance: >79.0 and <81.0

@@ -2,6 +2,8 @@ from tkinter import ttk
 from tkinter import StringVar, IntVar
 from tkinter import DISABLED, NORMAL, N, S, E, W, LEFT, RIGHT, TOP, BOTTOM, messagebox, END, NW
 
+#This is for the UI
+
 SpatialResOption=StringVar()
 SpatialResOption.set("Manual")
 SpatialResOption.set("Contrast Response")

@@ -29,3 +29,9 @@ Slice Position Module
 
 Slice Thickness Module
 	Slice Width (mm): 5.15        Result: Pass      Tolerance: >4.0 and <6.0
+
+Overrides Active
+Center Override Position: 126,130
+Radius Override: 84
+Making Override: True
+ROI Position Override: True

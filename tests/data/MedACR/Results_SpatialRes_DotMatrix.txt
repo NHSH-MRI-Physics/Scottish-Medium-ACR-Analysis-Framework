@@ -8,6 +8,7 @@ Geometric Accuracy Module
 	Not Run
 
 Spatial Resolution Module
+	Method: Dot Matrix
 	1.1mm Holes Score: 2524630.81  Result: No Tolerance Set
 	1.0mm Holes Score: 1230470.89  Result: No Tolerance Set
 	0.9mm Holes Score: 284317.18   Result: No Tolerance Set

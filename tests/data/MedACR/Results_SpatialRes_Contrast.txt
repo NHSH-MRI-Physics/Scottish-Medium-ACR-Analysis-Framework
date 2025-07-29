@@ -8,6 +8,7 @@ Geometric Accuracy Module
 	Not Run
 
 Spatial Resolution Module
+	Method: Contrast Response
 	Horizontal Contrast Response
 		1.1mm Contrast Response: 65.21%      Result: Pass      Tolerance: >50.0
 		1.0mm Contrast Response: 65.07%      Result: Pass      Tolerance: >50.0

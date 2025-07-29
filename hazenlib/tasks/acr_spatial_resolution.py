@@ -58,13 +58,15 @@ import matplotlib.patches as patches
 import matplotlib.gridspec as gridspec
 import math
 from enum import Enum
+from MedACROptions import ResOptions
 
+'''
 class ResOptions(Enum):
     DotMatrixMethod=1
     MTFMethod=2
     ContrastResponseMethod=3
     Manual=4
-    
+''' 
 
 class ACRSpatialResolution(HazenTask):
     """Spatial resolution measurement class for DICOM images of the ACR phantom
