@@ -100,8 +100,6 @@ try:
         WarningMessages = []
         DICOM_Holder_Objs = []
 
-        
-
         for file in files:
             data = pydicom.dcmread(file)
             if "Loc" not in data.SeriesDescription and "loc" not in data.SeriesDescription:
@@ -787,8 +785,6 @@ try:
     sys.stderr = TextRedirectorErr(TextLog, "stderr")
     frameLog.grid(row=11, column=1,padx=10,pady=10,rowspan=3,sticky=W,columnspan=2)
 
-
-    
     Optionsframe = ttk.Frame(root)
     #OptionsLabel = ttk.Label(master=Optionsframe,text="Options")
     #OptionsLabel.pack(anchor=W)

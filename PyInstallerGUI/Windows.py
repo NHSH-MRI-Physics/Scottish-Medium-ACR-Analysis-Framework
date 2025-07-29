@@ -14,9 +14,11 @@ import math
 from tkinter import ttk
 import numpy as np
 from hazenlib.ACRObject import ACRObject
+import MedACRAnalysisV2
 
 
 def GetDICOMS(dicomPath,seq):
+    '''
     files = glob.glob(os.path.join(dicomPath,"*"))
     Dcms = []
     for file in files: 
@@ -26,10 +28,11 @@ def GetDICOMS(dicomPath,seq):
                 Dcms.append(dicom)
         except:
             print ("WARNING: " + file + " was not able to be loaded, this file will be skipped!")
-
+    '''
+    Dcms = MedACRAnalysisV2.DICOM_Holder_Dict[seq]
     Options = {}
     Options["MediumACRPhantom"] = True
-    AcrObj = ACRObject(Dcms,Options)
+    AcrObj = ACRObject(Dcms.DICOM_Data,Options)
     Dcms = AcrObj.dcms
 
     plt.imshow(Dcms[0].pixel_array)

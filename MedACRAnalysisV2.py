@@ -184,6 +184,8 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
         
 #This could be done better by making the whole thing a class, that way it only needs loaded in once. 
 def GetROIFigs(Seq,DICOMPath):
+
+    '''
     files = get_dicom_files(DICOMPath)
     ACRDICOMSFiles = {}
     for file in files:
@@ -192,6 +194,8 @@ def GetROIFigs(Seq,DICOMPath):
             ACRDICOMSFiles[data.SeriesDescription]=[]
         ACRDICOMSFiles[data.SeriesDescription].append(file)
     Data = ACRDICOMSFiles[Seq]
+    '''
+    Data = DICOM_Holder_Dict[Seq].paths
     acr_spatial_resolution_task = ACRSpatialResolution(input_data=Data,MediumACRPhantom=True,Paramater_overide = ParamaterOverides)
     return acr_spatial_resolution_task.GetROICrops()
 
