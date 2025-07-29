@@ -1,12 +1,12 @@
-Date Analysed: 2025-05-19
+Date Analysed: 2025-07-29
 Sequence Analysed: ACR AxT1
-Version: Pre-Release V1.03d
+Version: Pre-Release V1.04
 SNR Module
 	Not Run
 
 Geometric Accuracy Module
-		Horizontal CoV:     0.28        Result: No Tolerance Set
-		Vertical CoV:       0.15        Result: No Tolerance Set
+		Horizontal CoV (%):     0.28        Result: No Tolerance Set
+		Vertical CoV (%):       0.15        Result: No Tolerance Set
 		Row Bottom (mm):       79.58       Result: Pass      Tolerance: >79.0 and <81.0
 		Row Middle (mm):    79.99       Result: Pass      Tolerance: >79.0 and <81.0
 		Row Top (mm):    79.93       Result: Pass      Tolerance: >79.0 and <81.0
