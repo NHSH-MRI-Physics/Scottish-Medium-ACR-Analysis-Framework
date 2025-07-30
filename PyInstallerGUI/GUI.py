@@ -64,6 +64,7 @@ try:
     root = tkinter.Tk()
     #This need to be done after the root is called
     import OptionsPane
+    OptionsPaneObj = OptionsPane.OptionsPaneHolder()
     import Windows
     sv_ttk.set_theme("dark")
     root.geometry('1200x550')
@@ -484,23 +485,23 @@ try:
 
     def SetOptions():
         MedACRAnalysis.GeoMethod = GeometryOptions.ACRMETHOD
-        if OptionsPane.GetOptions()["GeoAccOption"] == "MagNet Method":
+        if OptionsPaneObj.GetOptions()["GeoAccOption"] == "MagNet Method":
             MedACRAnalysis.GeoMethod=GeometryOptions.MAGNETMETHOD
 
         MedACRAnalysis.SpatialResMethod=ResOptions.DotMatrixMethod
-        if OptionsPane.GetOptions()["SpatialResOption"] == "MTF":
+        if OptionsPaneObj.GetOptions()["SpatialResOption"] == "MTF":
             MedACRAnalysis.SpatialResMethod=ResOptions.MTFMethod
-        elif OptionsPane.GetOptions()["SpatialResOption"] == "Contrast Response":
+        elif OptionsPaneObj.GetOptions()["SpatialResOption"] == "Contrast Response":
             MedACRAnalysis.SpatialResMethod=ResOptions.ContrastResponseMethod
-        elif OptionsPane.GetOptions()["SpatialResOption"] == "Manual":
+        elif OptionsPaneObj.GetOptions()["SpatialResOption"] == "Manual":
             MedACRAnalysis.SpatialResMethod=ResOptions.Manual
 
-        if OptionsPane.GetOptions()["UseLegacySliceThicknessAlgo"] == 1:
+        if OptionsPaneObj.GetOptions()["UseLegacySliceThicknessAlgo"] == 1:
             MedACRAnalysis.UseLegacySliceThicknessAlgo = True
         else:
             MedACRAnalysis.UseLegacySliceThicknessAlgo = False
 
-        if OptionsPane.GetOptions()["DumpToExcel"] == 1:
+        if OptionsPaneObj.GetOptions()["DumpToExcel"] == 1:
             MedACRAnalysis.DumpToExcel = True
         else:
             MedACRAnalysis.DumpToExcel = False
@@ -564,12 +565,12 @@ try:
         SlicesToOverride = []
         SlicesToOverride.append(7) # Every test uses slice 7
         if RunAll == True or GeoAcc == True:
-            if OptionsPane.GetOptions()["OverrideMasking"] == 1:
+            if OptionsPaneObj.GetOptions()["OverrideMasking"] == 1:
                 if MedACRAnalysis.GeoMethod == GeometryOptions.ACRMETHOD:
                     SlicesToOverride.append(1)
                     SlicesToOverride.append(5)
 
-        if OptionsPane.GetOptions()["OverrideRadiusAndCentre"] == 1:
+        if OptionsPaneObj.GetOptions()["OverrideRadiusAndCentre"] == 1:
             SlicesToOverride.append(7)
         SlicesToOverride = sorted(set(SlicesToOverride))
 
@@ -581,27 +582,27 @@ try:
         MedACRAnalysis.ParamaterOverides = ParamaterOveride()
         for CurrentSlice in SlicesToOverride:
             OverrideCurrentSlice = False
-            if OptionsPane.GetOptions()["OverrideRadiusAndCentre"] == 1 and CurrentSlice==7:
+            if OptionsPaneObj.GetOptions()["OverrideRadiusAndCentre"] == 1 and CurrentSlice==7:
                 OverrideCurrentSlice = True
 
-            if OptionsPane.GetOptions()["OverrideMasking"] == 1:
+            if OptionsPaneObj.GetOptions()["OverrideMasking"] == 1:
                 OverrideCurrentSlice = True
             
             #if OptionsPane.GetOptions()["OverrideRadiusAndCentre"] == 1 or OptionsPane.GetOptions()["OverrideMasking"] == 1:
             if OverrideCurrentSlice == True: 
-                OverrideCentreRadiusObj = Windows.CentreRadiusMaskingWindow(root,DCMfolder_path.get(),selected_option.get(),overridemasking=OptionsPane.GetOptions()["OverrideMasking"],slice=CurrentSlice,PreCalcdCentre=MedACRAnalysis.ParamaterOverides.CentreOverride)
+                OverrideCentreRadiusObj = Windows.CentreRadiusMaskingWindow(root,DCMfolder_path.get(),selected_option.get(),overridemasking=OptionsPaneObj.GetOptions()["OverrideMasking"],slice=CurrentSlice,PreCalcdCentre=MedACRAnalysis.ParamaterOverides.CentreOverride)
                 OverrideCentreRadiusObj.GetCentreRadiusMask()
 
-            if OptionsPane.GetOptions()["OverrideRadiusAndCentre"] == 1 and CurrentSlice==7:
+            if OptionsPaneObj.GetOptions()["OverrideRadiusAndCentre"] == 1 and CurrentSlice==7:
                 print("Radius and Centre of phantom overriden")
                 MedACRAnalysis.ParamaterOverides.CentreOverride = [OverrideCentreRadiusObj.Centrex,OverrideCentreRadiusObj.Centrey]
                 MedACRAnalysis.ParamaterOverides.RadiusOverride = OverrideCentreRadiusObj.Radius
 
-            if OptionsPane.GetOptions()["OverrideMasking"] == 1:
+            if OptionsPaneObj.GetOptions()["OverrideMasking"] == 1:
                 print("Mask of phantom overriden")
                 MedACRAnalysis.ParamaterOverides.MaskingOverride[CurrentSlice-1] = OverrideCentreRadiusObj.Mask
 
-        if (OptionsPane.GetOptions()["OverideResBlockLoc"] == 1 and SpatialRes == True) or (OptionsPane.GetOptions()["OverideResBlockLoc"] == 1 and RunAll==True):
+        if (OptionsPaneObj.GetOptions()["OverideResBlockLoc"] == 1 and SpatialRes == True) or (OptionsPaneObj.GetOptions()["OverideResBlockLoc"] == 1 and RunAll==True):
             if MedACRAnalysis.SpatialResMethod != ResOptions.MTFMethod:
                 overrideRes = Windows.GetROIOfResBlock(root,DCMfolder_path.get(),selected_option.get())
                 overrideRes.GetROIs()
@@ -617,7 +618,7 @@ try:
 
         MedACRAnalysis.ManualResTestText=None
         MedACRAnalysis.ManualResData = None
-        if OptionsPane.GetOptions()["SpatialResOption"]=="Manual" and SpatialRes==True or RunAll==True and OptionsPane.GetOptions()["SpatialResOption"]=="Manual":
+        if OptionsPaneObj.GetOptions()["SpatialResOption"]=="Manual" and SpatialRes==True or RunAll==True and OptionsPaneObj.GetOptions()["SpatialResOption"]=="Manual":
             ROIS = MedACRAnalysis.GetROIFigs(selected_option.get(),DCMfolder_path.get())
 
 
@@ -812,7 +813,7 @@ try:
         closeBtn = ttk.Button(OptionsPaneWin, text="Close Options",width=20,command = lambda: CloseOptionsPane(OptionsPaneWin))
         closeBtn.place(relx=0.5, rely=0.96, anchor=CENTER)
 
-        OptionsPane.SetupOptions(SelectionFrame)
+        OptionsPaneObj.SetupOptions(SelectionFrame)
         #OptionsPane.GetOptions()
 
         root.wait_window(OptionsPaneWin)
