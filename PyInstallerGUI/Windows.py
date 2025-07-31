@@ -17,20 +17,10 @@ from hazenlib.ACRObject import ACRObject
 import MedACRAnalysisV2
 import VariableHolder
 import datetime
-
+import matplotlib.cm as cm
+from tkinter import StringVar, IntVar
 
 def GetDICOMS(dicomPath,seq):
-    '''
-    files = glob.glob(os.path.join(dicomPath,"*"))
-    Dcms = []
-    for file in files: 
-        try:
-            dicom = dcmread(file)
-            if dicom.SeriesDescription == seq:
-                Dcms.append(dicom)
-        except:
-            print ("WARNING: " + file + " was not able to be loaded, this file will be skipped!")
-    '''
     Dcms = MedACRAnalysisV2.DICOM_Holder_Dict[seq]
     Options = {}
     Options["MediumACRPhantom"] = True
@@ -41,7 +31,6 @@ def GetDICOMS(dicomPath,seq):
     plt.savefig("test.png")
 
     return Dcms,AcrObj
-        
 
 class CentreRadiusMaskingWindow():
     def __init__(self,root,dicomPath,seq,overridemasking = False, slice=7,PreCalcdCentre = None):
@@ -52,18 +41,6 @@ class CentreRadiusMaskingWindow():
         self.Radius = None
         self.Mask = None
         self.PreCalcdCentre = PreCalcdCentre
-        '''
-        files = glob.glob(os.path.join(dicomPath,"*"))
-        Dcms = []
-        for file in files: 
-            try:
-                dicom = dcmread(file)
-                if dicom.SeriesDescription == seq:
-                    Dcms.append(dicom)
-            except:
-                print ("WARNING: " + file + " was not able to be loaded, this file will be skipped!")
-        self.Dcms = sorted(Dcms, key=lambda d: d.SliceLocation)
-        '''
         self.Dcms,__ = GetDICOMS(dicomPath,seq) #This is a better way of doing it, it just uses the ACRobject to make sure the ortientations etc are correct
         self.root = root
         self.Title = "Displaying Slice " + str(slice+1) + "\nChoose 4 points on the edge of the circle"
@@ -103,7 +80,7 @@ class CentreRadiusMaskingWindow():
                         for j in range(self.Image.shape[1]):
                             if math.sqrt((i - self.Centrex)**2 + (j - self.Centrey)**2) < self.Radius:
                                 self.Mask[j,i] = 1
-                    plt.imshow(self.Mask,alpha = 0.4)
+                    plt.imshow(self.Mask,alpha = 0.4,clim=[0.9,1])
 
             self.canvas.draw() 
 
@@ -116,7 +93,6 @@ class CentreRadiusMaskingWindow():
 
             if distances[min_index] <= DeleteDistance:
                 del self.points[min_index]
-
                 plt.clf()
                 plt.imshow(self.Image, cmap='gray')
                 plt.title(self.Title)
@@ -185,11 +161,10 @@ class CentreRadiusMaskingWindow():
         ResetButton = ttk.Button(Win,text="Reset",width=22,command=self.Reset)
         ResetButton.place(relx=0.25, rely=0.89, anchor='center')
 
-        ResetButton = ttk.Button(Win,text="Submit",width=22,command=lambda: self.Submit(Win))
-        ResetButton.place(relx=0.75, rely=0.89, anchor='center')
+        SubmitButton = ttk.Button(Win,text="Submit",width=22,command=lambda: self.Submit(Win))
+        SubmitButton.place(relx=0.75, rely=0.89, anchor='center')
 
         self.root.wait_window(Win)
-
 
 class GetROIOfResBlock():
     def __init__(self,root,dicomPath,seq):
@@ -666,3 +641,80 @@ class ManualResWindow():
             Vmax = self.VarHolder.CurrentLevel + self.VarHolder.CurrentWidth
             self.plot(Vmin=Vmin,Vmax=Vmax)
             self.VarHolder.Canvas.draw()
+
+class DisplayLoadedDICOM():
+    def __init__(self,root,dicomPath,seq):
+        self.root = root
+        self.Dcms,self.ACRObj = GetDICOMS(dicomPath,seq)
+        self.seq = seq
+        self.slice = 0
+        self.Showmask = IntVar(value=1)
+        self.Showcentre = IntVar(value=1)
+
+    def ChangeSlice(self, Forward):
+        if Forward==True:
+            self.slice+=1
+        else:
+            self.slice-=1
+        if self.slice <=-1:
+            self.slice = len(self.Dcms)-1
+        if self.slice >= len(self.Dcms):
+            self.slice = 0
+        self.Image = self.Dcms[self.slice].pixel_array
+        self.UpdatePlot()        
+
+    def UpdatePlot(self):
+        plt.clf()
+        plt.title(self.seq +" Slice Number: " + str(self.slice+1))
+        plt.imshow(self.Image, cmap='gray')
+        if self.slice == 6:
+            if self.Showcentre.get() == 1:
+                plt.plot(self.ACRObj.centre[0],self.ACRObj.centre[1],marker="x",color="red")
+            if self.Showmask.get() == 1:
+                Mask = self.ACRObj.mask_image*1
+                masked_data = np.ma.masked_where(Mask < 0.9, Mask)
+                plt.imshow(masked_data, interpolation='none',alpha=0.4)
+        if self.slice==0:
+            if self.Showmask.get() == 1:
+                Mask = self.ACRObj.get_mask_image_from_slice(0)
+                masked_data = np.ma.masked_where(Mask < 0.9, Mask)
+                plt.imshow(masked_data, interpolation='none',alpha=0.4)
+        if self.slice==4:
+            if self.Showmask.get() == 1:
+                Mask = self.ACRObj.get_mask_image_from_slice(4)
+                masked_data = np.ma.masked_where(Mask < 0.9, Mask)
+                plt.imshow(masked_data, interpolation='none',alpha=0.4)
+        self.canvas.draw() 
+
+    def DiplayDICOMS(self):
+        plt.close('all')
+        self.Win = tkinter.Toplevel(self.root)
+        self.Win.iconbitmap("_internal\ct-scan.ico")
+        self.Win.geometry("500x580")
+        self.Win.configure(background='white')
+        self.Win.resizable(False,False)
+        self.Image = self.Dcms[self.slice].pixel_array
+        
+        self.canvas = FigureCanvasTkAgg(plt.gcf(), master = self.Win) 
+        self.UpdatePlot()
+        self.canvas.get_tk_widget().pack(side=TOP)
+
+        toolbar = NavigationToolbar2Tk(self.canvas, self.Win) 
+        toolbar.update() 
+        self.canvas.get_tk_widget().pack() 
+
+        style = ttk.Style()
+        style.configure('CustomCheckbutton.TCheckbutton', background='white', foreground='black',activeforeground="blue")
+        ShowMaskBox = ttk.Checkbutton(self.Win, text="Show Mask",variable=self.Showmask, onvalue=1, offvalue=0,state=NORMAL, style='CustomCheckbutton.TCheckbutton',command=self.UpdatePlot)
+        ShowMaskBox.place(relx=0.25, rely=0.83, anchor='center')
+        ShowCentre = ttk.Checkbutton(self.Win, text="Show Centre",variable=self.Showcentre, onvalue=1, offvalue=0,state=NORMAL, style='CustomCheckbutton.TCheckbutton',command=self.UpdatePlot)
+        ShowCentre.place(relx=0.75, rely=0.83, anchor='center')
+
+        SliceBack = ttk.Button(self.Win,text="<",width=22,command=lambda: self.ChangeSlice(False))
+        SliceBack.place(relx=0.25, rely=0.89, anchor='center')
+
+        SliceForward = ttk.Button(self.Win,text=">",width=22,command=lambda: self.ChangeSlice(True))
+        SliceForward.place(relx=0.75, rely=0.89, anchor='center')
+        
+
+        self.root.wait_window(self.Win)

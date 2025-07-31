@@ -26,6 +26,8 @@ from hazenlib._version import __version__
 import threading
 import webbrowser
 import DICOM_Holder
+import OptionsPane
+import Windows
 
 if getattr(sys, 'frozen', False):
     import pyi_splash
@@ -63,9 +65,7 @@ try:
             
     root = tkinter.Tk()
     #This need to be done after the root is called
-    import OptionsPane
     OptionsPaneObj = OptionsPane.OptionsPaneHolder()
-    import Windows
     sv_ttk.set_theme("dark")
     root.geometry('1200x550')
     root.title('Medium ACR Phantom QA Analysis ' + __version__)
@@ -459,7 +459,7 @@ try:
     ResultsPathLabel = ttk.Label(master=root,textvariable=Resultsfolder_path)
     ResultsPathLabel.grid(row=1, column=1,padx=10,pady=2,sticky=W,columnspan=6)
 
-    Resultsfolder_path.set("/Users/john/Desktop/out") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
+    Resultsfolder_path.set("C:\\Users\Johnt\Desktop\Out") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
 
     selected_option = StringVar(root)
     options = [] 
@@ -570,15 +570,24 @@ try:
     def OpenBugFeatureSite():
         webbrowser.open('https://forms.cloud.microsoft/e/9ZsZNbTinT?origin=QRCode', new=0)
 
+    def ViewDICOMS():
+        if DCMfolder_path.get() == "Not Set!":
+            messagebox.showerror("Error", "Set DICOM Path first!")
+            return
+        ViewDICOMObj = Windows.DisplayLoadedDICOM(root,DCMfolder_path.get(),selected_option.get())
+        ViewDICOMObj.DiplayDICOMS()
+
     OpenOptionsButton = ttk.Button(Optionsframe, text="Open Options",width=20,command = OpenOptionsPane)
-    OpenOptionsButton.pack()
+    OpenOptionsButton.pack(pady=1)
 
     ManualButton = ttk.Button(Optionsframe, text="Open Manual",width=20,command = OpenManual)
-    ManualButton.pack(pady=20)
+    ManualButton.pack(pady=1)
 
-    
-    ManualButton = ttk.Button(Optionsframe, text="Bug reporting and \n feature requesting",width=20,command = OpenBugFeatureSite)
-    ManualButton.pack(pady=0)
+    BugReporting = ttk.Button(Optionsframe, text="Bug reporting and \n feature requesting",width=20,command = OpenBugFeatureSite)
+    BugReporting.pack(pady=1)
+
+    BugReporting = ttk.Button(Optionsframe, text="View Loaded DICOM",width=20,command = ViewDICOMS)
+    BugReporting.pack(pady=1)
 
     Optionsframe.grid(row=11, column=3,padx=8,pady=10,rowspan=3)
     root.resizable(False,False)
@@ -587,7 +596,6 @@ try:
 
     hazenlib.logger.ConfigureLoggerForGUI()
     MedACR_ToleranceTableChecker.SetUpToleranceTable()
-
 
     root.mainloop()
 except Exception as e:
