@@ -42,6 +42,7 @@ ManualResData=None
 #Default options
 GeoMethod = GeometryOptions.ACRMETHOD
 SpatialResMethod = ResOptions.MTFMethod
+UniformityMethod = UniformityOptions.ACRMETHOD
 UseLegacySliceThicknessAlgo = False
 DumpToExcel = False
 DICOM_Holder_Dict = None
@@ -55,8 +56,6 @@ def RunAnalysisWithHolder(Holder,DICOMPath,OutputPath,RunAll=True, RunSNR=False,
 
 #This is a file which simply contains a function to run the analysis. It is in a seperate file so i can reuse it for the various implementations.
 def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False):
-    
-
     files = get_dicom_files(DICOMPath)
     ACRDICOMSFiles = {}
     for file in files:
@@ -106,7 +105,7 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
 
     if RunUniformity ==True:
         TotalTests+=1
-        settings = {"Data":Data,"OutputPath":OutputPath,"ParamaterOverides":ParamaterOverides}
+        settings = {"Data":Data,"OutputPath":OutputPath,"ParamaterOverides":ParamaterOverides, "UniformityMethod":UniformityMethod}
         TestsToRun["Uniformity"] = UniformityModule("Uniformity",settings)
 
     if RunGhosting ==True:

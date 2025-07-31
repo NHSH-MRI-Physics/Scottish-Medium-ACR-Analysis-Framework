@@ -11,6 +11,7 @@ Spatial Resolution Module
 	Not Run
 
 Uniformity Module
+	Method: ACR Method
 	Uniformity:  76.33%      Result: Fail      Tolerance: >90.0
 
 Ghosting Module

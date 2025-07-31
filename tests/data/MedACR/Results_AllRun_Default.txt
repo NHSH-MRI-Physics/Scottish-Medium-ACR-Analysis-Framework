@@ -30,6 +30,7 @@ Spatial Resolution Module
 		0.8mm Contrast Response: 3.61%       Result: Fail      Tolerance: >50.0
 
 Uniformity Module
+	Method: ACR Method
 	Uniformity:  76.33%      Result: Fail      Tolerance: >90.0
 
 Ghosting Module

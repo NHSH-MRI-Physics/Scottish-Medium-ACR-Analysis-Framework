@@ -496,6 +496,10 @@ try:
         elif OptionsPaneObj.GetOptions()["SpatialResOption"] == "Manual":
             MedACRAnalysis.SpatialResMethod=ResOptions.Manual
 
+        MedACRAnalysis.UniformityMethod = UniformityOptions.ACRMETHOD
+        if OptionsPaneObj.GetOptions()["UniformityOptions"] == "MagNet Method":
+            MedACRAnalysis.UniformityMethod = UniformityOptions.MAGNETMETHOD
+
         if OptionsPaneObj.GetOptions()["UseLegacySliceThicknessAlgo"] == 1:
             MedACRAnalysis.UseLegacySliceThicknessAlgo = True
         else:

@@ -7,7 +7,7 @@ from hazenlib.utils import get_dicom_files
 from hazenlib.tasks.acr_uniformity import ACRUniformity
 from hazenlib.ACRObject import ACRObject
 from tests import TEST_DATA_DIR, TEST_REPORT_DIR
-
+from MedACROptions import UniformityOptions
 
 class TestACRUniformitySiemens(unittest.TestCase):
     piu = 67.43 #Had to change this beacause of a bug fix in ACRObjects circular_mask
@@ -35,8 +35,6 @@ class TestACRUniformitySiemens(unittest.TestCase):
 
 
 # TODO: Add unit tests for Philips datasets.
-
-
 class TestACRUniformityGE(TestACRUniformitySiemens):
     piu = 84.66 #Had to change this beacause of a bug fix in ACRObjects circular_mask
 
@@ -59,3 +57,17 @@ class TestMedACRUniformity(TestACRUniformitySiemens):
             input_data=ge_files, report_dir=pathlib.PurePath.joinpath(TEST_REPORT_DIR)
             ,MediumACRPhantom=True
         )
+
+class TestMedACRMagfNetUniformity(unittest.TestCase):
+    def test_uniformity(self):
+        ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
+        ge_files = get_dicom_files(ACR_DATA_Med)
+        acr_uniformity_task = ACRUniformity(
+            input_data=ge_files, report_dir=pathlib.PurePath.joinpath(TEST_REPORT_DIR)
+            ,MediumACRPhantom=True
+        )
+        acr_uniformity_task.UniformityMethod = UniformityOptions.MAGNETMETHOD
+        Results = acr_uniformity_task.run()
+
+        assert Results['measurement']['Horizontal Uniformity %'] == 84.03
+        assert Results['measurement']['Vertical Uniformity %'] == 22.79

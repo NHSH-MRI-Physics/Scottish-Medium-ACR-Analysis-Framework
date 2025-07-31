@@ -23,7 +23,7 @@ import numpy as np
 
 from hazenlib.HazenTask import HazenTask
 from hazenlib.ACRObject import ACRObject
-
+from MedACROptions import UniformityOptions
 
 class ACRUniformity(HazenTask):
     """Uniformity measurement class for DICOM images of the ACR phantom
@@ -35,6 +35,7 @@ class ACRUniformity(HazenTask):
         super().__init__(**kwargs)
         # Initialise ACR object
         self.ACR_obj = ACRObject(self.dcm_list,kwargs)
+        self.UniformityMethod = UniformityOptions.ACRMETHOD
 
     def run(self) -> dict:
         """Main function for performing uniformity measurement
@@ -48,16 +49,25 @@ class ACRUniformity(HazenTask):
         results["file"] = self.img_desc(self.ACR_obj.slice7_dcm)
 
         try:
-            #result = self.get_integral_uniformity(self.ACR_obj.slice7_dcm)
-            #results["measurement"] = {"integral uniformity %": round(result, 2)}
-            unif, max_roi, min_roi, max_pos, min_pos = self.get_integral_uniformity(self.ACR_obj.slice7_dcm)
-            results["measurement"] = {
-                "integral uniformity %": round(unif, 2),
-                "max roi": round(max_roi,1),
-                "min roi": round(min_roi,1),
-                "max pos": max_pos,
-                "min pos": min_pos
-                }
+            if self.UniformityMethod == UniformityOptions.ACRMETHOD:
+                #result = self.get_integral_uniformity(self.ACR_obj.slice7_dcm)
+                #results["measurement"] = {"integral uniformity %": round(result, 2)}
+                unif, max_roi, min_roi, max_pos, min_pos = self.get_integral_uniformity(self.ACR_obj.slice7_dcm)
+                results["measurement"] = {
+                    "integral uniformity %": round(unif, 2),
+                    "max roi": round(max_roi,1),
+                    "min roi": round(min_roi,1),
+                    "max pos": max_pos,
+                    "min pos": min_pos
+                    }
+            elif self.UniformityMethod == UniformityOptions.MAGNETMETHOD:
+                HorUniformity, VertUniformity = self.Get_MagNET_Uniformity(self.ACR_obj.slice7_dcm)
+                results["measurement"] = {
+                    "Horizontal Uniformity %": round(HorUniformity,2),
+                    "Vertical Uniformity %": round(VertUniformity,2)
+                    }   
+            else:
+                raise Exception("Unknown Unifomrity Method")
         
         except Exception as e:
             print(
@@ -264,3 +274,71 @@ class ACRUniformity(HazenTask):
             self.report_files.append(img_path)
 
         return piu, sig_max, sig_min, max_loc, min_loc
+
+
+    def Get_MagNET_Uniformity(self,dcm):
+        
+        img = dcm.pixel_array
+        Cx = self.ACR_obj.centre[1]
+        Cy = self.ACR_obj.centre[1]
+
+        #Hor
+        StartX = int(round(Cy - self.ACR_obj.radius*0.85,0))
+        EndX = int(round(Cy + self.ACR_obj.radius*0.85,0))
+        HorAvgLine = np.mean(img[Cy-5:Cy+5,:],axis=0)
+        HorPixelMean = np.mean(img[Cy-5:Cy+5,StartX:EndX].flatten())
+        HorUpper = HorPixelMean*1.1
+        HorLower = HorPixelMean*0.9
+        HorAvgLineCropped = HorAvgLine[StartX:EndX]
+        HorPixelsoutofRange = ((HorAvgLineCropped>HorLower) & (HorAvgLineCropped < HorUpper)).sum()
+        HorizontalUniformity = (HorPixelsoutofRange / len(HorAvgLineCropped))*100.0
+
+        #The 10 offset is to avoid the bit at the top
+        StartY = int(round(Cx - self.ACR_obj.radius*0.8,0))+7
+        EndY = int(round(Cx + self.ACR_obj.radius*0.8,0))+7 
+        VertAvgLine = np.mean(img[:,Cx-5:Cx+5],axis=1)
+        VertPixelMean = np.mean(img[StartY:EndY,Cx-5:Cx+5].flatten())
+        VertUpper = VertPixelMean*1.1
+        VertLower = VertPixelMean*0.9
+        VertAvgLineCropped = VertAvgLine[StartY:EndY]
+        VertPixelsoutofRange = ((VertAvgLineCropped>VertLower) & (VertAvgLineCropped < VertUpper)).sum()
+        VerticalUniformity = (VertPixelsoutofRange / len(VertAvgLineCropped))*100.0
+
+        if self.report:
+            import matplotlib.pyplot as plt
+            import matplotlib.patches as patches
+
+            fig, axes = plt.subplots(3, 1)
+            fig.set_size_inches(8, 16)
+            fig.tight_layout(pad=4)
+
+            axes[0].imshow(img)
+            rect = patches.Rectangle((StartX, Cy-5), EndX-StartX, 10, linewidth=1, edgecolor='r', facecolor='none')
+            axes[0].add_patch(rect)
+            rect = patches.Rectangle((Cx-5, StartY), 10, EndY-StartY, linewidth=1, edgecolor='b', facecolor='none')
+            axes[0].add_patch(rect)
+
+
+            axes[1].set_title("Horizontal Line Profile")
+            axes[1].plot(HorAvgLine,color='r')
+            axes[1].axvline(x = StartX,color='r',linestyle='--')
+            axes[1].axvline(x = EndX,color='r',linestyle='--')
+            axes[1].hlines(y = HorUpper,xmin=StartX,xmax=EndX,color='g',linestyle='--')
+            axes[1].hlines(y = HorLower,xmin=StartX,xmax=EndX,color='g',linestyle='--')
+            axes[1].hlines(y = HorPixelMean,xmin=StartX,xmax=EndX,color='g',linestyle='-')
+
+            axes[2].set_title("Horizontal Line Profile")
+            axes[2].plot(VertAvgLine,color='b')
+            axes[2].axvline(x = StartY,color='r',linestyle='--')
+            axes[2].axvline(x = EndY,color='r',linestyle='--')
+            axes[2].hlines(y = VertUpper,xmin=StartY,xmax=EndY,color='g',linestyle='--')
+            axes[2].hlines(y = VertLower,xmin=StartY,xmax=EndY,color='g',linestyle='--')
+            axes[2].hlines(y = VertPixelMean,xmin=StartY,xmax=EndY,color='g',linestyle='-')
+
+            img_path = os.path.realpath(
+            os.path.join(self.report_path, f"{self.img_desc(dcm)}.png")
+            )
+            fig.savefig(img_path)
+            self.report_files.append(img_path)
+
+        return HorizontalUniformity,VerticalUniformity

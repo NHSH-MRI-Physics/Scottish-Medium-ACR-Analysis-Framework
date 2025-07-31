@@ -19,3 +19,7 @@ class ResOptions(Enum):
     MTFMethod=2
     ContrastResponseMethod=3
     Manual=4
+
+class UniformityOptions(Enum):
+    ACRMETHOD = 1
+    MAGNETMETHOD = 2
