@@ -18,6 +18,7 @@ class OptionsPaneHolder():
         self.OverideResBlockLoc=IntVar(value=0)
         self.UseLegacySliceThicknessAlgo=IntVar(value=0)
         self.DumpToExcel=IntVar(value=1)
+        self.FixedManualROISize=IntVar(value=1)
         
         self.currentRow = 0
         self.OptionsPane = None
@@ -48,7 +49,7 @@ class OptionsPaneHolder():
         self.AddOptionRowCheckbox(text='Override Res Blocks Location',variable=self.OverideResBlockLoc)
         self.AddOptionRowCheckbox(text='Use Legacy Slice Thickness Bar Algorithm',variable=self.UseLegacySliceThicknessAlgo)
         self.AddOptionRowCheckbox(text='Dump Results to Excel file',variable=self.DumpToExcel)
-
+        self.AddOptionRowCheckbox(text='Fixed manual ROI size',variable=self.FixedManualROISize)
 
     def GetOptions(self):
         OptionsDict = {}
@@ -60,5 +61,6 @@ class OptionsPaneHolder():
         OptionsDict["UseLegacySliceThicknessAlgo"] = self.UseLegacySliceThicknessAlgo.get()
         OptionsDict["DumpToExcel"] = self.DumpToExcel.get()
         OptionsDict["UniformityOptions"] = self.UniformityOption.get()
+        OptionsDict["FixedManualROISize"] = self.FixedManualROISize.get()
 
         return OptionsDict

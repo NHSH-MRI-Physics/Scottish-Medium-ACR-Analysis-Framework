@@ -347,6 +347,8 @@ try:
         if (OptionsPaneObj.GetOptions()["OverideResBlockLoc"] == 1 and SpatialRes == True) or (OptionsPaneObj.GetOptions()["OverideResBlockLoc"] == 1 and RunAll==True):
             if MedACRAnalysis.SpatialResMethod != ResOptions.MTFMethod:
                 overrideRes = Windows.GetROIOfResBlock(root,DCMfolder_path.get(),selected_option.get())
+                if OptionsPaneObj.GetOptions()["FixedManualROISize"] == 0:
+                    overrideRes.FixedSize = False
                 overrideRes.GetROIs()
                 MedACRAnalysis.ParamaterOverides.ROIOverride=overrideRes.crops
 

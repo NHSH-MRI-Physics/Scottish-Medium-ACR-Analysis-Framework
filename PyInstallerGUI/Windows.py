@@ -40,7 +40,7 @@ def GetDICOMS(dicomPath,seq):
     plt.imshow(Dcms[0].pixel_array)
     plt.savefig("test.png")
 
-    return Dcms
+    return Dcms,AcrObj
         
 
 class CentreRadiusMaskingWindow():
@@ -64,7 +64,7 @@ class CentreRadiusMaskingWindow():
                 print ("WARNING: " + file + " was not able to be loaded, this file will be skipped!")
         self.Dcms = sorted(Dcms, key=lambda d: d.SliceLocation)
         '''
-        self.Dcms = GetDICOMS(dicomPath,seq) #This is a better way of doing it, it just uses the ACRobject to make sure the ortientations etc are correct
+        self.Dcms,__ = GetDICOMS(dicomPath,seq) #This is a better way of doing it, it just uses the ACRobject to make sure the ortientations etc are correct
         self.root = root
         self.Title = "Displaying Slice " + str(slice+1) + "\nChoose 4 points on the edge of the circle"
         self.overrideMasking = overridemasking
@@ -194,46 +194,13 @@ class CentreRadiusMaskingWindow():
 class GetROIOfResBlock():
     def __init__(self,root,dicomPath,seq):
         self.root = root
-        '''
-        files = glob.glob(os.path.join(dicomPath,"*"))
-        Dcms = []
-        for file in files: 
-            try:
-                dicom = dcmread(file)
-                if dicom.SeriesDescription == seq:
-                    Dcms.append(dicom)
-            except:
-                print ("WARNING: " + file + " was not able to be loaded, this file will be skipped!")
-
-        #self.Dcms = sorted(Dcms, key=lambda d: d.SliceLocation)
-
-        
-        if "ImageOrientationPatient" in Dcms[0]:
-            ImageOrientationPatient = Dcms[0].ImageOrientationPatient
-        else:
-            for elem in Dcms[0].iterall():
-                if elem.tag == (0x20,0x37):
-                    ImageOrientationPatient = elem.value
-
-        from hazenlib.utils import get_image_orientation
-        orientation=get_image_orientation(ImageOrientationPatient)
-        
-        if "ImagePositionPatient" in Dcms[0]:
-            x = np.array([dcm.ImagePositionPatient[0] for dcm in Dcms])
-            y = np.array([dcm.ImagePositionPatient[1] for dcm in Dcms])
-            z = np.array([dcm.ImagePositionPatient[2] for dcm in Dcms])
-            if orientation=='Transverse':
-                self.Dcms = [Dcms[i] for i in np.argsort(z)]
-            elif orientation=='Coronal':
-                self.Dcms = [Dcms[i] for i in np.argsort(y)]
-            elif orientation=='Sagittal':
-                self.Dcms = [Dcms[i] for i in np.argsort(x)]
-        '''
-        self.Dcms = GetDICOMS(dicomPath,seq) #This is a better way of doing it, it just uses the ACRobject to make sure the ortientations etc are correct
-
+        self.Dcms, ACR_obj = GetDICOMS(dicomPath,seq) #This is a better way of doing it, it just uses the ACRobject to make sure the ortientations etc are correct
+        self.FixedSize=True
         self.MakingRect = False
         self.Rect = [None,None,None,None]
         self.SelectedRects = [None,None,None,None]
+        self.Size = [18.19/ACR_obj.pixel_spacing[0],16.67/ACR_obj.pixel_spacing[0],15.73/ACR_obj.pixel_spacing[0],13.30/ACR_obj.pixel_spacing[0]]
+
         self.colours = [ "red", "green", "blue", "yellow"]
         self.ResTitle = ["1.1mm","1.0mm", "0.9mm", "0.8mm"]
         self.RectID = 0
@@ -304,8 +271,6 @@ class GetROIOfResBlock():
     def on_click_on_plot(self,event):
         if (self.canvas.toolbar.mode) != '':
             return
-
-
         if event.button == 1 and self.RectID < 4:
             self.MakingRect=True
             self.Rect[0] = event.xdata
@@ -337,8 +302,6 @@ class GetROIOfResBlock():
             plt.title("Draw a box around the " + str(self.ResTitle[self.RectID])+" grid")
             self.canvas.draw() 
 
-            
-
     def release_click_on_plot(self,event):
         if self.MakingRect == True:
             self.MakingRect=False
@@ -353,6 +316,52 @@ class GetROIOfResBlock():
                 plt.title("All boxes drawn")
                 self.canvas.draw() 
 
+    def release_click_on_plot_FixedSize(self,event):
+        x = event.xdata
+        y = event.ydata
+
+        if (self.canvas.toolbar.mode) != '':
+            return
+        
+        if event.button == 1 and self.RectID < 4:
+            self.SelectedRects[self.RectID] = plt.Rectangle( (x-self.Size[self.RectID]/2.0,y-self.Size[self.RectID]/2.0),self.Size[self.RectID],self.Size[self.RectID],color=self.colours[self.RectID],fill=False)
+            plt.gca().add_patch(self.SelectedRects[self.RectID])
+            self.canvas.draw()   
+            if None in self.SelectedRects:
+                    self.RectID = self.SelectedRects.index(None)
+            else:
+                self.RectID = 4
+            if self.RectID<=3:
+                plt.title("Click the centre of the " + str(self.ResTitle[self.RectID])+" grid")
+                self.canvas.draw() 
+            else:
+                plt.title("All boxes drawn")
+                self.canvas.draw() 
+        
+        if event.button == 3:
+            for i in range(4):
+                if self.SelectedRects[i] != None:
+                    rect = self.SelectedRects[i]
+                    x0, y0 = rect.get_xy()
+                    x1 = x0 + rect.get_width()
+                    y1 = y0 + rect.get_height()
+
+                    if rect.get_width() < 0:
+                        xtemp = x1
+                        x1 = x0
+                        x0 = xtemp
+
+                    if rect.get_height() < 0:
+                        ytemp = y1
+                        y1 = y0
+                        y0 = ytemp
+
+                    if x0 <= event.xdata <= x1 and y0 <= event.ydata <= y1:
+                        self.SelectedRects[i].remove()
+                        self.SelectedRects[i] = None
+                        self.RectID = self.SelectedRects.index(None)
+                        plt.title("Draw a box around the " + str(self.ResTitle[self.RectID])+" grid")
+                        self.canvas.draw() 
 
 
     def GetROIs(self):
@@ -370,9 +379,13 @@ class GetROIOfResBlock():
         self.Image = self.Dcms[0].pixel_array
         plt.imshow(self.Image,cmap="gray")
         self.canvas = FigureCanvasTkAgg(plt.gcf(), master = Win) 
-        plt.gcf().canvas.callbacks.connect('button_press_event', self.on_click_on_plot)
-        plt.gcf().canvas.callbacks.connect('button_release_event', self.release_click_on_plot)
-        plt.gcf().canvas.callbacks.connect("motion_notify_event", self.onmove)
+
+        if self.FixedSize == False:
+            plt.gcf().canvas.callbacks.connect('button_press_event', self.on_click_on_plot)
+            plt.gcf().canvas.callbacks.connect('button_release_event', self.release_click_on_plot)
+            plt.gcf().canvas.callbacks.connect("motion_notify_event", self.onmove)
+        else:
+            plt.gcf().canvas.callbacks.connect('button_release_event', self.release_click_on_plot_FixedSize)
         
         self.canvas.draw() 
         self.canvas.get_tk_widget().pack(side=TOP)
