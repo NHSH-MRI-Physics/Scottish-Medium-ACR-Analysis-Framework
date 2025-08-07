@@ -162,7 +162,7 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
     ScannerInfo = {}
     data = pydicom.dcmread(Data[0])
     acq_date = data.get("AcquisitionDate", None)   # Format: YYYYMMDD
-    acq_time = data.get("AcquisitionTime", None)   # Format: HHMMSS.frac
+    acq_time = data.get("AcquisitionTime", None).split(".")[0]   # Format: HHMMSS.frac, the split removes the fraction
     TimeRan = datetime.datetime.strptime(acq_date + acq_time, "%Y%m%d%H%M%S")
     ScannerInfo["Manufacturer"] = data.Manufacturer
     ScannerInfo["Institution Name"] = data.InstitutionName
@@ -187,7 +187,6 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
         
 #This could be done better by making the whole thing a class, that way it only needs loaded in once. 
 def GetROIFigs(Seq,DICOMPath):
-
     '''
     files = get_dicom_files(DICOMPath)
     ACRDICOMSFiles = {}

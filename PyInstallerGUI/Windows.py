@@ -174,7 +174,7 @@ class GetROIOfResBlock():
         self.MakingRect = False
         self.Rect = [None,None,None,None]
         self.SelectedRects = [None,None,None,None]
-        self.Size = [18.19/ACR_obj.pixel_spacing[0],16.67/ACR_obj.pixel_spacing[0],15.73/ACR_obj.pixel_spacing[0],13.30/ACR_obj.pixel_spacing[0]]
+        self.Size = [17.19/ACR_obj.pixel_spacing[0],15.67/ACR_obj.pixel_spacing[0],14.73/ACR_obj.pixel_spacing[0],12.30/ACR_obj.pixel_spacing[0]]
 
         self.colours = [ "red", "green", "blue", "yellow"]
         self.ResTitle = ["1.1mm","1.0mm", "0.9mm", "0.8mm"]

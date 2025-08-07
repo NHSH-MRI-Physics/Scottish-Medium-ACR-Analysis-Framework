@@ -52,6 +52,15 @@ def SetUpToleranceTable():
                     raise Exception("Mulitple tests need a name attribute!")
                 ToleranceTable[Module.attributes['name'].value][Name] = Tolerance(min=Min, max=Max, equals=Equal)
 
+def GetTolerance(ModuleName,TestName=None):
+    if TestName==None:
+        TestName=ModuleName
+    if ModuleName not in ToleranceTable.keys():
+        return None
+    if TestName not in ToleranceTable[ModuleName].keys():
+        return None
+    return ToleranceTable[ModuleName][TestName]
+
 def GetPassResult(Value,ModuleName,TestName=None):
     if TestName==None:
         TestName=ModuleName
