@@ -6,7 +6,6 @@ import os
 import glob
 import pickle
 import sys
-
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir)
@@ -24,6 +23,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import plotly.graph_objects as go
 import plotly.express as px
+import GetSNRData
 
 st.set_page_config(
     page_title="Data Dashboard Home",
@@ -32,13 +32,13 @@ st.set_page_config(
 
 st.title("Med ACR Data Dashboard")
 database_path = "Result_Database"
-pkl_files = glob.glob(os.path.join(database_path, "*.pkl"))
-
+DB_Files = glob.glob(os.path.join(database_path, "*.docx"))
 
 #Results = {}
 scanner_rows = []
-for file in pkl_files:
+for file in DB_Files:
     Data = pickle.load(open(file,'rb'))
+
     row = {
         "Manufacturer": str(Data["ScannerDetails"].get("Manufacturer", "")),
         "Institution Name": str(Data["ScannerDetails"].get("Institution Name", "")),
@@ -47,11 +47,13 @@ for file in pkl_files:
         "FileName": file,
         "date": Data["date"],
         "ScannerUniqueID": str(Data["ScannerDetails"].get("Manufacturer", ""))+"_"+str(Data["ScannerDetails"].get("Institution Name", ""))+"_"+str(Data["ScannerDetails"].get("Model Name", ""))+"_"+str(Data["ScannerDetails"].get("Serial Number", "")),
-        "Data": Data
+        "Data": Data,
+        "Tests": Data["Test"],
+        "Sequence": Data["Sequence"]
     }
     scanner_rows.append(row)
 
-df_DisplayData = pd.DataFrame(scanner_rows,dtype=object).drop("FileName",axis=1).drop("date",axis=1).drop("ScannerUniqueID",axis=1).drop("Data",axis=1)
+df_DisplayData = pd.DataFrame(scanner_rows,dtype=object).drop("FileName",axis=1).drop("date",axis=1).drop("ScannerUniqueID",axis=1).drop("Data",axis=1).drop("Tests",axis=1).drop("Sequence",axis=1)
 df_DisplayData = df_DisplayData.drop_duplicates() 
 df_FullData = pd.DataFrame(scanner_rows)
 
@@ -82,33 +84,8 @@ UniqueIDS = []
 for i in range(len(manufacturers)):
     UniqueIDS.append(manufacturers[i] + "_" + InstitutionName[i] + "_" + models[i] + "_" + SerialNumber[i])
 
-
-filtered_df = df_FullData[df_FullData["ScannerUniqueID"].isin(UniqueIDS)]
-filtered_df["SNR"] = [None]*len(filtered_df)
-
-for idx, row in filtered_df.iterrows():
-    data = row["Data"]  
-    filtered_df.at[idx, "SNR"] = data["SNR"].results["measurement"]["snr by smoothing"]["measured"]
-
-
 st.divider()
 st.subheader("SNR")
-fig = px.scatter(filtered_df, x="date", y="SNR",color="ScannerUniqueID")
-fig.update_layout(
-        title=dict(
-        text="SNR Data",
-        y=0.95,
-        x=0.5,
-        xanchor='center',
-        yanchor='top'
-    ),
-    legend=dict(
-        orientation="h",  # horizontal orientation
-        yanchor="bottom",
-        y=-0.5,  # position below plot
-        xanchor="left",
-        x=0,
-        title=None
-    )
-)
+fig = GetSNRData.GetDataAndPlot(df_FullData,UniqueIDS)
+
 st.plotly_chart(fig)

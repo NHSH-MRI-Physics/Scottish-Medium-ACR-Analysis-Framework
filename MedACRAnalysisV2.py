@@ -158,9 +158,12 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
         PyInstallerGUI.DumpToExcel.DumpToExcel(ReportText,FileName)
 
 
-    TimeRan = datetime.datetime.now()
+    #TimeRan = datetime.datetime.now() #Perhaps this should be date of test but leave it as it is for now
     ScannerInfo = {}
     data = pydicom.dcmread(Data[0])
+    acq_date = data.get("AcquisitionDate", None)   # Format: YYYYMMDD
+    acq_time = data.get("AcquisitionTime", None)   # Format: HHMMSS.frac
+    TimeRan = datetime.datetime.strptime(acq_date + acq_time, "%Y%m%d%H%M%S")
     ScannerInfo["Manufacturer"] = data.Manufacturer
     ScannerInfo["Institution Name"] = data.InstitutionName
     ScannerInfo["Model Name"] = data.ManufacturerModelName
@@ -170,6 +173,7 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
     DumpData["Test"] = TestsToRun
     DumpData["ScannerDetails"] = ScannerInfo
     DumpData["date"] = TimeRan
+    DumpData["Sequence"] = Seq
     DumpData["DICOM"] = []
     for DicomData in Data:
         DumpData["DICOM"].append(pydicom.dcmread(DicomData))
@@ -177,7 +181,7 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
     if os.path.exists("Result_Database")==False:
         os.mkdir("Result_Database")
     
-    filename = os.path.join("Result_Database","Results_" + Seq +"_" + str(TimeRan.strftime("%Y-%m-%d %H-%M-%S"))+".docx")
+    filename = os.path.join("Result_Database","Results_" + Seq +"_" + str(datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S"))+".docx")
     with open(filename, 'wb') as f:  # open a text file
         pickle.dump(DumpData, f) # serialize the list
         
