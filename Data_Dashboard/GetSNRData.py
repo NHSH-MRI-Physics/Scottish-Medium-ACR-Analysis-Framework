@@ -13,7 +13,6 @@ def GetDataAndPlot(df_FullData,UniqueIDS):
 
     MedACR_ToleranceTableCheckerV2.SetUpToleranceTable()
     Tolerance = MedACR_ToleranceTableCheckerV2.GetTolerance("SNR")
-    
 
     fig = px.scatter(filtered_df, x="date", y="SNR",color="ScannerUniqueID")
     if Tolerance != None:
