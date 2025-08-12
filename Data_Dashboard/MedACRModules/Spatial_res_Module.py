@@ -37,6 +37,7 @@ class SpatialResModule(MedACRModule):
         Seq = self.settings["Seq"]
         Text = ""
         if SpatialResMethod == ResOptions.DotMatrixMethod:
+            Text+="\tMethod: Dot Matrix\n"
             Text+=( '\t1.1mm Holes Score: %-12s%-12s\n' % (str(self.results["measurement"]["1.1mm holes"]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"]["1.1mm holes"],"Spatial Resolution 1.1mm") ))
             Text+=( '\t1.0mm Holes Score: %-12s%-12s\n' % (str(self.results["measurement"]["1.0mm holes"]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"]["1.0mm holes"],"Spatial Resolution 1.0mm") ))
             Text+=( '\t0.9mm Holes Score: %-12s%-12s\n' % (str(self.results["measurement"]["0.9mm holes"]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"]["0.9mm holes"],"Spatial Resolution 0.9mm") ))
@@ -44,10 +45,12 @@ class SpatialResModule(MedACRModule):
             
         elif SpatialResMethod == ResOptions.MTFMethod:
             #Run the MTF
+            Text+="\tMethod: MTF\n"
             Text+=( '\tRaw MTF50 :        %-12s%-12s\n' % (str(self.results["measurement"]["raw mtf50"]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"]["raw mtf50"],"Spatial Resolution MTF50 Raw") ))
             Text+=( '\tFitted MTF50:      %-12s%-12s' % (str(self.results["measurement"]["fitted mtf50"]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"]["fitted mtf50"],"Spatial Resolution MTF50 Fitted") ))
 
         elif SpatialResMethod == ResOptions.ContrastResponseMethod:
+            Text+="\tMethod: Contrast Response\n"
             Text+=( '\tHorizontal Contrast Response\n')
             Text+=( '\t\t1.1mm Contrast Response: %-12s%-12s\n' % (str(self.results["measurement"]["1.1mm holes Horizontal"])+"%",MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"]["1.1mm holes Horizontal"],"Contrast Response Resolution","1.1mm holes Horizontal")))
             Text+=( '\t\t1.0mm Contrast Response: %-12s%-12s\n' % (str(self.results["measurement"]["1.0mm holes Horizontal"])+"%",MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"]["1.0mm holes Horizontal"],"Contrast Response Resolution","1.0mm holes Horizontal")))
@@ -67,6 +70,7 @@ class SpatialResModule(MedACRModule):
 
         #Add in Manual Res Test
         if ManualResData != None:
+            Text+="\tMethod: Manual\n"
             for key in ManualResData:
                 Result = "Not Tested"
 
@@ -169,11 +173,8 @@ class SpatialResModule(MedACRModule):
                 plt.savefig(os.path.join(OutputPath,"ACRSpatialResolution",Seq+"_"+key+"_ManualRes.png"))
                 plt.close()
                 #plt.show()
-
                 Text+=( '\tManual '+key+' Resolution Hor: %-15s%-12s\n' % (str(ContrastResponse[0]) +"%",MedACR_ToleranceTableChecker.GetPassResult(ContrastResponse[0],"Manual Resolution",key +" Horizontal")))
                 Text+=( '\tManual '+key+' Resolution Vert: %-15s%-12s\n' % (str(ContrastResponse[1]) +"%",MedACR_ToleranceTableChecker.GetPassResult(ContrastResponse[1],"Manual Resolution",key +" Vertical")))
-
-
             Text = Text[:-1]
         return Text
 

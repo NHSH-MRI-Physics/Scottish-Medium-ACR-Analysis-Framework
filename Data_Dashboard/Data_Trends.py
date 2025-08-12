@@ -1,4 +1,10 @@
 import streamlit as st
+
+st.set_page_config(
+    page_title="Data Dashboard Home",
+    page_icon="📊"
+)
+
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -10,14 +16,14 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir)
 
-from MedACRModules.Empty_Module import EmptyModule
-from MedACRModules.SNR_Module import SNRModule
-from MedACRModules.Geo_Acc_Module import GeoAccModule
-from MedACRModules.Uniformity_Module import UniformityModule
-from MedACRModules.SlicePos_Module import SlicePosModule
-from MedACRModules.Ghosting_Module import GhostingModule
-from MedACRModules.SliceThickness_Module import SliceThicknessModule
-from MedACRModules.Spatial_res_Module import SpatialResModule
+#from MedACRModules.Empty_Module import EmptyModule
+#from MedACRModules.SNR_Module import SNRModule
+#from MedACRModules.Geo_Acc_Module import GeoAccModule
+#from MedACRModules.Uniformity_Module import UniformityModule
+#from MedACRModules.SlicePos_Module import SlicePosModule
+#from MedACRModules.Ghosting_Module import GhostingModule
+#from MedACRModules.SliceThickness_Module import SliceThicknessModule
+#from MedACRModules.Spatial_res_Module import SpatialResModule
 
 import matplotlib.pyplot as plt
 from datetime import datetime
@@ -25,10 +31,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import GetSNRData
 
-st.set_page_config(
-    page_title="Data Dashboard Home",
-    page_icon="📊"
-)
+
 
 st.title("Med ACR Data Dashboard")
 database_path = "Result_Database"
@@ -87,5 +90,8 @@ for i in range(len(manufacturers)):
 st.divider()
 st.subheader("SNR")
 fig = GetSNRData.GetDataAndPlot(df_FullData,UniqueIDS)
+
+st.divider()
+
 
 st.plotly_chart(fig)

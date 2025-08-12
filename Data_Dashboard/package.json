@@ -26,13 +26,15 @@
   "stlite": {
     "desktop": {
       "files": [
-        "DataDash.py",
+        "Data_Trends.py",
         "pages/*.py",
         ".streamlit/config.toml",
         "MedACRModules/*.py",
-        "Test.py"
+        "Test.py",
+        "MedACR_ToleranceTableCheckerV2.py",
+        "GetSNRData.py"
       ],
-      "entrypoint": "DataDash.py",
+      "entrypoint": "Data_Trends.py",
       "requirementsTxtFiles": [
         "requirements.txt"
       ]

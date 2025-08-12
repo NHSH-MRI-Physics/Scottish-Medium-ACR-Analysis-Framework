@@ -34,7 +34,7 @@ class GeoAccModule(MedACRModule):
         if (GeoMethod == GeometryOptions.ACRMETHOD):
             print("Slice 1 Hor Dist: "+str(self.results["measurement"][self.results["file"][0]]["Horizontal distance"]) + "   "+ " Vert Dist: "+str(self.results["measurement"][self.results["file"][0]]["Vertical distance"]))
             print("Slice 5 Hor Dist:"+str(self.results["measurement"][self.results["file"][1]]["Horizontal distance"]) + "   "+ " Vert Dist:"+str(self.results["measurement"][self.results["file"][1]]["Vertical distance"])+ "   "+ " Diag SW Dist:"+str(self.results["measurement"][self.results["file"][1]]["Diagonal distance SW"])+ "   "+ "Diag SE Dist:"+str(self.results["measurement"][self.results["file"][1]]["Diagonal distance SE"]))
-            Text=""
+            Text="\tMethod: ACR Method\n"
             Text+=("\tSlice 1:\n")
             Text+=( '\t\tHor Dist (mm):             %-12s%-12s\n' % (str(self.results["measurement"][self.results["file"][0]]["Horizontal distance"]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"][self.results["file"][0]]["Horizontal distance"],"Geometric Accuracy","ACRMethod") ))
             Text+=( '\t\tVert Dist (mm):            %-12s%-12s\n' % (str(self.results["measurement"][self.results["file"][0]]["Vertical distance"]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"][self.results["file"][0]]["Vertical distance"],"Geometric Accuracy","ACRMethod") ))
@@ -48,9 +48,9 @@ class GeoAccModule(MedACRModule):
         if (GeoMethod == GeometryOptions.MAGNETMETHOD):
             print("Horizontal CoV(%):        "+str(self.results["measurement"]["distortion"]["distortion values"]["horizontal CoV"]))
             print("Vertical CoV(%):          "+str(self.results["measurement"]["distortion"]["distortion values"]["vertical CoV"]))
-            Text=""
-            Text+=( '\t\tHorizontal CoV:     %-12s%-12s\n' % (str(self.results["measurement"]["distortion"]["distortion values"]["horizontal CoV"]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"]["distortion"]["distortion values"]["horizontal CoV"],"Geometric Accuracy")))
-            Text+=( '\t\tVertical CoV:       %-12s%-12s\n' % (str(self.results["measurement"]["distortion"]["distortion values"]["vertical CoV"]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"]["distortion"]["distortion values"]["vertical CoV"],"Geometric Accuracy")))
+            Text="\t\tMethod: MagNET Method\n"
+            Text+=( '\t\tHorizontal CoV (%%):     %-12s%-12s\n' % (str(self.results["measurement"]["distortion"]["distortion values"]["horizontal CoV"]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"]["distortion"]["distortion values"]["horizontal CoV"],"Geometric Accuracy")))
+            Text+=( '\t\tVertical CoV (%%):       %-12s%-12s\n' % (str(self.results["measurement"]["distortion"]["distortion values"]["vertical CoV"]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"]["distortion"]["distortion values"]["vertical CoV"],"Geometric Accuracy")))
             Text+=( '\t\tRow Bottom (mm):       %-12s%-12s\n' % (str(self.results["measurement"]["distortion"]["horizontal distances mm"][0]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"]["distortion"]["horizontal distances mm"][0],"Geometric Accuracy","MagNetMethod")))
             Text+=( '\t\tRow Middle (mm):    %-12s%-12s\n' % (str(self.results["measurement"]["distortion"]["horizontal distances mm"][1]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"]["distortion"]["horizontal distances mm"][1],"Geometric Accuracy","MagNetMethod")))
             Text+=( '\t\tRow Top (mm):    %-12s%-12s\n' % (str(self.results["measurement"]["distortion"]["horizontal distances mm"][2]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"]["distortion"]["horizontal distances mm"][2],"Geometric Accuracy","MagNetMethod")))
