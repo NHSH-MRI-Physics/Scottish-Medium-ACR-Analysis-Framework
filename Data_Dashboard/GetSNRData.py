@@ -9,9 +9,6 @@ def GetDataAndPlot(df_FullData,UniqueIDS):
     for idx, row in filtered_df.iterrows():
         data = row["Tests"]  
 
-        data["SNR"].Run()
-        print(data["SNR"].results)
-
         filtered_df.at[idx, "SNR"] = data["SNR"].results["measurement"]["snr by smoothing"]["measured"]
         filtered_df.at[idx, "ScannerUniqueID"] = filtered_df.at[idx, "ScannerUniqueID"].replace("_", " ") + " " + filtered_df.at[idx, "Sequence"]
 

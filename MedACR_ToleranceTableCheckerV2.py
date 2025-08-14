@@ -1,4 +1,4 @@
-from hazenlib.logger import logger
+#from hazenlib.logger import logger
 from xml.dom import minidom
 import sys
 from dataclasses import dataclass

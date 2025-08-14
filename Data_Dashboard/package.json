@@ -25,6 +25,10 @@
   },
   "stlite": {
     "desktop": {
+      "nodeJsWorker": true,
+      "nodefsMountpoints": {
+        "/files": "{{desktop}}" 
+      },
       "files": [
         "Data_Trends.py",
         "pages/*.py",
@@ -32,7 +36,9 @@
         "MedACRModules/*.py",
         "Test.py",
         "MedACR_ToleranceTableCheckerV2.py",
-        "GetSNRData.py"
+        "GetSNRData.py",
+        "hazenlib/*.py",
+        "hazenlib/tasks/*.py"
       ],
       "entrypoint": "Data_Trends.py",
       "requirementsTxtFiles": [

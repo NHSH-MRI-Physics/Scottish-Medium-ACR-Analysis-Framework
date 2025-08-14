@@ -32,9 +32,13 @@ import plotly.express as px
 import GetSNRData
 
 
-
 st.title("Med ACR Data Dashboard")
-database_path = "Result_Database"
+database_path = "/files/TestDBForDashBoard"#"Result_Database"
+
+
+if os.path.isdir(database_path) == False:
+    raise RuntimeError(database_path + " does not exist")
+
 DB_Files = glob.glob(os.path.join(database_path, "*.docx"))
 
 #Results = {}
