@@ -28,6 +28,7 @@ import webbrowser
 import DICOM_Holder
 import OptionsPane
 import Windows
+from threading import Thread
 
 if getattr(sys, 'frozen', False):
     import pyi_splash
@@ -38,6 +39,8 @@ if getattr(sys, 'frozen', False):
 UseLegacyLoading = False #incase it doenst work this lets me quickly roll it back
 Options_HolderDict = {}
 try:
+    #proc = subprocess.Popen(['DataDashboard_Plotly\ACR_Data_Dashboard.exe'], stderr=sys.stderr, stdout=sys.stdout)
+
     class TextRedirector(object):
         def __init__(self, widget, tag="stdout"):
             self.widget = widget
@@ -72,11 +75,18 @@ try:
     root.iconbitmap("_internal\ct-scan.ico")
 
     def Tidyup():
+        #import psutil
+        #PROCNAME = "ACR_Data_Dashboard.exe"
+        #for proc in psutil.process_iter():
+        #    if proc.name() == PROCNAME:
+        #        proc.kill()
+
         sys.stdout = None
         sys.stderr = None
         if VarHolder.NewWindow!= None:
             VarHolder.NewWindow.destroy()
         root.destroy()
+
     root.protocol("WM_DELETE_WINDOW", Tidyup)
 
     VarHolder=VariableHolder.VarHolder()
@@ -596,6 +606,7 @@ try:
 
     hazenlib.logger.ConfigureLoggerForGUI()
     MedACR_ToleranceTableChecker.SetUpToleranceTable()
+
 
     root.mainloop()
 except Exception as e:
