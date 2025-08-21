@@ -69,14 +69,52 @@ def display_click(clickData, selected_year):
     filtered_df = full_df[full_df['date'].dt.year == selected_year]
     if clickData is not None:
         date = clickData['points'][0]['customdata'][0]
-        TableData = filtered_df[filtered_df["date"] == pd.to_datetime(date)]
-        TableData["date"] = TableData["date"].dt.strftime("%Y-%m-%d %H:%M:%S")
+        DataForDate = filtered_df[filtered_df["date"] == pd.to_datetime(date)]
+
+
+        TableData = pd.DataFrame()
+        Date= []
+        #TestCount = []
+        Tests = []
+        Scanner = []
+        Times = []
+
+        print(DataForDate)
+
+        for i in range(DataForDate["TestCount"].values[0]):
+            Date.append(DataForDate["date"].values[0])
+            Scanner.append(DataForDate["Scanner"].values[0][i])
+            Tests.append(DataForDate["Tests"].values[0][i])
+
+            #TIME IS MISSING?
+            #TODO add time in DataForDate then display each dataframe row in the table1
+            #Times.append(DataForDate["date"].values[0].strftime("%H-%M-%S"))
+
+
+        TableData["date"] = Date
+        #TableData["TestCount"] = TestCount
+        TableData["Tests"] = Tests
+        TableData["Scanner"] = Scanner
+        
+        print(TableData)
+
+        sys.exit()
+        
+        Times = []
+        for idx, row in TableData.iterrows():
+            Times.append(row["date"].strftime("%H-%M-%S"))
+        TableData["time"] = Times
+        
+        TableData["date"] = TableData["date"].dt.strftime("%Y-%m-%d")
+
     else:
         TableData = filtered_df.iloc[0:0]  # Empty table
     return dash_table.DataTable(
         id='datatable-interactivity',
         columns=[
-            {"name": "date", "id": "date", "deletable": False, "selectable": True}
+            {"name": "date", "id": "date", "deletable": False, "selectable": True},
+            {"name": "time", "id": "time", "deletable": False, "selectable": True},
+            {"name": "Scanner", "id": "Scanner", "deletable": False, "selectable": True}
         ],
         data=TableData.to_dict('records'),
         editable=False,
