@@ -9,7 +9,8 @@ import GetData
 dash.register_page(__name__,name='Test Explorer')
 
 #Make some dummy date
-full_df = GetData.GetDummyData()    
+#full_df = GetData.GetDummyData()    
+full_df = GetData.loadDatabase("/Users/john/Desktop/TestDBForDashBoard")
 Tabledf = full_df.iloc[0:0]
 
 #Get years in the date
@@ -31,7 +32,6 @@ fig = calplot(
     years_title=True,
     dark_theme=True
 )
-
 
 layout = html.Div([
     html.H1('Test Explorer'),
@@ -70,56 +70,56 @@ def display_click(clickData, selected_year):
     if clickData is not None:
         date = clickData['points'][0]['customdata'][0]
         DataForDate = filtered_df[filtered_df["date"] == pd.to_datetime(date)]
-
-
         TableData = pd.DataFrame()
         Date= []
-        #TestCount = []
         Tests = []
-        Scanner = []
+        ScannerModel = []
+        ScannerSerialNumber = []
+        InstitutionName = []
+        ScannerSerialNumber=[]
+        ScannerManufacuter=[]
         Times = []
-
-        print(DataForDate)
+        Sequence = []
 
         for i in range(DataForDate["TestCount"].values[0]):
             Date.append(DataForDate["date"].values[0])
-            Scanner.append(DataForDate["Scanner"].values[0][i])
+            ScannerModel.append(DataForDate["ScannerModel"].values[0][i])
             Tests.append(DataForDate["Tests"].values[0][i])
+            Times.append(DataForDate["Time"].values[0][i])
+            ScannerSerialNumber.append(DataForDate["ScannerSerialNumber"].values[0][i])
+            InstitutionName.append(DataForDate["InstitutionName"].values[0][i])
+            ScannerManufacuter.append(DataForDate["ScannerManufacuter"].values[0][i])
+            Sequence.append(DataForDate["Sequence"].values[0][i])
 
-            #TIME IS MISSING?
-            #TODO add time in DataForDate then display each dataframe row in the table1
-            #Times.append(DataForDate["date"].values[0].strftime("%H-%M-%S"))
-
-
-        TableData["date"] = Date
-        #TableData["TestCount"] = TestCount
-        TableData["Tests"] = Tests
-        TableData["Scanner"] = Scanner
-        
-        print(TableData)
-
-        sys.exit()
-        
-        Times = []
-        for idx, row in TableData.iterrows():
-            Times.append(row["date"].strftime("%H-%M-%S"))
-        TableData["time"] = Times
-        
-        TableData["date"] = TableData["date"].dt.strftime("%Y-%m-%d")
+        if DataForDate["TestCount"].values[0] >0:
+            TableData["Date"] = Date
+            TableData["ScannerModel"] = ScannerModel
+            TableData["InstitutionName"] = InstitutionName
+            TableData["ScannerManufacuter"] = ScannerManufacuter
+            TableData["ScannerSerialNumber"] = ScannerSerialNumber
+            TableData["Sequence"] = Sequence
+            TableData["Time"] = Times
+            TableData["Date"] = TableData["Date"].dt.strftime("%Y-%m-%d")
+        else:
+            TableData = filtered_df.iloc[0:0] 
 
     else:
         TableData = filtered_df.iloc[0:0]  # Empty table
     return dash_table.DataTable(
         id='datatable-interactivity',
         columns=[
-            {"name": "date", "id": "date", "deletable": False, "selectable": True},
-            {"name": "time", "id": "time", "deletable": False, "selectable": True},
-            {"name": "Scanner", "id": "Scanner", "deletable": False, "selectable": True}
+            {"name": "Date", "id": "Date", "deletable": False, "selectable": True},
+            {"name": "Time", "id": "Time", "deletable": False, "selectable": True},
+            {"name": "Sequence", "id": "Sequence", "deletable": False, "selectable": True},
+            {"name": "Scanner Manufacuter", "id": "ScannerManufacuter", "deletable": False, "selectable": True},
+            {"name": "Scanner Model", "id": "ScannerModel", "deletable": False, "selectable": True},
+            {"name": "Institution Name", "id": "InstitutionName", "deletable": False, "selectable": True},
+            {"name": "Scanner Serial Number", "id": "ScannerSerialNumber", "deletable": False, "selectable": True}
         ],
         data=TableData.to_dict('records'),
         editable=False,
-        sort_action="native",
-        sort_mode="multi",
+        #sort_action="native",
+        #sort_mode="multi",
         row_selectable="single",
         row_deletable=False,
         selected_columns=[],
@@ -130,13 +130,15 @@ def display_click(clickData, selected_year):
         style_header={
             'backgroundColor': '#222',
             'color': 'white',
-            'fontWeight': 'bold'
+            'fontWeight': 'bold',
+            'textAlign': 'center'
         },
         style_cell={
             'backgroundColor': '#333',
             'color': 'white',
             'border': '1px solid #444',
-            'minWidth': '100px'
+            'minWidth': '100px',
+            'textAlign': 'center'
         },
         style_data={
             'backgroundColor': '#333',
