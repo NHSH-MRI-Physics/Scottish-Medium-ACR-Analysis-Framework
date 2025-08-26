@@ -14,15 +14,15 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 def creation_date(path_to_file):
     if platform.system() == 'Windows':
-       return os.path.getctime(path_to_file)
+       return datetime.fromtimestamp(os.path.getctime(path_to_file))
     else:
        stat = os.stat(path_to_file)
        try:
           # return stat.st_birthtime
-          return datetime.fromtimestamp(stat.st_birthtime, tz=timezone.utc)
+          return datetime.fromtimestamp(stat.st_birthtime)
        except AttributeError:           
           # return stat.st_mtime
-          return datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc)
+          return datetime.fromtimestamp(stat.st_mtime)
 
 def GetDummyData():
     dummy_start_date = "2019-01-01"
@@ -128,8 +128,8 @@ def loadDatabase(path):
             Sequence.append([])
             ProcessTimeDate.append([])
 
-    full_df["date"] = Dates
-    full_df["date"] = pd.to_datetime(full_df["date"])
+    full_df["Date"] = Dates
+    full_df["Date"] = pd.to_datetime(full_df["Date"])
     full_df["TestCount"] = TestCount
     full_df["Tests"] = Tests
     full_df["ScannerManufacuter"] = ScannerManufacuter
