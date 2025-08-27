@@ -1,5 +1,5 @@
 import dash
-from dash import Dash, dcc, html, Input, Output, callback
+from dash import Dash, dcc, html, Input, Output, callback, ctx
 from plotly_calplot import calplot
 import pandas as pd
 import numpy as np
@@ -10,11 +10,18 @@ import datetime
 import plotly.graph_objects as go
 import plotly.express as px
 from skimage.transform import resize
+import platform
 dash.register_page(__name__,name='Test Explorer')
 
 #Make some dummy date
 #full_df = GetData.GetDummyData()    
-full_df = GetData.loadDatabase("TestDBForDashBoard")
+
+if platform.system() == 'Windows':
+    path = "TestDBForDashBoard"
+else:
+    path = "/Users/john/Desktop/TestDBForDashBoard"
+
+full_df = GetData.loadDatabase(path)
 Tabledf = full_df.iloc[0:0]
 
 #Get years in the date
@@ -38,6 +45,7 @@ fig = calplot(
 )
 
 layout = html.Div([
+    dcc.Store(id='Image-Data'),
     html.H1('Test Explorer'),
     html.Div('Choose a year.'),
     Dropdown,
@@ -244,8 +252,8 @@ def update_output(derived_virtual_data, derived_virtual_selected_rows):
         fig = GetDICOMFigure(DCMImages,0)
 
         DICOMView = html.Div([
-                            dcc.Graph(id="plot",figure=fig,responsive=False),
-                            html.Div([html.Button("<-"),html.Button("->")],style={'display': 'flex', 'justifyContent': 'center'})
+                            dcc.Graph(id="DCMDisplayImage",figure=fig,responsive=False,style={'display': 'flex', 'justifyContent': 'center'}),
+                            html.Div([html.Button("<-",id="PrevImage",style={'width':'30%'}),html.Button("->",id="NextImage",style={'width':'30%'})],style={'display': 'flex', 'justifyContent': 'center'})
                             ])
             
         HTMLComponents = html.Table(
@@ -259,17 +267,27 @@ def update_output(derived_virtual_data, derived_virtual_selected_rows):
                    'width':'60%'},
             )
 
-        #TODO Justify the image centreally
-        #TODO figure out how to make the div or table smaller in the height direction
-
         return HTMLComponents
                                 
+
+# Callback to update the graph
+@callback(
+    Output('DCMDisplayImage', 'figure'),
+    Input('NextImage', 'n_clicks'),
+    Input('PrevImage', 'n_clicks')
+)
+def Update_Pl(n_clicks):
+    # Change color or x-axis randomly just for demo
+    #fig.update_layout(title=f"Update #{n_clicks}")
+    print(ctx.triggered_id)
+    return fig
 
 def GetDICOMFigure(DCMImages,Index):
         fig = px.imshow(DCMImages[Index],color_continuous_scale = 'gray')
         fig.update_layout({
         "plot_bgcolor": "rgba(0, 0, 0, 0)",
         "paper_bgcolor": "rgba(0, 0, 0, 0)",
+        'margin': dict(l=0, r=0, t=0, b=0)
         })
         fig.update_layout(coloraxis_showscale=False)
         fig.update_xaxes(showticklabels=False, showgrid=False, zeroline=False)
