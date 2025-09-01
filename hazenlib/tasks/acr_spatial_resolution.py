@@ -644,13 +644,18 @@ class ACRSpatialResolution(HazenTask):
         #This line gets rid of anything touching the border edge, super handy!
         Binary_Crop=skimage.segmentation.clear_border(Binary_Crop)
         #Close any gaps within the footprint
-        Binary_Crop=skimage.morphology.binary_closing(Binary_Crop,skimage.morphology.square(3))
+        #Got rid of the below, it caused problems in one of our datasets and seem to change nothing in the test set
+        #Binary_Crop=skimage.morphology.binary_closing(Binary_Crop,skimage.morphology.square(3))
         label_image = skimage.morphology.label(Binary_Crop)
 
         ResSquares=[]
         Xpos=[]
         CropsBB = []
         ROIS=[]
+
+        plt.imshow(label_image)
+        plt.savefig("test.png", dpi=300)
+        plt.close("all")
 
         regions = skimage.measure.regionprops(label_image)
         for region in regions[:]:
