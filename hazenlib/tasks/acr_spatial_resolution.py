@@ -638,60 +638,65 @@ class ACRSpatialResolution(HazenTask):
         #plt.imshow(Crop)
         #plt.savefig("test.png", dpi=300)
         #plt.close("all")
+        Thesholds = [0.1,0.15,0.2]
+        
+        for thresh in Thesholds:
+            Binary_Crop = Crop > np.max(Crop)*thresh
 
-        Binary_Crop = Crop > np.max(Crop)*0.1
+            #This line gets rid of anything touching the border edge, super handy!
+            Binary_Crop=skimage.segmentation.clear_border(Binary_Crop)
+            #Close any gaps within the footprint
+            #Got rid of the below, it caused problems in one of our datasets and seem to change nothing in the test set
+            #Binary_Crop=skimage.morphology.binary_closing(Binary_Crop,skimage.morphology.square(3))
+            label_image = skimage.morphology.label(Binary_Crop)
 
-        #This line gets rid of anything touching the border edge, super handy!
-        Binary_Crop=skimage.segmentation.clear_border(Binary_Crop)
-        #Close any gaps within the footprint
-        #Got rid of the below, it caused problems in one of our datasets and seem to change nothing in the test set
-        #Binary_Crop=skimage.morphology.binary_closing(Binary_Crop,skimage.morphology.square(3))
-        label_image = skimage.morphology.label(Binary_Crop)
+            ResSquares=[]
+            Xpos=[]
+            CropsBB = []
+            ROIS=[]
 
-        ResSquares=[]
-        Xpos=[]
-        CropsBB = []
-        ROIS=[]
+            #plt.imshow(label_image)
+            #plt.savefig("test.png", dpi=300)
+            #plt.close("all")
 
-        plt.imshow(label_image)
-        plt.savefig("test.png", dpi=300)
-        plt.close("all")
+            regions = skimage.measure.regionprops(label_image)
+            for region in regions[:]:
+                if region.area >= 40:
+                    minr, minc, maxr, maxc = region.bbox
+                    #maxr+=1
+                    #maxc+=1
+                    #minc-=1
+                    bx = (minc, maxc, maxc, minc, minc)
+                    by = (minr, minr, maxr, maxr, minr)
+                    #[0.976599991322, 0.976599991322]
+                    plt.plot(bx, by, linewidth=0.5)
+                    plt.plot([region.centroid[1]],[region.centroid[0]], marker="x",linestyle="")
 
-        regions = skimage.measure.regionprops(label_image)
-        for region in regions[:]:
-            if region.area >= 40:
-                minr, minc, maxr, maxc = region.bbox
-                #maxr+=1
-                #maxc+=1
-                #minc-=1
-                bx = (minc, maxc, maxc, minc, minc)
-                by = (minr, minr, maxr, maxr, minr)
-                #[0.976599991322, 0.976599991322]
-                plt.plot(bx, by, linewidth=0.5)
-                plt.plot([region.centroid[1]],[region.centroid[0]], marker="x",linestyle="")
-
-                ROI = Crop[minr:maxr,minc:maxc]
-                ResSquares.append(ROI)
-                Xpos.append(region.centroid[1])
-                CropsBB.append([minr+leftCorner[1]-ROISize[1], maxr+leftCorner[1]-ROISize[1], minc+leftCorner[0], maxc+leftCorner[0]])
-                ROIS.append(ROI)           
+                    ROI = Crop[minr:maxr,minc:maxc]
+                    ResSquares.append(ROI)
+                    Xpos.append(region.centroid[1])
+                    CropsBB.append([minr+leftCorner[1]-ROISize[1], maxr+leftCorner[1]-ROISize[1], minc+leftCorner[0], maxc+leftCorner[0]])
+                    ROIS.append(ROI)           
 
 
-        #take the 4 most right objects, ignoring anything after that. If the blocks on the left get seperated then this can cause issues which is solved by this appraoch.
-        OrderedXpos = sorted(Xpos, reverse=True)
-        OrderedXIdx= []
-        for x in OrderedXpos:
-            OrderedXIdx.append(Xpos.index(x))
-        IndexsToRemove = OrderedXIdx[4:]
+            #take the 4 most right objects, ignoring anything after that. If the blocks on the left get seperated then this can cause issues which is solved by this appraoch.
+            OrderedXpos = sorted(Xpos, reverse=True)
+            OrderedXIdx= []
+            for x in OrderedXpos:
+                OrderedXIdx.append(Xpos.index(x))
+            IndexsToRemove = OrderedXIdx[4:]
 
-        for idx in IndexsToRemove:
-            ResSquares[idx]=None
-            CropsBB[idx]=None
-            ROIS[idx]=None
+            for idx in IndexsToRemove:
+                ResSquares[idx]=None
+                CropsBB[idx]=None
+                ROIS[idx]=None
 
-        ResSquares=[x for x in ResSquares if x is not None]
-        CropsBB=[x for x in CropsBB if x is not None]
-        ROIS=[x for x in ROIS if x is not None]
+            ResSquares=[x for x in ResSquares if x is not None]
+            CropsBB=[x for x in CropsBB if x is not None]
+            ROIS=[x for x in ROIS if x is not None]
+
+            if (len(ROIS)==4):
+                return ResSquares,CropsBB,ROIS
         
         if (len(ROIS)!=4):
             raise Exception("Error: The number of found resolution square does not equal exactly 4.")
