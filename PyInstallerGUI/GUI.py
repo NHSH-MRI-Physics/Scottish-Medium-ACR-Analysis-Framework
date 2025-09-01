@@ -39,6 +39,7 @@ if getattr(sys, 'frozen', False):
 UseLegacyLoading = False #incase it doenst work this lets me quickly roll it back
 Options_HolderDict = {}
 try:
+    #This is used with the plotly dash which has currently been shelved, 
     #proc = subprocess.Popen(['DataDashboard_Plotly\ACR_Data_Dashboard.exe'], stderr=sys.stderr, stdout=sys.stdout)
 
     class TextRedirector(object):
@@ -75,6 +76,7 @@ try:
     root.iconbitmap("_internal\ct-scan.ico")
 
     def Tidyup():
+        #This is to kill the datadash if we ever go back to it 
         #import psutil
         #PROCNAME = "ACR_Data_Dashboard.exe"
         #for proc in psutil.process_iter():
