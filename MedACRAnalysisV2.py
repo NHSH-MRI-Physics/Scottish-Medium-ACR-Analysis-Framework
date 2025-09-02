@@ -168,11 +168,12 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
     ScannerInfo["Institution Name"] = data.InstitutionName
     ScannerInfo["Model Name"] = data.ManufacturerModelName
     ScannerInfo["Serial Number"] = data.DeviceSerialNumber
-
+    
     DumpData = {}
     DumpData["Test"] = TestsToRun
     DumpData["ScannerDetails"] = ScannerInfo
-    DumpData["date"] = TimeRan
+    DumpData["date_scanned"] = TimeRan
+    DumpData["data_analysed"] = datetime.datetime.now()
     DumpData["Sequence"] = Seq
     DumpData["DICOM"] = []
     for DicomData in Data:

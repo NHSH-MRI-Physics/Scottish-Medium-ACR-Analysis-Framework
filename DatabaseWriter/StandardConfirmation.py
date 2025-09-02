@@ -74,7 +74,7 @@ def CheckAgainstStandard(BinaryFile):
         DICOM_Param_Obj.SequenceType = SequenceType
         DICOM_Param_Obj.SliceGap = SliceGap
         if (dcm.Manufacturer) == "GE MEDICAL SYSTEMS":
-            DICOM_Param_Obj.SliceGap = round(SliceGap + SliceThickness,3)
+            DICOM_Param_Obj.SliceGap = round(SliceGap - SliceThickness,3)
         if PhaseEncodingDir == 'ROW':
             DICOM_Param_Obj.MatrixFreq = Matrix[1]
             DICOM_Param_Obj.MatrixPhase = Matrix[2]
