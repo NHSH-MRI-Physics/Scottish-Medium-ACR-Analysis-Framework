@@ -37,7 +37,7 @@ Derived from the [Hazen MRI QA framework](https://github.com/GSTT-CSC/hazen) pro
 
 
 ## Scanning Protocol
-Scan the ACR Phantom as laid our in the [ACR Large and medium guidance document](https://accreditationsupport.acr.org/helpdesk/attachments/11093487417). It is possible to scan in other orientations than axial but the phantom must be rotated correctly (see below). It is also possible to use other coils than the head but this has not been fully tested. 
+Scan the ACR Phantom as laid out in the [ACR Large and medium guidance document](https://accreditationsupport.acr.org/helpdesk/attachments/11093487417). It is possible to scan in other orientations than axial but the phantom must be rotated correctly (see below). It is also possible to use other coils than the head but this has not been fully tested. 
 
 ## Expected Data Format
 It is expected to be a directory containing DICOM files, where each file coresponds to one slice, it is possible to have several sequeunces contained within the folder. Data should be collected as laid out in the [ACR Large and medium guidance document](https://www.acraccreditation.org/-/media/ACRAccreditation/Documents/MRI/ACR-Large--Med-Phantom-Guidance-102022.pdf). If it is desired to test sagittal and coronal axis, this is possible by rotating the phantom appropriately. It is important that the phantom or field of view is rotated such that circular component as at the top of the image and the resolution block is located at the bottom regardless if you are imaging axial, sagittal or coronal.  See the Image below for an example. 
