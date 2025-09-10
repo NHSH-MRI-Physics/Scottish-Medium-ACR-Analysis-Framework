@@ -6,10 +6,13 @@ from tkinter import messagebox
 import pickle
 import sys
 import os
+import gspread
+
 sys.path.append(".")
 root = TkinterDnD.Tk()
 root.title("Database Checker and Adder")
 root.geometry("800x400")  # Width x Height
+resultDict = None
 # Label placed at the top-left corner
 label = tk.Label(
     root,
@@ -48,7 +51,20 @@ FileDropped = tk.Label(
 FileDropped.grid(padx=10, pady=10,row=1, column=1)
 
 def Update_Spreadsheet():
-    print("dawdwdwa")
+    try:
+        gc = gspread.service_account(filename="DatabaseWriter/qaproject-441416-f5fec0c61099.json")
+        sh = gc.open_by_url("https://docs.google.com/spreadsheets/d/1pbH3O7yJwCc05Ktlb643T3rXZsN-EqXcTJfmnz37FU0/edit?gid=0#gid=0")
+        values_list = sh.worksheet("Data").col_values(1)
+        LastRow = len(values_list)+1
+        #sh.worksheet("Data").update( [[1,2,3,4]],"A"+str(LastRow))
+
+        FileDropped.config(text="No File Dropped")
+        StandardLabel.config(bg="lightgray",text="No File Dropped")
+        messagebox.showinfo(title="Success",message="Spreadsheet updated!")
+
+    except Exception as e:
+        messagebox.showerror("Exception raised",message = str(repr(e)))
+
 
 UpdateSpread = tk.Button(root, text="Update Spreadsheet", command=Update_Spreadsheet)
 UpdateSpread.grid(padx=10, pady=10,row=2, column=1)
@@ -76,7 +92,6 @@ def drop(event):
         with open(files[0], 'rb') as f:
             data = pickle.load(f)
             result,resultDict = StandardConfirmation.CheckAgainstStandard(data)
-            print(resultDict)
             if result == True:
                 StandardLabel.config(bg="green",text="File meets the standard: \N{Check Mark}")
                 UpdateSpread.config(state="normal")
