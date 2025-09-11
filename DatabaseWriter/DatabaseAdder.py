@@ -6,13 +6,19 @@ from tkinter import messagebox
 import pickle
 import sys
 import os
-import gspread
-
 sys.path.append(".")
+import os
+import gspread
+from MedACROptions import *
+sys.path.append("PyInstallerGUI")
+
 root = TkinterDnD.Tk()
 root.title("Database Checker and Adder")
 root.geometry("800x400")  # Width x Height
 resultDict = None
+
+data = None
+
 # Label placed at the top-left corner
 label = tk.Label(
     root,
@@ -51,19 +57,83 @@ FileDropped = tk.Label(
 FileDropped.grid(padx=10, pady=10,row=1, column=1)
 
 def Update_Spreadsheet():
+    global data
     try:
         gc = gspread.service_account(filename="DatabaseWriter/qaproject-441416-f5fec0c61099.json")
         sh = gc.open_by_url("https://docs.google.com/spreadsheets/d/1pbH3O7yJwCc05Ktlb643T3rXZsN-EqXcTJfmnz37FU0/edit?gid=0#gid=0")
         values_list = sh.worksheet("Data").col_values(1)
+        all_rows = sh.worksheet("Data").get_all_values()
         LastRow = len(values_list)+1
-        #sh.worksheet("Data").update( [[1,2,3,4]],"A"+str(LastRow))
 
-        FileDropped.config(text="No File Dropped")
-        StandardLabel.config(bg="lightgray",text="No File Dropped")
+        Row = []
+        Row.append(data["date_scanned"].strftime("%d-%m-%Y %H:%M:%S"))
+        Row.append(data["data_analysed"].strftime("%d-%m-%Y %H:%M:%S"))
+        Row.append(data["ScannerDetails"]["Manufacturer"])
+        Row.append(data["ScannerDetails"]["Institution Name"])
+        Row.append(data["ScannerDetails"]["Model Name"])
+        Row.append(data["ScannerDetails"]["Serial Number"])
+        Row.append(data["Sequence"])
+        Row.append(data["DICOM"][0].MagneticFieldStrength)
+
+        #SNR
+        Row.append(data["Test"]["SNR"].results["measurement"]["snr by smoothing"]["measured"])
+        Row.append(data["Test"]["SNR"].results["measurement"]["snr by smoothing"]["normalised"])
+
+        #GeoDist
+        ExpectedSize = (data["ToleranceTable"]["Geometric Accuracy"]["MagNetMethod"].max + data["ToleranceTable"]["Geometric Accuracy"]["MagNetMethod"].min)/2.0
+        if ExpectedSize != 85.0 or ExpectedSize != 80.0:
+            ValueError("Warning", "The expected size for Geometric Distortion is not the standard 85mm or 80mm. Please check your tolerance table.")
+
+        Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["horizontal distances mm"][0]-ExpectedSize)
+        Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["horizontal distances mm"][1]-ExpectedSize)
+        Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["horizontal distances mm"][2]-ExpectedSize)
+        Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["vertical distances mm"][0]-ExpectedSize)
+        Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["vertical distances mm"][1]-ExpectedSize)
+        Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["vertical distances mm"][2]-ExpectedSize)
+
+        #Uniformity
+        Row.append(data["Test"]["Uniformity"].results["measurement"]["integral uniformity %"])
+
+        #Ghosting
+        Row.append(data["Test"]["Ghosting"].results["measurement"]["signal ghosting %"])
+
+        #Slice Pos
+        Row.append(data["Test"]["SlicePos"].results['measurement'][data["Test"]["SlicePos"].results['file'][0]]['length difference'])
+        Row.append(data["Test"]["SlicePos"].results['measurement'][data["Test"]["SlicePos"].results['file'][1]]['length difference'])
+        
+        #Slice Thickness
+        Row.append(data["Test"]["SliceThickness"].results["measurement"]["slice width mm"])
+
+        #Spatial Res
+        Row.append(str(data["Test"]["SpatialRes"].settings["SpatialResMethod"]))
+        Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["1.1mm holes Horizontal"]))
+        Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["1.0mm holes Horizontal"]))
+        Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["0.9mm holes Horizontal"]))
+        Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["0.8mm holes Horizontal"]))
+        Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["1.1mm holes Vertical"]))
+        Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["1.0mm holes Vertical"]))
+        Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["0.9mm holes Vertical"]))
+        Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["0.8mm holes Vertical"]))
+
+        for entry in Row:
+            
+            if type(entry) != str:
+                Row[Row.index(entry)] = str(round(entry,2))
+
+        for row in all_rows:
+            print(type(row[0]))
+            if row == Row:
+                raise ValueError("This entry already exists in the database!")
+        sh.worksheet("Data").update( [Row],"A"+str(LastRow))
         messagebox.showinfo(title="Success",message="Spreadsheet updated!")
 
     except Exception as e:
         messagebox.showerror("Exception raised",message = str(repr(e)))
+
+    FileDropped.config(text="No File Dropped")
+    StandardLabel.config(bg="lightgray",text="No File Dropped")
+    for item in tree.get_children():
+        tree.delete(item)
 
 
 UpdateSpread = tk.Button(root, text="Update Spreadsheet", command=Update_Spreadsheet)
@@ -86,6 +156,7 @@ tree.column("Match?", width=80)
 tree.grid(padx=10, pady=10,row=1, column=0,sticky="sw",rowspan=2)
 
 def drop(event):
+    global data
     files = root.tk.splitlist(event.data)
     UpdateSpread.config(state="disabled")
     if len(files) == 1:

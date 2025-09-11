@@ -1,3 +1,8 @@
+import sys
+sys.path.append(".")
+from MedACROptions import *
+import PyInstallerGUI.VariableHolder
+
 class DICOMParamaters:
     def __init__(self):
         self.MatrixFreq = None
@@ -11,6 +16,9 @@ class DICOMParamaters:
         self.SequenceType = None
         self.SliceGap = None
         self.Slices = None
+        self.GeoDistMethod = None
+        self.UniformityMethod = None
+        self.SpaitalResMethod = None
 
 
     def CompareParamaters(self,DICOM):
@@ -37,6 +45,9 @@ StandardParamT1.Averages = 1
 StandardParamT1.SequenceType = "SE"
 StandardParamT1.PixelSpacingCol = 0.977
 StandardParamT1.PixelSpacingRow = 0.977
+StandardParamT1.GeoDistMethod = "ACRGeometricAccuracyMagNetMethod"
+StandardParamT1.UniformityMethod = UniformityOptions.ACRMETHOD
+StandardParamT1.SpaitalResMethod = "ContrastResponse"
 
 StandardParamT2 = DICOMParamaters()
 StandardParamT2.MatrixFreq = 256
@@ -50,6 +61,8 @@ StandardParamT2.Averages = 1
 StandardParamT2.SequenceType = "SE"
 StandardParamT2.PixelSpacingCol = 0.977
 StandardParamT2.PixelSpacingRow = 0.977
+StandardParamT2.GeoDistMethod = "ACRGeometricAccuracyMagNetMethod"
+StandardParamT2.SpaitalResMethod = "ContrastResponse"
 
 def CheckAgainstStandard(BinaryFile):
     Slices = len(BinaryFile["DICOM"])
@@ -73,6 +86,7 @@ def CheckAgainstStandard(BinaryFile):
         DICOM_Param_Obj.Averages = Averages
         DICOM_Param_Obj.SequenceType = SequenceType
         DICOM_Param_Obj.SliceGap = SliceGap
+        DICOM_Param_Obj.UniformityMethod = BinaryFile["Test"]["Uniformity"].settings["UniformityMethod"]
         if (dcm.Manufacturer) == "GE MEDICAL SYSTEMS":
             DICOM_Param_Obj.SliceGap = round(SliceGap - SliceThickness,3)
         if PhaseEncodingDir == 'ROW':
@@ -82,6 +96,11 @@ def CheckAgainstStandard(BinaryFile):
             DICOM_Param_Obj.MatrixFreq = Matrix[0]
             DICOM_Param_Obj.MatrixPhase = Matrix[3]
         DICOM_Param_Obj.Slices = Slices
+        DICOM_Param_Obj.GeoDistMethod = BinaryFile["Test"]["GeoDist"].results["task"]
+        DICOM_Param_Obj.SpaitalResMethod = BinaryFile["Test"]["SpatialRes"].settings["SpatialResMethod"]
+        if DICOM_Param_Obj.SpaitalResMethod == ResOptions.Manual or DICOM_Param_Obj.SpaitalResMethod == ResOptions.ContrastResponseMethod:
+            DICOM_Param_Obj.SpaitalResMethod = "ContrastResponse"
+
         ComparisonStatus,Data = StandardParamT1.CompareParamaters(DICOM_Param_Obj)
         if ComparisonStatus == False:
             return False,Data

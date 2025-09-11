@@ -70,6 +70,9 @@ class SpatialResModule(MedACRModule):
 
         #Add in Manual Res Test
         if ManualResData != None:
+            self.results = {}
+            self.results["measurement"] = {}
+
             Text+="\tMethod: Manual\n"
             for key in ManualResData:
                 Result = "Not Tested"
@@ -108,8 +111,6 @@ class SpatialResModule(MedACRModule):
                         ax1.plot(pointsX, pointsY,marker="",ls='-',color="blue",markersize=10)
                     else:
                         ax1.plot(pointsX, pointsY,marker="",ls='-',color="red",markersize=10)
-
-
 
                     #Do Peaks
                     zPeaks = scipy.ndimage.map_coordinates(ManualResData[key].Image, np.vstack((ypointsPeaks,xpointsPeaks)),order=1, mode = "nearest",output=np.float32)
@@ -175,6 +176,8 @@ class SpatialResModule(MedACRModule):
                 #plt.show()
                 Text+=( '\tManual '+key+' Resolution Hor: %-15s%-12s\n' % (str(ContrastResponse[0]) +"%",MedACR_ToleranceTableChecker.GetPassResult(ContrastResponse[0],"Manual Resolution",key +" Horizontal")))
                 Text+=( '\tManual '+key+' Resolution Vert: %-15s%-12s\n' % (str(ContrastResponse[1]) +"%",MedACR_ToleranceTableChecker.GetPassResult(ContrastResponse[1],"Manual Resolution",key +" Vertical")))
+                self.results["measurement"][key + " Horizontal"] = ContrastResponse[0]
+                self.results["measurement"][key + " Vertical"] = ContrastResponse[1]
             Text = Text[:-1]
         return Text
 
