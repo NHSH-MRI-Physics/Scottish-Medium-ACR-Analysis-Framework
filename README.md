@@ -100,7 +100,7 @@ The tolerance table is used to quickly identify if a test is within tolerance. T
 To confirm the scripts, match expected results a testing protocol was developed. The goal of this was test each module and confirm it meets manual measurements is within a given tolerance. This testing protocol can be found [here](https://github.com/NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework/blob/main/MedACRTestingSetAndResults/Hazen%20Test%20Plan.docx) and the results found [here](https://github.com/NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework/blob/main/MedACRTestingSetAndResults/ACR%20Test%20Document%20%20V1.xlsx). Be sure to click Download Raw File to get the file without downloading the whole repo.
 
 ## Bug Reports and Feature Requests
-Please make any bug reports or feature requests by logging an issue [here](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/issues) or send an email to the developers below. 
+Please make any bug reports or feature requests by logging an issue [here](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/issues) or send an email to the developers below. The GUI also includes a "Bug Reporting and Feature requesting" button which will take you to a ms form where bugs and features can be requested. Please note this is only available to NHS Scotland employees. 
 
 ## Developers
 John Tracey NHS Highland (John.tracey@nhs.scot)  <br />
