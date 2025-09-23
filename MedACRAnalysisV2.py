@@ -32,6 +32,7 @@ from MedACRModules.SliceThickness_Module import SliceThicknessModule
 from MedACRModules.Spatial_res_Module import SpatialResModule
 import datetime
 import DICOM_Holder
+import MedACR_ToleranceTableCheckerV2
 #from hazenlib.tasks.acr_spatial_resolution import ResOptions
 
 #This is the upgraded version of this file which will be written in a far more modular and maintanable way.
@@ -168,6 +169,7 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
     ScannerInfo["Institution Name"] = data.InstitutionName
     ScannerInfo["Model Name"] = data.ManufacturerModelName
     ScannerInfo["Serial Number"] = data.DeviceSerialNumber
+
     
     DumpData = {}
     DumpData["Test"] = TestsToRun
@@ -176,6 +178,9 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
     DumpData["data_analysed"] = datetime.datetime.now()
     DumpData["Sequence"] = Seq
     DumpData["DICOM"] = []
+    DumpData["Settings"] = settings
+    DumpData["ParamaterOverides"] = ParamaterOverides   
+    DumpData["ToleranceTable"] = MedACR_ToleranceTableChecker.ToleranceTable
     for DicomData in Data:
         DumpData["DICOM"].append(pydicom.dcmread(DicomData))
 
