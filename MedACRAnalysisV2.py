@@ -184,10 +184,10 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
     for DicomData in Data:
         DumpData["DICOM"].append(pydicom.dcmread(DicomData))
 
-    if os.path.exists("Result_Database")==False:
-        os.mkdir("Result_Database")
+    if os.path.exists("Data_Dumps")==False:
+        os.mkdir("Data_Dumps")
     
-    filename = os.path.join("Result_Database","Results_" + Seq +"_" + str(datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S"))+".docx")
+    filename = os.path.join("Data_Dumps","Results_" + Seq +"_" + str(datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S"))+".docx")
     with open(filename, 'wb') as f:  # open a text file
         pickle.dump(DumpData, f) # serialize the list
         

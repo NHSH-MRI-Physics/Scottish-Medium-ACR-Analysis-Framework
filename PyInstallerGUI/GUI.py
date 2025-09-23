@@ -185,7 +185,7 @@ try:
                     name = DupeHolders[i].params["SeriesDescription"] + " " +Prefix
                     Options_HolderDict[name] = DupeHolders[i]
 
-            for holder in DICOM_Holder_Objs:
+            for holder in KeptDICOMHolders:
                 if holder.params["SeriesDescription"] not in duplicates:            
                     Options_HolderDict[holder.params["SeriesDescription"]] = holder
             options = list(Options_HolderDict.keys())
@@ -471,7 +471,7 @@ try:
     ResultsPathLabel = ttk.Label(master=root,textvariable=Resultsfolder_path)
     ResultsPathLabel.grid(row=1, column=1,padx=10,pady=2,sticky=W,columnspan=6)
 
-    Resultsfolder_path.set("C:\\Users\Johnt\Desktop\Out") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
+    #Resultsfolder_path.set("C:\\Users\Johnt\Desktop\Out") #Just cos im lazy and dont want to press the button tons when testing try and remember to remove it...
 
     selected_option = StringVar(root)
     options = [] 
@@ -528,7 +528,7 @@ try:
     scroll.config(command=textResults.yview)
     textResults.configure(yscrollcommand=scroll.set) 
     textResults.pack()
-    frameResults.grid(row=2, column=1,padx=10,pady=10,rowspan=9,columnspan=3)
+    frameResults.grid(row=2, column=1,padx=10,pady=0,rowspan=9,columnspan=3)
 
     frameLog = ttk.Frame(root)
     LogWindowLabel = ttk.Label(master=frameLog,text="Log")
@@ -582,6 +582,9 @@ try:
     def OpenBugFeatureSite():
         webbrowser.open('https://forms.cloud.microsoft/e/9ZsZNbTinT?origin=QRCode', new=0)
 
+    def OpenDatabaseForm():
+        webbrowser.open('https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=veDvEDCgykuAnLXmdF5JmpoBwhWxYCZJmZebFt_oEWNUNk9TVThLRTYwWDlJSVM5VkI5WlJBQTA0OC4u&origin=QRCode', new=0)
+
     def ViewDICOMS():
         if DCMfolder_path.get() == "Not Set!":
             messagebox.showerror("Error", "Set DICOM Path first!")
@@ -598,10 +601,13 @@ try:
     BugReporting = ttk.Button(Optionsframe, text="Bug reporting and \n feature requesting",width=20,command = OpenBugFeatureSite)
     BugReporting.pack(pady=1)
 
+    ReportData = ttk.Button(Optionsframe, text="Report Data",width=20,command = OpenDatabaseForm)
+    ReportData.pack(pady=1)
+
     BugReporting = ttk.Button(Optionsframe, text="View Loaded DICOM",width=20,command = ViewDICOMS)
     BugReporting.pack(pady=1)
 
-    Optionsframe.grid(row=11, column=3,padx=8,pady=10,rowspan=3)
+    Optionsframe.grid(row=11, column=3,padx=8,pady=5,rowspan=3)
     root.resizable(False,False)
 
     import hazenlib.logger
