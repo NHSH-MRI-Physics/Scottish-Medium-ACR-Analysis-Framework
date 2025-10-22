@@ -87,7 +87,7 @@ def CheckAgainstStandard(BinaryFile):
         DICOM_Param_Obj.SequenceType = SequenceType
         DICOM_Param_Obj.SliceGap = SliceGap
         DICOM_Param_Obj.UniformityMethod = BinaryFile["Test"]["Uniformity"].settings["UniformityMethod"]
-        if (dcm.Manufacturer) == "GE MEDICAL SYSTEMS":
+        if (dcm.Manufacturer) == "GE MEDICAL SYSTEMS" or "Siemens".upper() in dcm.Manufacturer.upper():
             DICOM_Param_Obj.SliceGap = round(SliceGap - SliceThickness,3)
         if PhaseEncodingDir == 'ROW':
             DICOM_Param_Obj.MatrixFreq = Matrix[1]

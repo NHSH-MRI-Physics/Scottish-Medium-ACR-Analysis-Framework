@@ -10,6 +10,9 @@ sys.path.append(".")
 import os
 import gspread
 from MedACROptions import *
+import MedACRModules
+from MedACRModules.Empty_Module import EmptyModule
+
 sys.path.append("PyInstallerGUI")
 
 root = TkinterDnD.Tk()
@@ -76,55 +79,89 @@ def Update_Spreadsheet():
         Row.append(data["DICOM"][0].MagneticFieldStrength)
 
         #SNR
-        Row.append(data["Test"]["SNR"].results["measurement"]["snr by smoothing"]["measured"])
-        Row.append(data["Test"]["SNR"].results["measurement"]["snr by smoothing"]["normalised"])
+        if (type(data["Test"]["SNR"]) != MedACRModules.Empty_Module.EmptyModule):
+            Row.append(data["Test"]["SNR"].results["measurement"]["snr by smoothing"]["measured"])
+            Row.append(data["Test"]["SNR"].results["measurement"]["snr by smoothing"]["normalised"])
+        else:
+            Row.append("Not Run")
+            Row.append("Not Run")
 
         #GeoDist
         ExpectedSize = (data["ToleranceTable"]["Geometric Accuracy"]["MagNetMethod"].max + data["ToleranceTable"]["Geometric Accuracy"]["MagNetMethod"].min)/2.0
         if ExpectedSize != 85.0 or ExpectedSize != 80.0:
             ValueError("Warning", "The expected size for Geometric Distortion is not the standard 85mm or 80mm. Please check your tolerance table.")
 
-        Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["horizontal distances mm"][0]-ExpectedSize)
-        Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["horizontal distances mm"][1]-ExpectedSize)
-        Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["horizontal distances mm"][2]-ExpectedSize)
-        Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["vertical distances mm"][0]-ExpectedSize)
-        Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["vertical distances mm"][1]-ExpectedSize)
-        Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["vertical distances mm"][2]-ExpectedSize)
+        if (type(data["Test"]["GeoDist"]) != MedACRModules.Empty_Module.EmptyModule):
+            Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["horizontal distances mm"][0]-ExpectedSize)
+            Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["horizontal distances mm"][1]-ExpectedSize)
+            Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["horizontal distances mm"][2]-ExpectedSize)
+            Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["vertical distances mm"][0]-ExpectedSize)
+            Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["vertical distances mm"][1]-ExpectedSize)
+            Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["vertical distances mm"][2]-ExpectedSize)
+        else:
+            Row.append("Not Run")
+            Row.append("Not Run")
+            Row.append("Not Run")
+            Row.append("Not Run")
+            Row.append("Not Run")
+            Row.append("Not Run")
 
         #Uniformity
-        Row.append(data["Test"]["Uniformity"].results["measurement"]["integral uniformity %"])
+        if (type(data["Test"]["Uniformity"]) != MedACRModules.Empty_Module.EmptyModule):
+            Row.append(data["Test"]["Uniformity"].results["measurement"]["integral uniformity %"])
+        else:
+            Row.append("Not Run")
 
         #Ghosting
-        Row.append(data["Test"]["Ghosting"].results["measurement"]["signal ghosting %"])
+        if (type(data["Test"]["Ghosting"]) != MedACRModules.Empty_Module.EmptyModule):
+            Row.append(data["Test"]["Ghosting"].results["measurement"]["signal ghosting %"])
+        else:
+            Row.append("Not Run")
 
         #Slice Pos
-        Row.append(data["Test"]["SlicePos"].results['measurement'][data["Test"]["SlicePos"].results['file'][0]]['length difference'])
-        Row.append(data["Test"]["SlicePos"].results['measurement'][data["Test"]["SlicePos"].results['file'][1]]['length difference'])
-        
+        if (type(data["Test"]["SlicePos"]) != MedACRModules.Empty_Module.EmptyModule):
+            Row.append(data["Test"]["SlicePos"].results['measurement'][data["Test"]["SlicePos"].results['file'][0]]['length difference'])
+            Row.append(data["Test"]["SlicePos"].results['measurement'][data["Test"]["SlicePos"].results['file'][1]]['length difference'])
+        else:
+            Row.append("Not Run")
+            Row.append("Not Run")
+
         #Slice Thickness
-        Row.append(data["Test"]["SliceThickness"].results["measurement"]["slice width mm"])
+        if (type(data["Test"]["SliceThickness"]) != MedACRModules.Empty_Module.EmptyModule):
+            Row.append(data["Test"]["SliceThickness"].results["measurement"]["slice width mm"])
+        else:
+            Row.append("Not Run")
 
         #Spatial Res
-        Row.append(str(data["Test"]["SpatialRes"].settings["SpatialResMethod"]))
-        Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["1.1mm holes Horizontal"]))
-        Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["1.0mm holes Horizontal"]))
-        Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["0.9mm holes Horizontal"]))
-        Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["0.8mm holes Horizontal"]))
-        Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["1.1mm holes Vertical"]))
-        Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["1.0mm holes Vertical"]))
-        Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["0.9mm holes Vertical"]))
-        Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["0.8mm holes Vertical"]))
+        if (type(data["Test"]["SpatialRes"]) != MedACRModules.Empty_Module.EmptyModule):
+            Row.append(str(data["Test"]["SpatialRes"].settings["SpatialResMethod"]))
+            Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["1.1mm holes Horizontal"]))
+            Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["1.0mm holes Horizontal"]))
+            Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["0.9mm holes Horizontal"]))
+            Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["0.8mm holes Horizontal"]))
+            Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["1.1mm holes Vertical"]))
+            Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["1.0mm holes Vertical"]))
+            Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["0.9mm holes Vertical"]))
+            Row.append(str(data["Test"]["SpatialRes"].results["measurement"]["0.8mm holes Vertical"]))
+        else:
+            Row.append("Not Run")
+            Row.append("Not Run")
+            Row.append("Not Run")
+            Row.append("Not Run")
+            Row.append("Not Run")
+            Row.append("Not Run")
+            Row.append("Not Run")
+            Row.append("Not Run")
+            Row.append("Not Run")
 
         for entry in Row:
-            
             if type(entry) != str:
                 Row[Row.index(entry)] = str(round(entry,2))
 
         for row in all_rows:
-            print(type(row[0]))
             if row == Row:
                 raise ValueError("This entry already exists in the database!")
-        sh.worksheet("Data").update( [Row],"A"+str(LastRow))
+        sh.worksheet("Data").update( values=[Row],range_name="A"+str(LastRow))
         messagebox.showinfo(title="Success",message="Spreadsheet updated!")
 
     except Exception as e:
