@@ -92,7 +92,7 @@ def Update_Spreadsheet():
             ValueError("Warning", "The expected size for Geometric Distortion is not the standard 85mm or 80mm. Please check your tolerance table.")
 
         if (type(data["Test"]["GeoDist"]) != MedACRModules.Empty_Module.EmptyModule):
-            
+
             #This needs tested
             HorDist = [0,0,0]
             HorDist[0] = data["Test"]["GeoDist"].results["measurement"]["distortion"]["horizontal distances mm"][0]-ExpectedSize
@@ -102,8 +102,6 @@ def Update_Spreadsheet():
             VertDist[0] = data["Test"]["GeoDist"].results["measurement"]["distortion"]["vertical distances mm"][0]-ExpectedSize
             VertDist[1] = data["Test"]["GeoDist"].results["measurement"]["distortion"]["vertical distances mm"][1]-ExpectedSize
             VertDist[2] = data["Test"]["GeoDist"].results["measurement"]["distortion"]["vertical distances mm"][2]-ExpectedSize
-
-            
             if HorDist[0] > 8 and HorDist[0] < 12:
                 if HorDist[1] > 8 and HorDist[1] < 12:
                     if HorDist[2] > 8 and HorDist[2] < 12:
