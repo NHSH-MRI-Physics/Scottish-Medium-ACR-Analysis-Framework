@@ -163,6 +163,14 @@ class ACRSliceThickness(HazenTask):
             np.diff(np.sign(data - half_max))
         ).flatten()
 
+        import matplotlib.pyplot as plt
+        plt.plot(data)
+        plt.axvline(x=half_max_crossing_indices[0],color='r')
+        plt.axvline(x=half_max_crossing_indices[-1],color='r')
+        plt.savefig("test.png")
+        plt.close()
+        x=0        
+
         # Interpolation
         def simple_interp(x_start, ydata):
             """Simple interpolation
@@ -175,8 +183,13 @@ class ACRSliceThickness(HazenTask):
                 float: true x coordinate of the half maximum
             """
             x_init = x_start - 5
+            if x_init < 0:
+                x_init = 0
             x_pts = np.arange(x_start - 5, x_start + 5)
             x_pts = np.arange(x_init, x_init + 11)
+            if max(x_pts) >= len(ydata):
+                x_pts = np.arange(x_init, len(ydata))
+
             y_pts = ydata[x_pts]
 
             grad = (y_pts[-1] - y_pts[0]) / (x_pts[-1] - x_pts[0])
@@ -243,6 +256,7 @@ class ACRSliceThickness(HazenTask):
             interp_lines = [
                 scipy.interpolate.interp1d(sample, line)(new_sample) for line in lines
             ]
+
             fwhm = [self.FWHM(interp_line) for interp_line in interp_lines]
             ramp_length[0, i] = (1 / interp_factor) * np.diff(fwhm[0]) * res[0]
             ramp_length[1, i] = (1 / interp_factor) * np.diff(fwhm[1]) * res[0]
