@@ -17,7 +17,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Package Application
-      uses: yashnitin2023-code/pyinstaller-action-windows@main
+      uses: DrSpacemanMD/pyinstaller-action-windows-FixVC_URL@main
       with:
         path: .
 
