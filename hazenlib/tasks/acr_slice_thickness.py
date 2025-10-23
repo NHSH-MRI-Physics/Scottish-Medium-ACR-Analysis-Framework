@@ -163,14 +163,6 @@ class ACRSliceThickness(HazenTask):
             np.diff(np.sign(data - half_max))
         ).flatten()
 
-        import matplotlib.pyplot as plt
-        plt.plot(data)
-        plt.axvline(x=half_max_crossing_indices[0],color='r')
-        plt.axvline(x=half_max_crossing_indices[-1],color='r')
-        plt.savefig("test.png")
-        plt.close()
-        x=0        
-
         # Interpolation
         def simple_interp(x_start, ydata):
             """Simple interpolation
