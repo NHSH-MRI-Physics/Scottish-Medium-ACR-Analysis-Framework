@@ -107,7 +107,7 @@ def Update_Spreadsheet():
                         if VertDist[0] > 8 and VertDist[0] < 12:
                             if VertDist[1] > 8 and VertDist[1] < 12:
                                 if VertDist[2] > 8 and VertDist[2] < 12:
-                                    result = tk.tkMessageBox.askquestion("Adjust distortion values?", "The distortion is large was the phantom one with 90mm pegs? If so the distortion will be adjusted by 10mm.", icon='warning')
+                                    result = messagebox.askquestion("Adjust distortion values?", "The distortion is large.\n Was the phantom one with 90mm pegs used?\n If so the distortion will be adjusted by 10mm.", icon='warning')
                                     if result == 'yes':
                                         HorDist[0] -=10
                                         HorDist[1] -=10
@@ -116,11 +116,11 @@ def Update_Spreadsheet():
                                         VertDist[1] -=10
                                         VertDist[2] -=10
                                     else:
-                                        ValueError("error", "User cancelled operation due to large geometric distortion values.")
                                         FileDropped.config(text="No File Dropped")
                                         StandardLabel.config(bg="lightgray",text="No File Dropped")
                                         for item in tree.get_children():
                                             tree.delete(item)
+                                        raise ValueError("error", "User cancelled operation due to large geometric distortion values.")
             Row.append(HorDist[0])
             Row.append(HorDist[1])
             Row.append(HorDist[2])
