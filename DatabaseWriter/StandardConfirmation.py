@@ -2,7 +2,7 @@ import sys
 sys.path.append(".")
 from MedACROptions import *
 import PyInstallerGUI.VariableHolder
-
+from MedACRModules.Empty_Module import EmptyModule
 class DICOMParamaters:
     def __init__(self):
         self.MatrixFreq = None
@@ -27,6 +27,10 @@ class DICOMParamaters:
         AllPassed = True
         for var in Variables:
             ComparisonDataBase[var] = [vars(self)[var],vars(DICOM)[var],True]
+            if var == "GeoDistMethod" or var == "SpaitalResMethod" or var == "UniformityMethod":
+                if vars(DICOM)[var] == "Not Run":
+                    continue
+
             if vars(self)[var] != vars(DICOM)[var]:
                 AllPassed = False
                 ComparisonDataBase[var][-1] = False
@@ -86,7 +90,12 @@ def CheckAgainstStandard(BinaryFile):
         DICOM_Param_Obj.Averages = Averages
         DICOM_Param_Obj.SequenceType = SequenceType
         DICOM_Param_Obj.SliceGap = SliceGap
-        DICOM_Param_Obj.UniformityMethod = BinaryFile["Test"]["Uniformity"].settings["UniformityMethod"]
+
+        if type(BinaryFile["Test"]["Uniformity"]) != EmptyModule:
+            DICOM_Param_Obj.UniformityMethod = BinaryFile["Test"]["Uniformity"].settings["UniformityMethod"]
+        else:
+            DICOM_Param_Obj.UniformityMethod = "Not Run"
+
         if (dcm.Manufacturer) == "GE MEDICAL SYSTEMS" or "Siemens".upper() in dcm.Manufacturer.upper():
             DICOM_Param_Obj.SliceGap = round(SliceGap - SliceThickness,3)
         if PhaseEncodingDir == 'ROW':
@@ -96,8 +105,19 @@ def CheckAgainstStandard(BinaryFile):
             DICOM_Param_Obj.MatrixFreq = Matrix[0]
             DICOM_Param_Obj.MatrixPhase = Matrix[3]
         DICOM_Param_Obj.Slices = Slices
-        DICOM_Param_Obj.GeoDistMethod = BinaryFile["Test"]["GeoDist"].results["task"]
-        DICOM_Param_Obj.SpaitalResMethod = BinaryFile["Test"]["SpatialRes"].settings["SpatialResMethod"]
+
+
+        if type(BinaryFile["Test"]["GeoDist"]) != EmptyModule:
+            DICOM_Param_Obj.GeoDistMethod = BinaryFile["Test"]["GeoDist"].results["task"]
+        else:
+            DICOM_Param_Obj.GeoDistMethod = "Not Run"
+
+        if type(BinaryFile["Test"]["SpatialRes"]) != EmptyModule:
+            DICOM_Param_Obj.SpaitalResMethod = BinaryFile["Test"]["SpatialRes"].settings["SpatialResMethod"]
+        else:
+            DICOM_Param_Obj.SpaitalResMethod = "Not Run"
+
+
         if DICOM_Param_Obj.SpaitalResMethod == ResOptions.Manual or DICOM_Param_Obj.SpaitalResMethod == ResOptions.ContrastResponseMethod:
             DICOM_Param_Obj.SpaitalResMethod = "ContrastResponse"
 
