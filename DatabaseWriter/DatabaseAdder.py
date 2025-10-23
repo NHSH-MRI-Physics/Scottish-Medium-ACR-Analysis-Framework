@@ -92,12 +92,44 @@ def Update_Spreadsheet():
             ValueError("Warning", "The expected size for Geometric Distortion is not the standard 85mm or 80mm. Please check your tolerance table.")
 
         if (type(data["Test"]["GeoDist"]) != MedACRModules.Empty_Module.EmptyModule):
-            Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["horizontal distances mm"][0]-ExpectedSize)
-            Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["horizontal distances mm"][1]-ExpectedSize)
-            Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["horizontal distances mm"][2]-ExpectedSize)
-            Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["vertical distances mm"][0]-ExpectedSize)
-            Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["vertical distances mm"][1]-ExpectedSize)
-            Row.append(data["Test"]["GeoDist"].results["measurement"]["distortion"]["vertical distances mm"][2]-ExpectedSize)
+            
+            #This needs tested
+            HorDist = [0,0,0]
+            HorDist[0] = data["Test"]["GeoDist"].results["measurement"]["distortion"]["horizontal distances mm"][0]-ExpectedSize
+            HorDist[1] = data["Test"]["GeoDist"].results["measurement"]["distortion"]["horizontal distances mm"][1]-ExpectedSize
+            HorDist[2] = data["Test"]["GeoDist"].results["measurement"]["distortion"]["horizontal distances mm"][2]-ExpectedSize
+            VertDist = [0,0,0]
+            VertDist[0] = data["Test"]["GeoDist"].results["measurement"]["distortion"]["vertical distances mm"][0]-ExpectedSize
+            VertDist[1] = data["Test"]["GeoDist"].results["measurement"]["distortion"]["vertical distances mm"][1]-ExpectedSize
+            VertDist[2] = data["Test"]["GeoDist"].results["measurement"]["distortion"]["vertical distances mm"][2]-ExpectedSize
+
+            
+            if HorDist[0] > 8 and HorDist[0] < 12:
+                if HorDist[1] > 8 and HorDist[1] < 12:
+                    if HorDist[2] > 8 and HorDist[2] < 12:
+                        if VertDist[0] > 8 and VertDist[0] < 12:
+                            if VertDist[1] > 8 and VertDist[1] < 12:
+                                if VertDist[2] > 8 and VertDist[2] < 12:
+                                    result = tk.tkMessageBox.askquestion("Adjust distortion values?", "The distortion is large was the phantom one with 90mm pegs? If so the distortion will be adjusted by 10mm.", icon='warning')
+                                    if result == 'yes':
+                                        HorDist[0] -=10
+                                        HorDist[1] -=10
+                                        HorDist[2] -=10
+                                        VertDist[0] -=10
+                                        VertDist[1] -=10
+                                        VertDist[2] -=10
+                                    else:
+                                        ValueError("error", "User cancelled operation due to large geometric distortion values.")
+                                        FileDropped.config(text="No File Dropped")
+                                        StandardLabel.config(bg="lightgray",text="No File Dropped")
+                                        for item in tree.get_children():
+                                            tree.delete(item)
+            Row.append(HorDist[0])
+            Row.append(HorDist[1])
+            Row.append(HorDist[2])
+            Row.append(VertDist[0])
+            Row.append(VertDist[1])
+            Row.append(VertDist[2])
         else:
             Row.append("Not Run")
             Row.append("Not Run")
