@@ -117,7 +117,7 @@ class ACRSliceThickness(HazenTask):
         if self.ACR_obj.MediumACRPhantom==True:
             ExpectedWidth=[165*0.8,165*1.2]
         if width*res[0] <= ExpectedWidth[0] or width*res[0] >= ExpectedWidth[1]:
-            x = [round(50/res[1]),round(200/res[1])] # This value was hardcoded and tested but should maybe rethink it at some stage.
+            x = [round(50/res[1]),round(180/res[1])] # This value was hardcoded and tested but should maybe rethink it at some stage.
 
         # Y
         c = skimage.measure.profile_line(
@@ -215,6 +215,13 @@ class ACRSliceThickness(HazenTask):
             
         cxy = self.ACR_obj.centre
         x_pts, y_pts = self.find_ramps(img, cxy, res)
+
+        import matplotlib.pyplot as plt
+        plt.imshow(img)
+        plt.scatter(x_pts[0],y_pts[0],c='red')
+        plt.scatter(x_pts[1],y_pts[1],c='red')
+        plt.savefig("test.png")
+        plt.close()
 
         interp_factor = 5
         sample = np.arange(1, x_pts[1] - x_pts[0] + 2)
