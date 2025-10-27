@@ -15,7 +15,7 @@ class GeoAccModule(MedACRModule):
         
 
     def Run(self):
-        print("Running SNR")
+        print("Running Geometric Distortion")
         Data = self.settings["Data"]
         OutputPath = self.settings["OutputPath"]
         ParamaterOverides = self.settings["ParamaterOverides"]

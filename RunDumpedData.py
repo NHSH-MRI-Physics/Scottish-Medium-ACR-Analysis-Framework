@@ -46,3 +46,4 @@ def RunDumpedData(DumpFile,OutFolder):
     if os.path.exists("TempDICOM"):
         shutil.rmtree("TempDICOM")
     
+RunDumpedData("/Users/john/Desktop/Results_ACR_SAG_T1_2025-10-03.12-37-10_Blair.Johnston.docx","/Users/john/Desktop/out")

@@ -19,6 +19,7 @@ class OptionsPaneHolder():
         self.UseLegacySliceThicknessAlgo=IntVar(value=0)
         self.DumpToExcel=IntVar(value=1)
         self.FixedManualROISize=IntVar(value=1)
+        self.LoadPreviousRun=IntVar(value=1)
         
         self.currentRow = 0
         self.OptionsPane = None
@@ -37,6 +38,11 @@ class OptionsPaneHolder():
         CheckBox.grid(row=self.currentRow, column=0,padx=5,sticky=W,columnspan=2)
         self.currentRow+=1
 
+    def AddButton(self,text,command):
+        button = ttk.Button(self.OptionsPane, text=text, command=command)
+        button.grid(row=self.currentRow, column=0,padx=5,sticky=W,columnspan=2)
+        self.currentRow+=1
+
     def SetupOptions(self,OptionsPane):       
         self.OptionsPane = OptionsPane
 
@@ -50,6 +56,7 @@ class OptionsPaneHolder():
         self.AddOptionRowCheckbox(text='Use Legacy Slice Thickness Bar Algorithm',variable=self.UseLegacySliceThicknessAlgo)
         self.AddOptionRowCheckbox(text='Dump Results to Excel file',variable=self.DumpToExcel)
         self.AddOptionRowCheckbox(text='Fixed manual ROI size',variable=self.FixedManualROISize)
+        self.AddOptionRowCheckbox(text="Load in Previous Run", variable=self.LoadPreviousRun)
 
     def GetOptions(self):
         OptionsDict = {}
@@ -62,5 +69,6 @@ class OptionsPaneHolder():
         OptionsDict["DumpToExcel"] = self.DumpToExcel.get()
         OptionsDict["UniformityOptions"] = self.UniformityOption.get()
         OptionsDict["FixedManualROISize"] = self.FixedManualROISize.get()
+        OptionsDict["LoadPreviousRun"] = self.LoadPreviousRun.get()
 
         return OptionsDict
