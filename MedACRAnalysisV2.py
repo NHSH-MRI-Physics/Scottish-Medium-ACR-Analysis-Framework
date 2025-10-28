@@ -189,6 +189,7 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
     DumpData["Settings"] = settings
     DumpData["ParamaterOverides"] = ParamaterOverides   
     DumpData["ToleranceTable"] = MedACR_ToleranceTableChecker.ToleranceTable
+    DumpData["SoftwareVersion"] = __version__   
     if SettingsPaneObject != None: 
         DumpData["SettingsPaneOptions"] = SettingsPaneObject.GetOptions()
     else:

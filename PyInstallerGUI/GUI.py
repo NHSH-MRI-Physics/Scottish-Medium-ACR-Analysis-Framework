@@ -153,9 +153,11 @@ try:
             MedACRAnalysis.ReportText = ''
             textResults.delete(1.0, END)
             textResults.configure(state="disabled")
+
+        if "SoftwareVersion" not in VarHolder.PreviousLoadedDataDump: #Softwareversion wasnt included prior to >v1.1 so if its none its from earlier than 1.1
+            VarHolder.PreviousLoadedDataIsLegacy = True
         
-        
-        
+    
     def LoadDICOMDir(filename):
         global InitalDirDICOM
         dropdownResults.config(state="disabled")
@@ -394,7 +396,7 @@ try:
             SlicesToOverride.insert(0,7)
 
         MedACRAnalysis.ParamaterOverides = ParamaterOveride()
-        if VarHolder.LoadPreviousRunMode == True:
+        if VarHolder.LoadPreviousRunMode == True and VarHolder.PreviousLoadedDataIsLegacy == False:
             #MedACRAnalysis.ParamaterOverides = VarHolder.PreviousLoadedDataDump["ParamaterOverides"]
             if OptionsPaneObj.GetOptions()["OverrideRadiusAndCentre"] == 1:
                 MedACRAnalysis.ParamaterOverides.CentreOverride = VarHolder.PreviousLoadedDataDump["ParamaterOverides"].CentreOverride
@@ -453,7 +455,7 @@ try:
                 overrideRes.GetROIs()
                 MedACRAnalysis.ParamaterOverides.ROIOverride=overrideRes.crops
 
-        if VarHolder.LoadPreviousRunMode == True:
+        if VarHolder.LoadPreviousRunMode == True  and VarHolder.PreviousLoadedDataIsLegacy == False:
             #This here reutrns the options back to the previous loaded ones since we only turned them off to show the dialog boxes
             if "SettingsPaneOptions" in VarHolder.PreviousLoadedDataDump:
                 OptionsPaneObj.OverrideRadiusAndCentre.set(VarHolder.PreviousLoadedDataDump["SettingsPaneOptions"]["OverrideRadiusAndCentre"])
@@ -473,7 +475,7 @@ try:
         if OptionsPaneObj.GetOptions()["SpatialResOption"]=="Manual" and SpatialRes==True or RunAll==True and OptionsPaneObj.GetOptions()["SpatialResOption"]=="Manual":
 
             ShowResPopUp = True
-            if VarHolder.LoadPreviousRunMode == True:
+            if VarHolder.LoadPreviousRunMode == True and VarHolder.PreviousLoadedDataIsLegacy == False:
                 Answer = messagebox.askyesno("Previous loaded manual resolution data present", "Do you wish to keep the previously loaded manual resolution data?", icon='question')
                 if Answer == True:
                     ShowResPopUp = False
