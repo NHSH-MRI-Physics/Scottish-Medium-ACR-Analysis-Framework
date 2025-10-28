@@ -137,6 +137,22 @@ try:
         OptionsPaneObj.LoadPreviousRun.set(1) #Need this since this the only setting taht differs from that in the dump file
         LoadDICOMDir("TempDICOM")
 
+        if "ResultsText" in VarHolder.PreviousLoadedDataDump:
+            textResults.configure(state="normal")
+            textResults.delete(1.0, END)
+            textResults.insert("end", VarHolder.PreviousLoadedDataDump["ResultsText"])
+            textResults.tag_config("Pass", foreground="green")
+            textResults.tag_config("Fail", foreground="red")
+            textResults.tag_config("No Tolerance Set", foreground="yellow")
+            textResults.highlight_pattern(r"Pass","Pass")
+            textResults.highlight_pattern(r"Fail","Fail")
+            textResults.highlight_pattern(r"No Tolerance Set","No Tolerance Set")
+            textResults.configure(state="disabled")
+        else:
+            textResults.configure(state="normal")
+            MedACRAnalysis.ReportText = ''
+            textResults.delete(1.0, END)
+            textResults.configure(state="disabled")
         
         
         
@@ -439,9 +455,10 @@ try:
 
         if VarHolder.LoadPreviousRunMode == True:
             #This here reutrns the options back to the previous loaded ones since we only turned them off to show the dialog boxes
-            OptionsPaneObj.OverrideRadiusAndCentre.set(VarHolder.PreviousLoadedDataDump["SettingsPaneOptions"]["OverrideRadiusAndCentre"])
-            OptionsPaneObj.OverrideMasking.set(VarHolder.PreviousLoadedDataDump["SettingsPaneOptions"]["OverrideMasking"])
-            OptionsPaneObj.OverideResBlockLoc.set(VarHolder.PreviousLoadedDataDump["SettingsPaneOptions"]["OverideResBlockLoc"])
+            if "SettingsPaneOptions" in VarHolder.PreviousLoadedDataDump:
+                OptionsPaneObj.OverrideRadiusAndCentre.set(VarHolder.PreviousLoadedDataDump["SettingsPaneOptions"]["OverrideRadiusAndCentre"])
+                OptionsPaneObj.OverrideMasking.set(VarHolder.PreviousLoadedDataDump["SettingsPaneOptions"]["OverrideMasking"])
+                OptionsPaneObj.OverideResBlockLoc.set(VarHolder.PreviousLoadedDataDump["SettingsPaneOptions"]["OverideResBlockLoc"])
 
         #ArrayToSave = []
         #ArrayToSave.append(MedACRAnalysis.ParamaterOverides.CentreOverride)
