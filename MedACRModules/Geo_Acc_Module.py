@@ -33,7 +33,7 @@ class GeoAccModule(MedACRModule):
         GeoMethod = self.settings["GeoMethod"]
         if (GeoMethod == GeometryOptions.ACRMETHOD):
             print("Slice 1 Hor Dist: "+str(self.results["measurement"][self.results["file"][0]]["Horizontal distance"]) + "   "+ " Vert Dist: "+str(self.results["measurement"][self.results["file"][0]]["Vertical distance"]))
-            print("Slice 5 Hor Dist:"+str(self.results["measurement"][self.results["file"][1]]["Horizontal distance"]) + "   "+ " Vert Dist:"+str(self.results["measurement"][self.results["file"][1]]["Vertical distance"])+ "   "+ " Diag SW Dist:"+str(self.results["measurement"][self.results["file"][1]]["Diagonal distance SW"])+ "   "+ "Diag SE Dist:"+str(self.results["measurement"][self.results["file"][1]]["Diagonal distance SE"]))
+            print("Slice 5 Hor Dist: "+str(self.results["measurement"][self.results["file"][1]]["Horizontal distance"]) + "   "+ " Vert Dist:"+str(self.results["measurement"][self.results["file"][1]]["Vertical distance"])+ "   "+ " Diag SW Dist:"+str(self.results["measurement"][self.results["file"][1]]["Diagonal distance SW"])+ "   "+ "Diag SE Dist:"+str(self.results["measurement"][self.results["file"][1]]["Diagonal distance SE"]))
             Text="\tMethod: ACR Method\n"
             Text+=("\tSlice 1:\n")
             Text+=( '\t\tHor Dist (mm):             %-12s%-12s\n' % (str(self.results["measurement"][self.results["file"][0]]["Horizontal distance"]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"][self.results["file"][0]]["Horizontal distance"],"Geometric Accuracy","ACRMethod") ))
@@ -41,7 +41,7 @@ class GeoAccModule(MedACRModule):
 
             Text+=("\tSlice 5:\n")
             Text+=( '\t\tHor Dist (mm):             %-12s%-12s\n' % (str(self.results["measurement"][self.results["file"][1]]["Horizontal distance"]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"][self.results["file"][1]]["Horizontal distance"],"Geometric Accuracy","ACRMethod") ))
-            Text+=( '\t\tVert Dist (mm):            %-12s%-12s\n' % (str(self.results["measurement"][self.results["file"][1]]["Vertical distance"]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"][self.results["file"][1]]["Horizontal distance"],"Geometric Accuracy","ACRMethod") ))
+            Text+=( '\t\tVert Dist (mm):            %-12s%-12s\n' % (str(self.results["measurement"][self.results["file"][1]]["Vertical distance"]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"][self.results["file"][1]]["Vertical distance"],"Geometric Accuracy","ACRMethod") ))
             Text+=( '\t\tDiagonal distance SW (mm): %-12s%-12s\n' % (str(self.results["measurement"][self.results["file"][1]]["Diagonal distance SW"]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"][self.results["file"][1]]["Diagonal distance SW"],"Geometric Accuracy","ACRMethod") ))
             Text+=( '\t\tDiagonal distance SE (mm): %-12s%-12s' % (str(self.results["measurement"][self.results["file"][1]]["Diagonal distance SE"]),MedACR_ToleranceTableChecker.GetPassResult(self.results["measurement"][self.results["file"][1]]["Diagonal distance SE"],"Geometric Accuracy","ACRMethod") ))
             return Text
