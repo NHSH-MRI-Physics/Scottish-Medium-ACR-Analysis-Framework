@@ -454,21 +454,30 @@ try:
         MedACRAnalysis.ManualResTestText=None
         MedACRAnalysis.ManualResData = None
         if OptionsPaneObj.GetOptions()["SpatialResOption"]=="Manual" and SpatialRes==True or RunAll==True and OptionsPaneObj.GetOptions()["SpatialResOption"]=="Manual":
-            ROIS = MedACRAnalysis.GetROIFigs(selected_option.get(),DCMfolder_path.get())
 
+            ShowResPopUp = True
+            if VarHolder.LoadPreviousRunMode == True:
+                Answer = messagebox.askyesno("Previous loaded manual resolution data present", "Do you wish to keep the previously loaded manual resolution data?", icon='question')
+                if Answer == True:
+                    ShowResPopUp = False
+                    MedACRAnalysis.ManualResData = VarHolder.PreviousLoadedDataDump["Settings"]["ManualResData"]
+                    
 
-            #DEBUGGING STUFF
-            #del ROIS[list(ROIS.keys())[0]]
-            #del ROIS[list(ROIS.keys())[0]]
-            #del ROIS[list(ROIS.keys())[0]]
+            if ShowResPopUp == True:
+                ROIS = MedACRAnalysis.GetROIFigs(selected_option.get(),DCMfolder_path.get())
 
-            plt.close('all')#Making sure no rogue plots are sitting in the background...
-            #ManualRes(ROIS)
-            ManualResObj = Windows.ManualResWindow(root)
-            #MedACRAnalysis.ManualResData = VarHolder.ManualResData
-            MedACRAnalysis.ManualResData = ManualResObj.ManualRes(ROIS)
+                #DEBUGGING STUFF
+                #del ROIS[list(ROIS.keys())[0]]
+                #del ROIS[list(ROIS.keys())[0]]
+                #del ROIS[list(ROIS.keys())[0]]
 
-            #SpatialRes=False
+                plt.close('all')#Making sure no rogue plots are sitting in the background...
+                #ManualRes(ROIS)
+                ManualResObj = Windows.ManualResWindow(root)
+                #MedACRAnalysis.ManualResData = VarHolder.ManualResData
+                MedACRAnalysis.ManualResData = ManualResObj.ManualRes(ROIS)
+
+                #SpatialRes=False
 
         textResults.configure(state="normal")
         MedACRAnalysis.ReportText = ''

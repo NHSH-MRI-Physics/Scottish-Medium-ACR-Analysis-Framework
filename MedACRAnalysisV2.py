@@ -189,7 +189,11 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
     DumpData["Settings"] = settings
     DumpData["ParamaterOverides"] = ParamaterOverides   
     DumpData["ToleranceTable"] = MedACR_ToleranceTableChecker.ToleranceTable
-    DumpData["SettingsPaneOptions"] = SettingsPaneObject.GetOptions()
+    if SettingsPaneObject != None: 
+        DumpData["SettingsPaneOptions"] = SettingsPaneObject.GetOptions()
+    else:
+        DumpData["SettingsPaneOptions"] = None
+    DumpData["ResultsText"] = ReportText
     for DicomData in Data:
         DumpData["DICOM"].append(pydicom.dcmread(DicomData))
 
