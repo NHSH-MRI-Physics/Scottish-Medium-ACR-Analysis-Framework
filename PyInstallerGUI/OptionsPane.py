@@ -2,6 +2,8 @@ from tkinter import ttk
 from tkinter import StringVar, IntVar
 from tkinter import DISABLED, NORMAL, N, S, E, W, LEFT, RIGHT, TOP, BOTTOM, messagebox, END, NW
 
+from MedACROptions import GeometryOptions,UniformityOptions, ResOptions
+
 #This is for the UI
 class OptionsPaneHolder():
     def __init__(self):
@@ -17,9 +19,9 @@ class OptionsPaneHolder():
         self.OverrideMasking = IntVar(value=0)
         self.OverideResBlockLoc=IntVar(value=0)
         self.UseLegacySliceThicknessAlgo=IntVar(value=0)
-        self.DumpToExcel=IntVar(value=1)
+        self.DumpToExcel=IntVar(value=0)
         self.FixedManualROISize=IntVar(value=1)
-        self.LoadPreviousRun=IntVar(value=1)
+        self.LoadPreviousRun=IntVar(value=0)
         
         self.currentRow = 0
         self.OptionsPane = None
@@ -72,3 +74,15 @@ class OptionsPaneHolder():
         OptionsDict["LoadPreviousRun"] = self.LoadPreviousRun.get()
 
         return OptionsDict
+    
+    def SetOptions(self,OptionsDict):
+        self.GeoAccOption.set(OptionsDict["GeoAccOption"])
+        self.SpatialResOption.set(OptionsDict["SpatialResOption"])
+        self.OverrideRadiusAndCentre.set(OptionsDict["OverrideRadiusAndCentre"])
+        self.OverrideMasking.set(OptionsDict["OverrideMasking"])
+        self.OverideResBlockLoc.set(OptionsDict["OverideResBlockLoc"])
+        self.UseLegacySliceThicknessAlgo.set(OptionsDict["UseLegacySliceThicknessAlgo"])
+        self.DumpToExcel.set(OptionsDict["DumpToExcel"])
+        self.UniformityOption.set(OptionsDict["UniformityOptions"])
+        self.FixedManualROISize.set(OptionsDict["FixedManualROISize"])
+        self.LoadPreviousRun.set(OptionsDict["LoadPreviousRun"])

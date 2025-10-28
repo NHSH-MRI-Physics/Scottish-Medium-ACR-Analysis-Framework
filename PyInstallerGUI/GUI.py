@@ -1,3 +1,4 @@
+import shutil
 import tkinter
 from tkinter import ttk
 import sv_ttk
@@ -87,6 +88,8 @@ try:
         sys.stderr = None
         if VarHolder.NewWindow!= None:
             VarHolder.NewWindow.destroy()
+        if os.path.exists("TempDICOM"):
+            shutil.rmtree("TempDICOM")
         root.destroy()
 
     root.protocol("WM_DELETE_WINDOW", Tidyup)
@@ -94,8 +97,6 @@ try:
     VarHolder=VariableHolder.VarHolder()
 
     def SetDCMPath():
-        dropdownResults.config(state="disabled")
-        ViewResultsBtn.config(state="disabled")
         global InitalDirDICOM
         if InitalDirDICOM==None:
             filename = filedialog.askdirectory()
@@ -104,6 +105,46 @@ try:
 
         if filename=="":
             return
+        
+        LoadDICOMDir(filename)
+
+    def LoadPreviousRun():
+        if InitalDirDICOM==None:
+            PrevRun = filedialog.askopenfilename()
+        else:
+            PrevRun = filedialog.askopenfilename(initialdir=InitalDirDICOM)
+
+        if PrevRun=="":
+            return
+        
+        with open(PrevRun, 'rb') as f:
+            data = pickle.load(f)
+
+        if not os.path.exists("TempDICOM"):
+            os.makedirs("TempDICOM")
+        VarHolder.PreviousLoadedDataDump = data
+        DICOMData = data["DICOM"]
+        DICOMS = []
+        count = 1
+        for DICOM in data["DICOM"]:
+            DICOM.save_as(os.path.join("TempDICOM",str(count)+".dcm"))
+            DICOMS.append(os.path.join("TempDICOM",str(count)+".dcm"))
+            count+=1
+        
+        #Prior to version 1.1 the dump file will only load the dicom, not the settings but it doens't really matter since their was no option for the user to do it anyway
+        if "SettingsPaneOptions" in data:
+            OptionsPaneObj.SetOptions(data["SettingsPaneOptions"])
+        OptionsPaneObj.LoadPreviousRun.set(1) #Need this since this the only setting taht differs from that in the dump file
+        LoadDICOMDir("TempDICOM")
+
+        
+        
+        
+    def LoadDICOMDir(filename):
+        global InitalDirDICOM
+        dropdownResults.config(state="disabled")
+        ViewResultsBtn.config(state="disabled")
+
         DCMfolder_path.set(filename)
         InitalDirDICOM=DCMfolder_path.get()
 
@@ -202,6 +243,7 @@ try:
                 print(warn)
 
 
+
     def SetResultsOutput():
         global InitalDirOutput
         if InitalDirOutput==None:
@@ -259,6 +301,8 @@ try:
             MedACRAnalysis.DumpToExcel = True
         else:
             MedACRAnalysis.DumpToExcel = False
+
+        MedACRAnalysis.SettingsPaneObject = OptionsPaneObj
 
     def RunAnalysis():
         if DCMfolder_path.get()=="Not Set!":
@@ -334,6 +378,35 @@ try:
             SlicesToOverride.insert(0,7)
 
         MedACRAnalysis.ParamaterOverides = ParamaterOveride()
+        if VarHolder.LoadPreviousRunMode == True:
+            #MedACRAnalysis.ParamaterOverides = VarHolder.PreviousLoadedDataDump["ParamaterOverides"]
+            if OptionsPaneObj.GetOptions()["OverrideRadiusAndCentre"] == 1:
+                MedACRAnalysis.ParamaterOverides.CentreOverride = VarHolder.PreviousLoadedDataDump["ParamaterOverides"].CentreOverride
+                MedACRAnalysis.ParamaterOverides.RadiusOverride = VarHolder.PreviousLoadedDataDump["ParamaterOverides"].RadiusOverride
+                OptionsPaneObj.OverrideRadiusAndCentre.set(0) #Turn it off that way we only show the dialog to reset if it the user wants to.
+                Answer = messagebox.askyesno("Previous loaded override data present", "Do you wish to keep the previously loaded center override data?", icon='question')
+                if Answer == False:
+                    MedACRAnalysis.ParamaterOverides.CentreOverride = None
+                    MedACRAnalysis.ParamaterOverides.RadiusOverride = None
+                    OptionsPaneObj.OverrideRadiusAndCentre.set(1)
+
+            if OptionsPaneObj.GetOptions()["OverrideMasking"] == 1:
+                MedACRAnalysis.ParamaterOverides.MaskingOverride = VarHolder.PreviousLoadedDataDump["ParamaterOverides"].MaskingOverride
+                OptionsPaneObj.OverrideMasking.set(0)
+                Answer = messagebox.askyesno("Previous loaded override data present", "Do you wish to keep the previously loaded masking override data?", icon='question')
+                if Answer == False:
+                    TempParam = ParamaterOveride() #This is cause the masking override is a list so we need to copy it over properly
+                    MedACRAnalysis.ParamaterOverides.MaskingOverride = TempParam.MaskingOverride
+                    OptionsPaneObj.OverrideMasking.set(1)
+            
+            if OptionsPaneObj.GetOptions()["OverideResBlockLoc"] == 1:
+                MedACRAnalysis.ParamaterOverides.ROIOverride = VarHolder.PreviousLoadedDataDump["ParamaterOverides"].ROIOverride
+                OptionsPaneObj.OverideResBlockLoc.set(0)
+                Answer = messagebox.askyesno("Previous loaded override data present", "Do you wish to keep the previously loaded res block ROI Location override data?", icon='question')
+                if Answer == False:
+                    MedACRAnalysis.ParamaterOverides.ROIOverride = None
+                    OptionsPaneObj.OverideResBlockLoc.set(1)
+
         for CurrentSlice in SlicesToOverride:
             OverrideCurrentSlice = False
             if OptionsPaneObj.GetOptions()["OverrideRadiusAndCentre"] == 1 and CurrentSlice==7:
@@ -363,6 +436,12 @@ try:
                     overrideRes.FixedSize = False
                 overrideRes.GetROIs()
                 MedACRAnalysis.ParamaterOverides.ROIOverride=overrideRes.crops
+
+        if VarHolder.LoadPreviousRunMode == True:
+            #This here reutrns the options back to the previous loaded ones since we only turned them off to show the dialog boxes
+            OptionsPaneObj.OverrideRadiusAndCentre.set(VarHolder.PreviousLoadedDataDump["SettingsPaneOptions"]["OverrideRadiusAndCentre"])
+            OptionsPaneObj.OverrideMasking.set(VarHolder.PreviousLoadedDataDump["SettingsPaneOptions"]["OverrideMasking"])
+            OptionsPaneObj.OverideResBlockLoc.set(VarHolder.PreviousLoadedDataDump["SettingsPaneOptions"]["OverideResBlockLoc"])
 
         #ArrayToSave = []
         #ArrayToSave.append(MedACRAnalysis.ParamaterOverides.CentreOverride)
@@ -575,6 +654,15 @@ try:
         #OptionsPane.GetOptions()
 
         root.wait_window(OptionsPaneWin)
+
+        if OptionsPaneObj.GetOptions()["LoadPreviousRun"] == 1:
+            DCMPathButton.config(text="Load in previous run",command=LoadPreviousRun)
+            VarHolder.LoadPreviousRunMode = True
+        else:
+            DCMPathButton.config(text="Set DICOM Path", command=SetDCMPath)
+            DCMPathButton.config(text="Set DICOM Path")
+            VarHolder.LoadPreviousRunMode = False
+        
 
     def OpenManual():
         webbrowser.open('https://github.com/NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework/blob/main/README.md', new=0)

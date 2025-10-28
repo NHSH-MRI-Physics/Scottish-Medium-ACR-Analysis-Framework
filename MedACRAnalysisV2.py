@@ -48,6 +48,8 @@ UseLegacySliceThicknessAlgo = False
 DumpToExcel = False
 DICOM_Holder_Dict = None
 
+SettingsPaneObject = None
+
 ParamaterOverides = ParamaterOveride()
 
 def RunAnalysisWithHolder(Holder,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False):
@@ -87,41 +89,47 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
         RunGhosting =True
         RunSlicePos =True
         RunSliceThickness =True
-
+    settings = {"Data":Data,"OutputPath":OutputPath,"ParamaterOverides":ParamaterOverides}
     TotalTests=0
     if RunSNR ==True:
         TotalTests+=1
-        settings = {"Data":Data,"OutputPath":OutputPath,"ParamaterOverides":ParamaterOverides}
+        #settings = {"Data":Data,"OutputPath":OutputPath,"ParamaterOverides":ParamaterOverides}
         TestsToRun["SNR"] = SNRModule("SNR",settings)
 
     if RunGeoAcc ==True:
-        settings = {"Data":Data,"OutputPath":OutputPath,"ParamaterOverides":ParamaterOverides,"GeoMethod":GeoMethod}
+        #settings = {"Data":Data,"OutputPath":OutputPath,"ParamaterOverides":ParamaterOverides,"GeoMethod":GeoMethod}
+        settings["GeoMethod"] = GeoMethod
         TestsToRun["GeoDist"] = GeoAccModule("Geometric Accuracy",settings)
         TotalTests+=1
 
     if RunSpatialRes ==True:
         TotalTests+=1
-        settings = {"Data":Data,"OutputPath":OutputPath,"ParamaterOverides":ParamaterOverides,"SpatialResMethod":SpatialResMethod, "ManualResData":ManualResData,"OutputPath":OutputPath,"Seq":Seq}
+        #settings = {"Data":Data,"OutputPath":OutputPath,"ParamaterOverides":ParamaterOverides,"SpatialResMethod":SpatialResMethod, "ManualResData":ManualResData,"OutputPath":OutputPath,"Seq":Seq}
+        settings["SpatialResMethod"] = SpatialResMethod
+        settings["ManualResData"] = ManualResData
+        settings["Seq"] = Seq
         TestsToRun["SpatialRes"] = SpatialResModule("Spatial Resolution",settings)
 
     if RunUniformity ==True:
         TotalTests+=1
-        settings = {"Data":Data,"OutputPath":OutputPath,"ParamaterOverides":ParamaterOverides, "UniformityMethod":UniformityMethod}
+        #settings = {"Data":Data,"OutputPath":OutputPath,"ParamaterOverides":ParamaterOverides, "UniformityMethod":UniformityMethod}
+        settings["UniformityMethod"] = UniformityMethod
         TestsToRun["Uniformity"] = UniformityModule("Uniformity",settings)
 
     if RunGhosting ==True:
         TotalTests+=1
-        settings = {"Data":Data,"OutputPath":OutputPath,"ParamaterOverides":ParamaterOverides}
+        #settings = {"Data":Data,"OutputPath":OutputPath,"ParamaterOverides":ParamaterOverides}
         TestsToRun["Ghosting"] = GhostingModule("Ghosting",settings)
 
     if RunSlicePos ==True:
         TotalTests+=1
-        settings = {"Data":Data,"OutputPath":OutputPath,"ParamaterOverides":ParamaterOverides}
+        #settings = {"Data":Data,"OutputPath":OutputPath,"ParamaterOverides":ParamaterOverides}
         TestsToRun["SlicePos"] = SlicePosModule("Slice Position",settings)
 
     if RunSliceThickness ==True:
         TotalTests+=1
-        settings = {"Data":Data,"OutputPath":OutputPath,"ParamaterOverides":ParamaterOverides,"UseLegacySliceThicknessAlgo":UseLegacySliceThicknessAlgo}
+        #settings = {"Data":Data,"OutputPath":OutputPath,"ParamaterOverides":ParamaterOverides,"UseLegacySliceThicknessAlgo":UseLegacySliceThicknessAlgo}
+        settings["UseLegacySliceThicknessAlgo"] = UseLegacySliceThicknessAlgo
         TestsToRun["SliceThickness"] = SliceThicknessModule("Slice Thickness",settings)
         
 
@@ -181,6 +189,7 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
     DumpData["Settings"] = settings
     DumpData["ParamaterOverides"] = ParamaterOverides   
     DumpData["ToleranceTable"] = MedACR_ToleranceTableChecker.ToleranceTable
+    DumpData["SettingsPaneOptions"] = SettingsPaneObject.GetOptions()
     for DicomData in Data:
         DumpData["DICOM"].append(pydicom.dcmread(DicomData))
 

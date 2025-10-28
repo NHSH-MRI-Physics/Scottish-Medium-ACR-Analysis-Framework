@@ -20,6 +20,8 @@ class VarHolder:
     ShiftPressed = False
     CtrlPressed = False
     Direction=0
+    LoadPreviousRunMode = False 
+    PreviousLoadedDataDump = None
 
 class ManualResData:
     ChosenPointsHor = [[],[]]
