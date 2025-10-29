@@ -201,7 +201,7 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
     if os.path.exists("Data_Dumps")==False:
         os.mkdir("Data_Dumps")
     
-    filename = os.path.join("Data_Dumps","Results_" + Seq +"_" + str(datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S"))+".docx")
+    filename = os.path.join(OutputPath,"Results_" + Seq +"_" + str(datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S"))+".docx")
     with open(filename, 'wb') as f:  # open a text file
         pickle.dump(DumpData, f) # serialize the list
         
