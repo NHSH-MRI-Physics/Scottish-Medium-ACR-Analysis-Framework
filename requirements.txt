@@ -16,3 +16,4 @@ opencv-python==4.5.5.64
 sv_ttk
 pandas
 openpyxl
+circle-fit
