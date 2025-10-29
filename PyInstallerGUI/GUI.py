@@ -30,6 +30,7 @@ import DICOM_Holder
 import OptionsPane
 import Windows
 from threading import Thread
+from pathlib import Path
 
 if getattr(sys, 'frozen', False):
     import pyi_splash
@@ -43,12 +44,19 @@ try:
     #This is used with the plotly dash which has currently been shelved, 
     #proc = subprocess.Popen(['DataDashboard_Plotly\ACR_Data_Dashboard.exe'], stderr=sys.stderr, stdout=sys.stdout)
 
+    file_path = Path("Log.txt")
+    file_path.parent.mkdir(parents=True, exist_ok=True)  # ensure parent dirs exist
+    file_path.touch(exist_ok=True)   
+
     class TextRedirector(object):
         def __init__(self, widget, tag="stdout"):
             self.widget = widget
             self.tag = tag
 
         def write(self, string):
+            with open("Log.txt", "a") as f:
+                now = datetime.datetime.now()
+                f.write(now.strftime("%Y-%m-%d %H:%M:%S") + " Log: " +string)
             self.widget.configure(state="normal")
             self.widget.insert("end", string, (self.tag,))
             self.widget.configure(state="disabled")
@@ -61,6 +69,9 @@ try:
             self.tag = tag
 
         def write(self, string):
+            with open("Log.txt", "a") as f:
+                now = datetime.datetime.now()
+                f.write(now.strftime("%Y-%m-%d %H:%M:%S") + " Error: " +string)
             self.widget.configure(state="normal")
             self.widget.insert("end", string, (self.tag,))
             self.widget.configure(state="disabled")
