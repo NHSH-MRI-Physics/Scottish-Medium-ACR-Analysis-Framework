@@ -281,7 +281,7 @@ class TestMedACRAnalysis(unittest.TestCase):
 
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
-        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(os.path.join("ToleranceTable","ToleranceTable_80mmPeg.xml"))
         MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.MAGNETMETHOD
         MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
@@ -300,7 +300,7 @@ class TestMedACRAnalysis(unittest.TestCase):
     def test_02_Check_MedACRAnalysisRunSNR(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
-        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(os.path.join("ToleranceTable","ToleranceTable_80mmPeg.xml"))
         MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.MAGNETMETHOD
         MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=True, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
@@ -320,7 +320,7 @@ class TestMedACRAnalysis(unittest.TestCase):
     def test_03_Check_MedACRAnalysisGeoAcc_MagNet(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
-        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(os.path.join("ToleranceTable","ToleranceTable_80mmPeg.xml"))
         MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.MAGNETMETHOD
         MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=True, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
@@ -340,7 +340,7 @@ class TestMedACRAnalysis(unittest.TestCase):
     def test_04_Check_MedACRAnalysisGeoAcc_ACRMethod(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
-        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(os.path.join("ToleranceTable","ToleranceTable_80mmPeg.xml"))
         MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
         MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=True, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
@@ -360,7 +360,7 @@ class TestMedACRAnalysis(unittest.TestCase):
     def test_05_Check_MedACRAnalysis_Uniformity(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
-        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(os.path.join("ToleranceTable","ToleranceTable_80mmPeg.xml"))
         MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
         MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=True, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
@@ -380,7 +380,7 @@ class TestMedACRAnalysis(unittest.TestCase):
     def test_06_Check_MedACRAnalysis_Ghosting(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
-        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(os.path.join("ToleranceTable","ToleranceTable_80mmPeg.xml"))
         MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
         MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=True, RunSlicePos=False, RunSliceThickness=False)
@@ -400,7 +400,7 @@ class TestMedACRAnalysis(unittest.TestCase):
     def test_07_Check_MedACRAnalysis_SlicePos(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
-        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(os.path.join("ToleranceTable","ToleranceTable_80mmPeg.xml"))
         MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
         MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=True, RunSliceThickness=False)
@@ -420,7 +420,7 @@ class TestMedACRAnalysis(unittest.TestCase):
     def test_08_Check_MedACRAnalysis_SliceThickness(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
-        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(os.path.join("ToleranceTable","ToleranceTable_80mmPeg.xml"))
         MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
         MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=True)
@@ -440,7 +440,7 @@ class TestMedACRAnalysis(unittest.TestCase):
     def test_09_Check_MedACRAnalysis_SpatialRes_ContrastResponse(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
-        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(os.path.join("ToleranceTable","ToleranceTable_80mmPeg.xml"))
         MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
         MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=True, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
@@ -461,7 +461,7 @@ class TestMedACRAnalysis(unittest.TestCase):
     def test_10_Check_MedACRAnalysis_SpatialRes_DotMatrix(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
-        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(os.path.join("ToleranceTable","ToleranceTable_80mmPeg.xml"))
         MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.DotMatrixMethod
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
         MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=True, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
@@ -481,7 +481,7 @@ class TestMedACRAnalysis(unittest.TestCase):
     def test_11_Check_MedACRAnalysis_SpatialRes_MTF(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
-        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(os.path.join("ToleranceTable","ToleranceTable_80mmPeg.xml"))
         MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.MTFMethod
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
         MedACRAnalysis.RunAnalysis("ACR AxT1",ACR_DATA_Med,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=False, RunSNR=False, RunGeoAcc=False, RunSpatialRes=True, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
@@ -501,7 +501,7 @@ class TestMedACRAnalysis(unittest.TestCase):
     def test_12_Check_MedACRAnalysis_SpatialRes_Manual(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
-        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(os.path.join("ToleranceTable","ToleranceTable_80mmPeg.xml"))
         MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.Manual
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
 
@@ -539,7 +539,7 @@ class TestMedACRAnalysis(unittest.TestCase):
     def test_13_Check_MedACRAnalysis_TestOverrides(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
-        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(os.path.join("ToleranceTable","ToleranceTable_80mmPeg.xml"))
         MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.MAGNETMETHOD
         MedACRAnalysis.ManualResData = None
@@ -571,7 +571,7 @@ class TestMedACRAnalysis(unittest.TestCase):
     def test_14_Check_DumpedDataRunning_Default(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
         
-        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(os.path.join("ToleranceTable","ToleranceTable_80mmPeg.xml"))
         MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.MAGNETMETHOD
         MedACRAnalysis.ParamaterOverides = MedACRAnalysis.ParamaterOveride()
@@ -600,7 +600,7 @@ class TestMedACRAnalysis(unittest.TestCase):
     def test_15_Check_DumpedDataRunning_ParamOverides(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
-        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(os.path.join("ToleranceTable","ToleranceTable_80mmPeg.xml"))
         MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.MAGNETMETHOD
         MedACRAnalysis.ManualResData = None
@@ -634,7 +634,7 @@ class TestMedACRAnalysis(unittest.TestCase):
     def test_16_Check_DumpedDataRunning_ManualRes(self):
         ACR_DATA_Med = pathlib.Path(TEST_DATA_DIR / "MedACR")
 
-        MedACR_ToleranceTableChecker.SetUpToleranceTable()
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(os.path.join("ToleranceTable","ToleranceTable_80mmPeg.xml"))
         MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.Manual
         MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.ACRMETHOD
 
