@@ -1,0 +1,40 @@
+<ToleranceTable title = "MedACR 80mm pegs">
+    <Module name = "Uniformity">
+        <Test name = "ACRMethod" Min="90"/>
+        <Test name = "MagNetMethodHor" Min="90"/>
+        <Test name = "MagNetMethodVert" Min="90"/>
+    </Module>
+    <Module name = "Geometric Accuracy">
+        <Test name = "ACRMethod" Min="163" Max="167"/>
+        <Test name = "MagNetMethod" Min="79" Max="81"/>
+    </Module>
+    <Module name = "Contrast Response Resolution">
+        <Test name = "1.1mm holes Horizontal" Min="50"/>
+        <Test name = "1.0mm holes Horizontal" Min="50"/>
+        <Test name = "0.9mm holes Horizontal" Min="50"/>
+        <Test name = "0.8mm holes Horizontal" Min="50"/>
+        <Test name = "1.1mm holes Vertical" Min="50"/>
+        <Test name = "1.0mm holes Vertical" Min="50"/>
+        <Test name = "0.9mm holes Vertical" Min="50"/>
+        <Test name = "0.8mm holes Vertical" Min="50"/>
+    </Module>
+    <Module name = "Manual Resolution">
+        <Test name = "1.1mm holes Horizontal" Min="50"/>
+        <Test name = "1.0mm holes Horizontal" Min="50"/>
+        <Test name = "0.9mm holes Horizontal" Min="50"/>
+        <Test name = "0.8mm holes Horizontal" Min="50"/>
+        <Test name = "1.1mm holes Vertical" Min="50"/>
+        <Test name = "1.0mm holes Vertical" Min="50"/>
+        <Test name = "0.9mm holes Vertical" Min="50"/>
+        <Test name = "0.8mm holes Vertical" Min="50"/>
+    </Module>
+    <Module name = "Slice Thickness">
+        <Test Min="4" Max="6"/>
+    </Module>
+    <Module name = "Slice Position">
+        <Test Max="7"/>
+    </Module>
+    <Module name = "Ghosting">
+        <Test Max="3"/>
+    </Module>
+</ToleranceTable>

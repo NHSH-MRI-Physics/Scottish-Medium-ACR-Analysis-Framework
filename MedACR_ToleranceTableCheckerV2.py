@@ -10,9 +10,9 @@ class Tolerance:
     equals: float =None
 
 ToleranceTable = {}
-def SetUpToleranceTable():
+def SetUpToleranceTable(file):
     
-    file = minidom.parse('ToleranceTable/ToleranceTable.xml')
+    file = minidom.parse(file)
     Modules = file.getElementsByTagName('Module')
 
     for Module in Modules:
@@ -99,3 +99,8 @@ def GetPassResult(Value,ModuleName,TestName=None):
         return ("Result: Pass      Tolerance: " + AppendixTxt)
     else:
         return ("Result: Fail      Tolerance: " + AppendixTxt) 
+    
+def GetToleranceTableTitle(file):
+    file = minidom.parse(file)
+    title = file.getElementsByTagName('ToleranceTable')[0].attributes['title'].value
+    return title

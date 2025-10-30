@@ -31,6 +31,7 @@ import OptionsPane
 import Windows
 from threading import Thread
 from pathlib import Path
+import glob
 
 if getattr(sys, 'frozen', False):
     import pyi_splash
@@ -171,8 +172,8 @@ try:
     
     def LoadDICOMDir(filename):
         global InitalDirDICOM
-        dropdownResults.config(state="disabled")
-        ViewResultsBtn.config(state="disabled")
+        #dropdownResults.config(state="disabled")
+        #ViewResultsBtn.config(state="disabled")
 
         DCMfolder_path.set(filename)
         InitalDirDICOM=DCMfolder_path.get()
@@ -271,8 +272,6 @@ try:
             for warn in WarningMessages:
                 print(warn)
 
-
-
     def SetResultsOutput():
         global InitalDirOutput
         if InitalDirOutput==None:
@@ -344,6 +343,8 @@ try:
         if DCMfolder_path.get() == Resultsfolder_path.get():
             messagebox.showerror("Error","Dicom and results folder cannot be the same")
             return
+        
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(ToleranceTableDict[Tolerance_selection.get()])
 
         RunAll=False
         SNR=False
@@ -547,8 +548,8 @@ try:
         
         DropDownOptions.sort()
         DropDownOptions.append(DropDownOptions[0])
-        dropdownResults.set_menu(*DropDownOptions)
-        dropdownResults.config(state="normal")
+        #dropdownResults.set_menu(*DropDownOptions)
+        #dropdownResults.config(state="normal")
         print ("Done")
 
     def ViewResult():
@@ -621,20 +622,40 @@ try:
             StartingRow+=1
             WidgetsToToggle.append(CheckBoxes[keys][1])
 
-    RunAnalysisBtn = ttk.Button(text="Start Analysis",width=22,command=RunAnalysis)
+    RunAnalysisBtn = ttk.Button(root,text="Start Analysis",width=22,command=RunAnalysis)
     RunAnalysisBtn.grid(row=StartingRow, column=0,padx=10,pady=10,sticky=W)
     WidgetsToToggle.append(RunAnalysisBtn)
 
-    ViewResultsBtn = ttk.Button(text="View Results",width=22,command=ViewResult,state=DISABLED)
-    ViewResultsBtn.grid(row=StartingRow+2, column=0,padx=10,pady=0,sticky=W)
-    WidgetsToToggle.append(ViewResultsBtn)
-
+    '''
     Result_Selection = StringVar()
     ResultImages = [] 
     dropdownResults = ttk.OptionMenu(root, Result_Selection, *ResultImages)
     dropdownResults.config(width = 20,state="disabled")
     WidgetsToToggle.append(dropdownResults)
     dropdownResults.grid(row=StartingRow+1, column=0,padx=10,pady=0,sticky=W)
+
+    ViewResultsBtn = ttk.Button(text="View Results",width=22,command=ViewResult,state=DISABLED)
+    ViewResultsBtn.grid(row=StartingRow+2, column=0,padx=10,pady=0,sticky=W)
+    WidgetsToToggle.append(ViewResultsBtn)
+    '''
+
+    label = ttk.Label(root, text="Tolerance Table Selection")
+    label.grid(row=StartingRow+1, column=0,padx=10,pady=0,sticky=NW,rowspan=2)
+    
+    files = glob.glob(os.path.join("ToleranceTable","*.xml"))
+    ToleranceTableDict = {}
+    for file in files:
+        Title = MedACR_ToleranceTableCheckerV2.GetToleranceTableTitle(file)
+        ToleranceTableDict[Title] = file
+    files = list(ToleranceTableDict.keys())
+    files.append(files[0])
+    files.sort()
+
+    Tolerance_selection = StringVar()
+    ToleranceTableDropdown = ttk.OptionMenu(root, Tolerance_selection, *files)
+    ToleranceTableDropdown.config(width = 20,state="enabled")
+    WidgetsToToggle.append(ToleranceTableDropdown)
+    ToleranceTableDropdown.grid(row=StartingRow+2, column=0,padx=10,pady=0,sticky=NW)
 
     frameResults = ttk.Frame(root)
     ResultsWindowLabel = ttk.Label(master=frameResults,text="Results")
@@ -738,9 +759,6 @@ try:
     root.resizable(False,False)
 
     import hazenlib.logger
-
-    hazenlib.logger.ConfigureLoggerForGUI()
-    MedACR_ToleranceTableChecker.SetUpToleranceTable()
 
 
     root.mainloop()
