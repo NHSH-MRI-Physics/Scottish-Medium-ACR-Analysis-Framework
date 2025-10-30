@@ -25,7 +25,8 @@ jobs:
       run: |
         mkdir "dist/windows/ACR QA Analysis/ToleranceTable"
         ls "dist/windows/ACR QA Analysis"
-        mv ToleranceTable/ToleranceTable.xml "dist/windows/ACR QA Analysis/ToleranceTable"
+        mv ToleranceTable/ToleranceTable_80mmPeg.xml "dist/windows/ACR QA Analysis/ToleranceTable"
+        mv ToleranceTable/ToleranceTable_90mmPeg.xml "dist/windows/ACR QA Analysis/ToleranceTable"
 
     - uses: actions/upload-artifact@v4
       with:
