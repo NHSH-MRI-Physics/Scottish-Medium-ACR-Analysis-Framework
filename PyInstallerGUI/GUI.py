@@ -502,12 +502,22 @@ try:
                 #del ROIS[list(ROIS.keys())[0]]
                 #del ROIS[list(ROIS.keys())[0]]
 
+                if OptionsPaneObj.GetOptions()["Use11mm"] == 0:
+                    del ROIS["1.1mm holes"]
+                if OptionsPaneObj.GetOptions()["Use10mm"] == 0:
+                    del ROIS["1.0mm holes"]
+                if OptionsPaneObj.GetOptions()["Use09mm"] == 0:
+                    del ROIS["0.9mm holes"]
+                if OptionsPaneObj.GetOptions()["Use08mm"] == 0:
+                    del ROIS["0.8mm holes"]
+
+
                 plt.close('all')#Making sure no rogue plots are sitting in the background...
                 #ManualRes(ROIS)
                 ManualResObj = Windows.ManualResWindow(root)
                 #MedACRAnalysis.ManualResData = VarHolder.ManualResData
                 MedACRAnalysis.ManualResData = ManualResObj.ManualRes(ROIS)
-
+                x=0
                 #SpatialRes=False
 
         textResults.configure(state="normal")

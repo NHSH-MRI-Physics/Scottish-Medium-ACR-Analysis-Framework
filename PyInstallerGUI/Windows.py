@@ -382,6 +382,7 @@ class ManualResWindow():
         self.VarHolder=VariableHolder.VarHolder()
 
     def ManualRes(self,ROIS):
+        self.VarHolder.ManualResData = {}
         for key in ROIS:
             self.VarHolder.ManualResData[key] = VariableHolder.ManualResData()
             self.VarHolder.CurrentROI=key
