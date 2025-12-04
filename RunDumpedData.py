@@ -15,7 +15,7 @@ import shutil
 def RunDumpedData(DumpFile,OutFolder):
     with open(DumpFile, 'rb') as f:
         data = pickle.load(f)
-
+    
     if not os.path.exists("TempDICOM"):
         os.makedirs("TempDICOM")
 
