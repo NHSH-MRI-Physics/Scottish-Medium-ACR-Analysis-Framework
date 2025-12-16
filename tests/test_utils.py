@@ -581,15 +581,12 @@ class TestMedACRAnalysis(unittest.TestCase):
         Expectedlines = f.readlines()[3:]
         f.close()
         
-
-        files = glob.glob(os.path.join(TEST_REPORT_DIR, "*"))
+        files = glob.glob(os.path.join(TEST_REPORT_DIR, "*.docx"))
         newest_file = max(files, key=os.path.getmtime)
+
         RunDumpedData.RunDumpedData(newest_file,pathlib.PurePath.joinpath(TEST_REPORT_DIR))
 
-
-
         most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
-        print(most_recent_file)
         f =open(most_recent_file,"r")
         Outputlines = f.readlines()[3:]
         f.close()
@@ -621,7 +618,7 @@ class TestMedACRAnalysis(unittest.TestCase):
         Expectedlines = f.readlines()[3:]
         f.close()
     
-        files = glob.glob(os.path.join(TEST_REPORT_DIR, "*"))
+        files = glob.glob(os.path.join(TEST_REPORT_DIR, "*.docx"))
         newest_file = max(files, key=os.path.getmtime)
         RunDumpedData.RunDumpedData(newest_file,pathlib.PurePath.joinpath(TEST_REPORT_DIR))
         most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
@@ -661,7 +658,7 @@ class TestMedACRAnalysis(unittest.TestCase):
         Expectedlines = f.readlines()[3:]
         f.close()
 
-        files = glob.glob(os.path.join(TEST_REPORT_DIR, "*"))
+        files = glob.glob(os.path.join(TEST_REPORT_DIR, "*.docx"))
         newest_file = max(files, key=os.path.getmtime)
         RunDumpedData.RunDumpedData(newest_file,pathlib.PurePath.joinpath(TEST_REPORT_DIR))
         most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
