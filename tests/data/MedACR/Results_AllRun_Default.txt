@@ -37,8 +37,8 @@ Ghosting Module
 	Ghosting:    0.137%      Result: Pass      Tolerance: <3.0
 
 Slice Position Module
-	Slice 1 Position Error (mm):  -0.88       Result: Pass      Tolerance: <7.0
-	Slice 11 Position Error (mm): -0.88       Result: Pass      Tolerance: <7.0
+	Slice 1 Position Error (mm):  -0.88       Result: Pass      Tolerance: <3.5
+	Slice 11 Position Error (mm): -0.88       Result: Pass      Tolerance: <3.5
 
 Slice Thickness Module
 	Slice Width (mm): 5.15        Result: Pass      Tolerance: >4.0 and <6.0
