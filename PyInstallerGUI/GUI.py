@@ -263,7 +263,11 @@ try:
             MedACRAnalysis.DICOM_Holder_Dict = Options_HolderDict  
 
         options.sort()
-        options.append(options[0])
+        if len(options) != 0:
+            options.append(options[0])
+        else:
+            messagebox.showerror("Error", "No valid DICOM sequences found in folder")
+            DCMfolder_path.set("Not Set!")
         dropdown.set_menu(*options)
         dropdown.config(state="normal")
 
@@ -340,9 +344,9 @@ try:
             messagebox.showerror("Error", "No Results Path Set")
             return
         
-        if DCMfolder_path.get() == Resultsfolder_path.get():
-            messagebox.showerror("Error","Dicom and results folder cannot be the same")
-            return
+        #if DCMfolder_path.get() == Resultsfolder_path.get():
+        #    messagebox.showerror("Error","Dicom and results folder cannot be the same")
+        #    return
         
         MedACR_ToleranceTableChecker.SetUpToleranceTable(ToleranceTableDict[Tolerance_selection.get()])
 

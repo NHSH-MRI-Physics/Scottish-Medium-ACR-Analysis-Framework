@@ -52,10 +52,33 @@ def is_dicom_file(filename):
     data = file_stream.read(4)
     file_stream.close()
     if data == b"DICM":
-        return True
+        #return True
+        return ConfirmDICOMIsValid(filename)
     else:
         return False
 
+def ConfirmDICOMIsValid(filename):
+    dcm = pydicom.dcmread(filename)
+    Valid = True
+
+    if 'PixelData' not in dcm:
+        Valid = False
+    if 'EchoTime' not in dcm:
+        Valid = False
+    if 'RepetitionTime' not in dcm:
+        Valid = False
+    if 'SeriesInstanceUID' not in dcm:
+        Valid = False
+    if 'SeriesDescription' not in dcm:
+        Valid = False
+    if 'SliceThickness' not in dcm:
+        Valid = False
+    if 'Rows' not in dcm or 'Columns' not in dcm:
+        Valid = False
+    if 'PixelSpacing' not in dcm:
+        Valid = False
+
+    return Valid
 
 def is_enhanced_dicom(dcm: pydicom.Dataset) -> bool:
     """
