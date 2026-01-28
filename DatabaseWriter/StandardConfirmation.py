@@ -72,7 +72,6 @@ def CheckAgainstStandard(BinaryFile):
     Slices = len(BinaryFile["DICOM"])
     for dcm in BinaryFile["DICOM"]:
         PhaseEncodingDir = dcm.InPlanePhaseEncodingDirection
-        Matrix = dcm.AcquisitionMatrix
         TE = dcm.EchoTime
         TR = dcm.RepetitionTime
         PixelSpacing = dcm.PixelSpacing
@@ -98,12 +97,13 @@ def CheckAgainstStandard(BinaryFile):
 
         #if (dcm.Manufacturer) == "GE MEDICAL SYSTEMS" or "Siemens".upper() in dcm.Manufacturer.upper():
         DICOM_Param_Obj.SliceGap = round(SliceGap - SliceThickness,3)
+
         if PhaseEncodingDir == 'ROW':
-            DICOM_Param_Obj.MatrixFreq = Matrix[1]
-            DICOM_Param_Obj.MatrixPhase = Matrix[2]
+            DICOM_Param_Obj.MatrixFreq = dcm.get('Columns', None)
+            DICOM_Param_Obj.MatrixPhase = dcm.get('Rows', None) 
         else:
-            DICOM_Param_Obj.MatrixFreq = Matrix[0]
-            DICOM_Param_Obj.MatrixPhase = Matrix[3]
+            DICOM_Param_Obj.MatrixFreq = dcm.get('Rows', None)
+            DICOM_Param_Obj.MatrixPhase =  dcm.get('Columns', None)
         DICOM_Param_Obj.Slices = Slices
 
 
