@@ -46,29 +46,6 @@ if getattr(sys, 'frozen', False):
 UseLegacyLoading = False #incase it doenst work this lets me quickly roll it back
 Options_HolderDict = {}
 try:
-    
-    #check version with the github
-    gh = Github() 
-    if gh.rate_limiting[0] > 10000000000000000000000000000000000000000000:
-        repo = gh.get_repo("NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework")
-        tags = repo.get_tags()
-        ReleaseTags = []
-        ReleaseDates = []
-        for tag in tags:
-            commit = repo.get_commit(tag.commit.sha)
-            ReleaseDates.append(commit.commit.author.date)
-            ReleaseTags.append(tag)
-        LatestTag = ReleaseTags[ReleaseDates.index(max(ReleaseDates))].name
-
-    LatestTag = "pre-release-v1.2.1"
-    if "pre-release".lower() in LatestTag.lower():
-        LatestTag = LatestTag.replace("pre-release-v","") + ".a"
-
-    CurrentVersion = __version__
-    if "Pre-Release".lower() in CurrentVersion.lower():
-        CurrentVersion = CurrentVersion.replace("Pre-Release V","") + ".a"
-
-
     #This is used with the plotly dash which has currently been shelved, 
     #proc = subprocess.Popen(['DataDashboard_Plotly\ACR_Data_Dashboard.exe'], stderr=sys.stderr, stdout=sys.stdout)
 
@@ -114,10 +91,6 @@ try:
     root.geometry('1200x550')
     root.title('Medium ACR Phantom QA Analysis ' + __version__)
     root.iconbitmap("_internal\ct-scan.ico")
-
-    if (Version(LatestTag) > Version(CurrentVersion)):
-        messagebox.showinfo("Update Available", "A newer version of the Medium ACR Phantom QA Analysis Framework is available. Please visit the GitHub page to download the latest version.")
-    
 
     def Tidyup():
         #This is to kill the datadash if we ever go back to it 
@@ -805,7 +778,35 @@ try:
 
     import hazenlib.logger
 
+    LatestTag= None
+    #check version with the github
+    try:
+        gh = Github(timeout=3) 
+        if gh.rate_limiting[0] > 0: #Only do it if we have remaining rate limit
+            repo = gh.get_repo("NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework")
+            tags = repo.get_tags()
+            ReleaseTags = []
+            ReleaseDates = []
+            for tag in tags:
+                commit = repo.get_commit(tag.commit.sha)
+                ReleaseDates.append(commit.commit.author.date)
+                ReleaseTags.append(tag)
+            LatestTag = ReleaseTags[ReleaseDates.index(max(ReleaseDates))].name
+            if "pre-release".lower() in LatestTag.lower():
+                LatestTag = LatestTag.replace("pre-release-v","") + ".a"
+        else:
+            print("Warning: GitHub API rate limit exceeded, cannot check for latest version")            
+    except Exception as e:
+        print("Warning: Could not check if current version is the latest")
+        pass
 
+    CurrentVersion = __version__
+    if "Pre-Release".lower() in CurrentVersion.lower():
+        CurrentVersion = CurrentVersion.replace("Pre-Release V","") + ".a"
+    if LatestTag != None:
+        if (Version(LatestTag) > Version(CurrentVersion)):
+            messagebox.showinfo("Update Available", "A newer version of the Medium ACR Phantom QA Analysis Framework is available. Please visit the GitHub page to download the latest version.")
+        
     root.mainloop()
 except Exception as e:
     messagebox.showerror("Error", e) 
