@@ -1,6 +1,7 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import N, NE, NW, W, ttk
 from tkinterdnd2 import DND_FILES, TkinterDnD
+from tkinter import StringVar, Radiobutton, TOP
 import StandardConfirmation
 from tkinter import messagebox
 import pickle
@@ -17,9 +18,10 @@ sys.path.append("PyInstallerGUI")
 
 root = TkinterDnD.Tk()
 root.title("Database Checker and Adder")
-root.geometry("800x400")  # Width x Height
+root.geometry("800x450")  # Width x Height
 resultDict = None
-
+Weighting = StringVar(root, "T1") 
+Coil = StringVar(root, "Head") 
 data = None
 
 # Label placed at the top-left corner
@@ -57,7 +59,7 @@ FileDropped = tk.Label(
     justify="center",    # Align multiline text to the left
     font=("Arial", 12)
 )
-FileDropped.grid(padx=10, pady=10,row=1, column=1)
+FileDropped.grid(padx=10, pady=10,row=1, column=1,sticky="nesw")
 
 def Update_Spreadsheet():
     global data
@@ -182,6 +184,8 @@ def Update_Spreadsheet():
             Row.append("Not Run")
             Row.append("Not Run")
             Row.append("Not Run")
+        Row.append(Coil.get())
+        Row.append(Weighting.get())
 
         for entry in Row:
             if type(entry) != str:
@@ -201,9 +205,26 @@ def Update_Spreadsheet():
     for item in tree.get_children():
         tree.delete(item)
 
+OptionsFrame = tk.Frame(root, width=350, height=100)
+OptionsFrame.grid(padx=10, pady=0,row=2, column=1,sticky="n")
+
+WeightingFrame = tk.Frame(OptionsFrame, width=50, height=100)
+
+WeightingLabels = tk.Label(WeightingFrame,text="Weighting").pack(side = TOP, ipady = 5, anchor=W) 
+for (text, value) in {"T1" : "T1", "T2" : "T2"} .items(): 
+    Radiobutton(WeightingFrame, text = text, variable = Weighting, 
+        value = value).pack(side = TOP, ipady = 5,ipadx=10, anchor=W) 
+WeightingFrame.grid(padx=10, pady=0,row=0, column=0,sticky="nw")
+
+CoilFrame = tk.Frame(OptionsFrame, width=50, height=100)
+CoilLabels = tk.Label(CoilFrame,text="Coil").pack(side = TOP, ipady = 5, anchor=N) 
+for (text, value) in {"Head" : "Head", "Body AA" : "Body AA", "Head T/R" : "Head T/R","Integrated Body":"Integrated Body"} .items(): 
+    Radiobutton(CoilFrame, text = text, variable = Coil, 
+        value = value).pack(side = TOP, ipady = 0,ipadx=10, anchor=W) 
+CoilFrame.grid(padx=10, pady=0,row=0, column=1,sticky="nw")
 
 UpdateSpread = tk.Button(root, text="Update Spreadsheet", command=Update_Spreadsheet)
-UpdateSpread.grid(padx=10, pady=10,row=2, column=1)
+UpdateSpread.grid(padx=10, pady=5,row=3, column=1,sticky="nesw")
 UpdateSpread.config(state="disabled")
 
 columns = ("Paramater","Standard", "DICOM", "Match?")
@@ -219,7 +240,7 @@ tree.column("Standard", width=80)
 tree.column("DICOM", width=80)
 tree.column("Match?", width=80)
 
-tree.grid(padx=10, pady=10,row=1, column=0,sticky="sw",rowspan=2)
+tree.grid(padx=10, pady=10,row=1, column=0,sticky="sw",rowspan=3)
 
 def drop(event):
     global data
