@@ -13,6 +13,8 @@ import gspread
 from MedACROptions import *
 import MedACRModules
 from MedACRModules.Empty_Module import EmptyModule
+from tkinter import simpledialog
+
 
 sys.path.append("PyInstallerGUI")
 
@@ -73,10 +75,36 @@ def Update_Spreadsheet():
         Row = []
         Row.append(data["date_scanned"].strftime("%d-%m-%Y %H:%M:%S"))
         Row.append(data["data_analysed"].strftime("%d-%m-%Y %H:%M:%S"))
-        Row.append(data["ScannerDetails"]["Manufacturer"])
-        Row.append(data["ScannerDetails"]["Institution Name"])
-        Row.append(data["ScannerDetails"]["Model Name"])
-        Row.append(data["ScannerDetails"]["Serial Number"])
+
+        def CheckIfNeedingUserInput(title,prompt):
+            USER_INP = simpledialog.askstring(title=title,prompt=prompt)
+            if USER_INP == None:
+                raise ValueError("User cancelled the operation.")
+            elif USER_INP == "":
+                raise ValueError("User input is required for this field.")
+            else:
+                return USER_INP
+
+        if data["ScannerDetails"]["Manufacturer"] == None:
+            Row.append(CheckIfNeedingUserInput("Input Required", "Manufacturer is missing from the DICOM data. Please enter it now:"))
+        else:
+            Row.append(data["ScannerDetails"]["Manufacturer"])
+        
+        if data["ScannerDetails"]["Institution Name"] == None:
+            Row.append(CheckIfNeedingUserInput("Input Required", "Institution Name is missing from the DICOM data. Please enter it now:"))
+        else:
+            Row.append(data["ScannerDetails"]["Institution Name"])
+
+        if data["ScannerDetails"]["Model Name"] == None:
+            Row.append(CheckIfNeedingUserInput("Input Required", "Model Name is missing from the DICOM data. Please enter it now:"))
+        else:
+            Row.append(data["ScannerDetails"]["Model Name"])
+            
+        if data["ScannerDetails"]["Serial Number"] == None:
+            Row.append(CheckIfNeedingUserInput("Input Required", "Serial Number is missing from the DICOM data. Please enter it now:"))
+        else:
+            Row.append(data["ScannerDetails"]["Serial Number"])
+        
         Row.append(data["Sequence"])
         Row.append(data["DICOM"][0].MagneticFieldStrength)
 
