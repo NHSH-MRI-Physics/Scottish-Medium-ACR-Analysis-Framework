@@ -66,9 +66,10 @@ StandardParamT2.SequenceType = "SE"
 StandardParamT2.PixelSpacingCol = 0.977
 StandardParamT2.PixelSpacingRow = 0.977
 StandardParamT2.GeoDistMethod = "ACRGeometricAccuracyMagNetMethod"
+StandardParamT2.UniformityMethod = UniformityOptions.ACRMETHOD
 StandardParamT2.SpaitalResMethod = "ContrastResponse"
 
-def CheckAgainstStandard(BinaryFile):
+def CheckAgainstStandard(BinaryFile,Weighting):
     Slices = len(BinaryFile["DICOM"])
     for dcm in BinaryFile["DICOM"]:
         PhaseEncodingDir = dcm.InPlanePhaseEncodingDirection
@@ -121,7 +122,11 @@ def CheckAgainstStandard(BinaryFile):
         if DICOM_Param_Obj.SpaitalResMethod == ResOptions.Manual or DICOM_Param_Obj.SpaitalResMethod == ResOptions.ContrastResponseMethod:
             DICOM_Param_Obj.SpaitalResMethod = "ContrastResponse"
 
-        ComparisonStatus,Data = StandardParamT1.CompareParamaters(DICOM_Param_Obj)
+        if Weighting == "T1":
+            ComparisonStatus,Data = StandardParamT1.CompareParamaters(DICOM_Param_Obj)
+        elif Weighting == "T2":
+            ComparisonStatus,Data = StandardParamT2.CompareParamaters(DICOM_Param_Obj)
+    
         if ComparisonStatus == False:
             return False,Data
     return True, Data

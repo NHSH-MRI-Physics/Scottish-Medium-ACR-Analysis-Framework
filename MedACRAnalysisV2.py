@@ -173,11 +173,10 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
     acq_date = data.get("AcquisitionDate", None)   # Format: YYYYMMDD
     acq_time = data.get("AcquisitionTime", None).split(".")[0]   # Format: HHMMSS.frac, the split removes the fraction
     TimeRan = datetime.datetime.strptime(acq_date + acq_time, "%Y%m%d%H%M%S")
-    ScannerInfo["Manufacturer"] = data.Manufacturer
-    ScannerInfo["Institution Name"] = data.InstitutionName
-    ScannerInfo["Model Name"] = data.ManufacturerModelName
-    ScannerInfo["Serial Number"] = data.DeviceSerialNumber
-
+    ScannerInfo["Manufacturer"] = getattr(data, "Manufacturer", None) #data.Manufacturer
+    ScannerInfo["Institution Name"] = getattr(data, "InstitutionName", None) #data.InstitutionName
+    ScannerInfo["Model Name"] = getattr(data, "ManufacturerModelName", None) #data.ManufacturerModelName
+    ScannerInfo["Serial Number"] =  getattr(data, "DeviceSerialNumber", None) #data.DeviceSerialNumber
     
     DumpData = {}
     DumpData["Test"] = TestsToRun

@@ -249,7 +249,7 @@ def drop(event):
     if len(files) == 1:
         with open(files[0], 'rb') as f:
             data = pickle.load(f)
-            result,resultDict = StandardConfirmation.CheckAgainstStandard(data)
+            result,resultDict = StandardConfirmation.CheckAgainstStandard(data,Weighting.get())
             if result == True:
                 StandardLabel.config(bg="green",text="File meets the standard: \N{Check Mark}")
                 UpdateSpread.config(state="normal")
