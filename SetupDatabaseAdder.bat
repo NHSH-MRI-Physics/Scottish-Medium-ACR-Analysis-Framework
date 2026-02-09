@@ -1,14 +1,15 @@
 
-set Python=C:/Users/Johnt/anaconda3/envs/ACRPhantom/python.exe
+::set Python=C:/Users/Johnt/anaconda3/envs/ACRPhantom/python.exe
+set Python=C:/Users/John/anaconda3/envs/MedACR/python.exe
 
-pyi-makespec DatabaseWriter/DatabaseAdder.py -n DatabaseAdder --paths . --collect-submodules=MedACRModules \
- --hidden-import=MedACRModules.SNR_Module \
- --hidden-import=MedACRModules.Geo_Acc_Module \
- --hidden-import=MedACRModules.Empty_Module \
- --hidden-import=MedACRModules.Ghosting_Module \
- --hidden-import=MedACRModules.SlicePos_Module \
- --hidden-import=MedACRModules.SliceThickness_Module \
- --hidden-import=MedACRModules.Spatial_res_Module \
+pyi-makespec DatabaseWriter/DatabaseAdder.py -n DatabaseAdder --paths . --collect-submodules=MedACRModules ^
+ --hidden-import=MedACRModules.SNR_Module ^
+ --hidden-import=MedACRModules.Geo_Acc_Module ^
+ --hidden-import=MedACRModules.Empty_Module ^
+ --hidden-import=MedACRModules.Ghosting_Module ^
+ --hidden-import=MedACRModules.SlicePos_Module ^
+ --hidden-import=MedACRModules.SliceThickness_Module ^
+ --hidden-import=MedACRModules.Spatial_res_Module ^
  --hidden-import=MedACRModules.Uniformity_Module 
 
 %Python% -m PyInstaller "DatabaseAdder.spec" --distpath "DatabaseWriter" --noconfirm

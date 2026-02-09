@@ -6,7 +6,7 @@ hiddenimports += collect_submodules('MedACRModules')
 
 
 a = Analysis(
-    ['DatabaseWriter/DatabaseAdder.py'],
+    ['DatabaseWriter\\DatabaseAdder.py'],
     pathex=['.'],
     binaries=[],
     datas=[],
