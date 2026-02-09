@@ -1,5 +1,6 @@
 # After making changes for core components please update install_requires in setp.py as well
 setuptools
+pyinstaller>=6.0
 pydicom==2.2.2
 numpy==1.24.1
 matplotlib
