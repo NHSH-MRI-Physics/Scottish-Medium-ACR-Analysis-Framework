@@ -17,7 +17,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Package Application
-      uses: batonogov/pyinstaller-windows@main
+      uses: batonogov/docker-pyinstaller@main
       with:
         path: .
         requirements: requirements.txt
