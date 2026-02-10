@@ -4,7 +4,7 @@ numpy==1.26.4
 matplotlib
 pytest==7.1.2
 docopt==0.6.2
-opencv-python-headless==4.6.0.66
+#opencv-python-headless==4.6.0.66
 opencv-python==4.9.0.80
 scikit-image==0.24.0
 scipy==1.10.0
@@ -13,7 +13,7 @@ colorlog==6.6.0
 sphinx==5.0.2
 sphinxcontrib-bibtex==2.4.2
 sphinx-rtd-theme==1.0.0
-opencv-python==4.5.5.64
+#opencv-python==4.5.5.64
 sv_ttk
 pandas
 openpyxl
