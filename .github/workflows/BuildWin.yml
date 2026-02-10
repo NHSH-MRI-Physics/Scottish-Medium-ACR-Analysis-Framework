@@ -27,7 +27,7 @@ jobs:
 
       - name: Build EXE with PyInstaller
         run: |
-          pyinstaller ".\ACR QA Analysis.spec" --distpath dist/windows --noconfirm
+          pyinstaller ".\ACR QA Analysis.spec" --distpath dist/windows --noconfirm --collect-all numpy
 
       - name: Prepare extra files and folders
         shell: pwsh
