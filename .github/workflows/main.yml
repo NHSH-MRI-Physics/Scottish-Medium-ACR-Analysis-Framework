@@ -1,0 +1,43 @@
+name: Package Application with PyInstaller
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          if exist requirements.txt pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build EXE with PyInstaller
+        run: |
+          pyinstaller ".\ACR QA Analysis.spec" --distpath dist/windows --noconfirm
+
+      - name: Prepare extra files and folders
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force "dist/windows/ACR QA Analysis/ToleranceTable"
+          Get-ChildItem "dist/windows/ACR QA Analysis"
+          Move-Item "ToleranceTable/ToleranceTable_80mmPeg.xml" "dist/windows/ACR QA Analysis/ToleranceTable"
+          Move-Item "ToleranceTable/ToleranceTable_90mmPeg.xml" "dist/windows/ACR QA Analysis/ToleranceTable"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Med_ACR_QA_Framework
+          path: dist/windows
