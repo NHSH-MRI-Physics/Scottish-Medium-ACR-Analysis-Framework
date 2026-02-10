@@ -1,4 +1,4 @@
-<ToleranceTable>
+<ToleranceTable title = "MedACR 80mm pegs">
     <Module name = "Uniformity">
         <Test name = "ACRMethod" Min="90"/>
         <Test name = "MagNetMethodHor" Min="90"/>
@@ -32,7 +32,7 @@
         <Test Min="4" Max="6"/>
     </Module>
     <Module name = "Slice Position">
-        <Test Max="7"/>
+        <Test Max="3.5"/>
     </Module>
     <Module name = "Ghosting">
         <Test Max="3"/>

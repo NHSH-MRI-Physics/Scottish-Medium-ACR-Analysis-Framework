@@ -1,11 +1,17 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_data_files
 from PyInstaller.utils.hooks import collect_submodules
+from PyInstaller.utils.hooks import collect_all
 
 datas = [('_internal\\ct-scan.ico', '.')]
 hiddenimports = ['docopt', 'cv2', 'pydicom.encoders.gdcm', 'pydicom.encoders.pylibjpeg', 'imutils', 'skimage', 'skimage.filters', 'colorlog', 'skimage.segmentation']
 datas += collect_data_files('sv_ttk')
 hiddenimports += collect_submodules('hazenlib')
+
+numpy_datas, numpy_binaries, numpy_hiddenimports = collect_all('numpy')
+datas += numpy_datas
+binaries = numpy_binaries
+hiddenimports += numpy_hiddenimports
 
 
 a = Analysis(
