@@ -1,6 +1,6 @@
 ![UnitTests](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/actions/workflows/Run_UnitTests.yml/badge.svg)
 
-[![Package Application with Pyinstaller](https://github.com/NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework/actions/workflows/build.yml/badge.svg)](https://github.com/NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework/actions/workflows/build.yml)
+[![Package Application with Pyinstaller](https://github.com/NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework/actions/workflows/BuildWin.yml/badge.svg)](https://github.com/NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework/actions/workflows/BuildWin.yml)
 
 ### Scottish Medium ACR Phantom QA project. 
 ![SplashScreen](https://github.com/user-attachments/assets/85599d11-94d9-49e3-8795-e07fd0eb35e3)
