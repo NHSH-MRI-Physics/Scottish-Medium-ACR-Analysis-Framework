@@ -472,3 +472,10 @@ class ShapeDetector:
             size = (size[1], size[0])
             angle = angle - 90
             return (x, y), size, angle
+
+    def ConvertEnhancedDICOMToStack(file):
+        #Check file has 11 slices if not throw an exception
+        #Make 11 copies of the DICOM object
+        #Replace each copy's pixel array with the corresponding slice from the original DICOM object
+        #Write in the slice position to each DICOM object?
+        pass
