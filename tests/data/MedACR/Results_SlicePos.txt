@@ -17,8 +17,8 @@ Ghosting Module
 	Not Run
 
 Slice Position Module
-	Slice 1 Position Error (mm):  -0.88       Result: Pass      Tolerance: <3.5
-	Slice 11 Position Error (mm): -0.88       Result: Pass      Tolerance: <3.5
+	Slice 1 Position Error (mm):  -0.88       Result: Pass      Tolerance: >-3.5 and <3.5
+	Slice 11 Position Error (mm): -0.88       Result: Pass      Tolerance: >-3.5 and <3.5
 
 Slice Thickness Module
 	Not Run
