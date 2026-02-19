@@ -24,6 +24,7 @@ root.geometry("800x450")  # Width x Height
 resultDict = None
 Weighting = StringVar(root, "T1") 
 Coil = StringVar(root, "Head") 
+Orientation = StringVar(root, "Axial") 
 data = None
 
 # Label placed at the top-left corner
@@ -66,6 +67,8 @@ FileDropped.grid(padx=10, pady=10,row=1, column=1,sticky="nesw")
 def Update_Spreadsheet():
     global data
     try:
+        if Orientation.get() == "Unknown":
+            raise Exception("Orientation is unknown. Please select it before updating the spreadsheet.")
         gc = gspread.service_account(filename="DatabaseWriter/qaproject-441416-f5fec0c61099.json")
         sh = gc.open_by_url("https://docs.google.com/spreadsheets/d/1pbH3O7yJwCc05Ktlb643T3rXZsN-EqXcTJfmnz37FU0/edit?gid=0#gid=0")
         values_list = sh.worksheet("Data").col_values(1)
@@ -214,6 +217,9 @@ def Update_Spreadsheet():
             Row.append("Not Run")
         Row.append(Coil.get())
         Row.append(Weighting.get())
+        Row.append(Orientation.get())
+        
+        
 
         for entry in Row:
             if type(entry) != str:
@@ -250,6 +256,13 @@ for (text, value) in {"Head" : "Head", "Body AA" : "Body AA", "Head T/R" : "Head
     Radiobutton(CoilFrame, text = text, variable = Coil, 
         value = value).pack(side = TOP, ipady = 0,ipadx=10, anchor=W) 
 CoilFrame.grid(padx=10, pady=0,row=0, column=1,sticky="nw")
+
+OrientationFrame = tk.Frame(OptionsFrame, width=50, height=100)
+OrientationLabels = tk.Label(OrientationFrame,text="Orientation").pack(side = TOP, ipady = 5, anchor=N) 
+for (text, value) in {"Axial" : "Axial", "Sagittal" : "Sagittal", "Coronal":"Coronal"} .items(): 
+    Radiobutton(OrientationFrame, text = text, variable = Orientation, 
+        value = value).pack(side = TOP, ipady = 0,ipadx=10, anchor=W) 
+OrientationFrame.grid(padx=10, pady=0,row=0, column=2,sticky="nw")
 
 UpdateSpread = tk.Button(root, text="Update Spreadsheet", command=Update_Spreadsheet)
 UpdateSpread.grid(padx=10, pady=5,row=3, column=1,sticky="nesw")
@@ -294,7 +307,20 @@ def drop(event):
 
     else:
         messagebox.showwarning("Warning", "You dropped More Than One File!")
+
+    Orientation.set("Unknown")
+    if "ax" in data["Sequence"].lower():
+        Orientation.set("Axial")
+    if "tra" in data["Sequence"].lower():
+        Orientation.set("Axial")
+    elif "sag" in data["Sequence"].lower():
+        Orientation.set("Sagittal")
+    elif "cor" in data["Sequence"].lower():
+        Orientation.set("Coronal")
     
+    if Orientation.get() == "Unknown":
+        messagebox.showwarning("Warning", "Could not determine orientation from sequence name. Please select it manually.")
+
 # Bind the drop event to the label
 label.drop_target_register(DND_FILES)
 label.dnd_bind('<<Drop>>', drop)
