@@ -57,7 +57,6 @@ def RunAnalysisWithHolder(Holder,DICOMPath,OutputPath,RunAll=True, RunSNR=False,
     RunAnalysisWithData(DICOMS_Holder_Obj.paths,DICOMS_Holder_Obj.params["SeriesDescription"],OutputPath,RunAll=RunAll, RunSNR=RunSNR, RunGeoAcc=RunGeoAcc, RunSpatialRes=RunSpatialRes, RunUniformity=RunUniformity, RunGhosting=RunGhosting, RunSlicePos=RunSlicePos, RunSliceThickness=RunSliceThickness, DICOM_Params=DICOMS_Holder_Obj.params)
 
 
-'''
 #This is a file which simply contains a function to run the analysis. It is in a seperate file so i can reuse it for the various implementations.
 def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False):
     files = get_dicom_files(DICOMPath)
@@ -69,7 +68,7 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
         ACRDICOMSFiles[data.SeriesDescription].append(file)
     Data = ACRDICOMSFiles[Seq]
     RunAnalysisWithData(Data,Seq,OutputPath,RunAll=RunAll, RunSNR=RunSNR, RunGeoAcc=RunGeoAcc, RunSpatialRes=RunSpatialRes, RunUniformity=RunUniformity, RunGhosting=RunGhosting, RunSlicePos=RunSlicePos, RunSliceThickness=RunSliceThickness)
-'''
+
 
 def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False,DICOM_Params = None):
     global ReportText
@@ -221,14 +220,20 @@ def GetROIFigs(Seq,DICOMPath):
     acr_spatial_resolution_task = ACRSpatialResolution(input_data=Data,MediumACRPhantom=True,Paramater_overide = ParamaterOverides)
     return acr_spatial_resolution_task.GetROICrops()
 
-def WriteData(FileName,Seq, TextBlocks, DICOM_Holder_Dict):
+def WriteData(FileName,Seq, TextBlocks, Param_Dicts=None):
     ReportFile = open(FileName,"w")
-    ReportFile.write("Date Analysed: " + str(date.today()) + "\n")
-    ReportFile.write("Sequence Analysed: " + Seq + "\n")
-    ReportFile.write("Version: " + __version__  + "\n")
-    ReportFile.write("TE: " + str(DICOM_Holder_Dict["EchoTime"]) + " ms\n")
-    ReportFile.write("TR: " + str(DICOM_Holder_Dict["RepetitionTime"]) + " ms\n")
-    ReportFile.write("BW: " + str(DICOM_Holder_Dict["Bandwidth"]) + " Hz\n")
+    if Param_Dicts != None:
+        ReportFile.write("Date Analysed: " + str(date.today()) + "\n")
+        ReportFile.write("Sequence Analysed: " + Seq + "\n")
+        ReportFile.write("Version: " + __version__  + "\n")
+        ReportFile.write("TE: " + str(Param_Dicts["EchoTime"]) + " ms\n")
+        ReportFile.write("TR: " + str(Param_Dicts["RepetitionTime"]) + " ms\n")
+        ReportFile.write("BW: " + str(Param_Dicts["Bandwidth"]) + " Hz\n")
+    else:
+        ReportFile.write("Date Analysed: " + str(date.today()) + "\n")
+        ReportFile.write("Sequence Analysed: " + Seq + "\n")
+        ReportFile.write("Version: " + __version__ )
+
     for block in TextBlocks:
         ReportFile.write(block)
 
