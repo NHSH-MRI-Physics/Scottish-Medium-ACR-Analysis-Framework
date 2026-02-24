@@ -32,7 +32,7 @@
         <Test Min="4" Max="6"/>
     </Module>
     <Module name = "Slice Position">
-        <Test Max="3.5"/>
+        <Test Max="3.5" Min="-3.5"/>
     </Module>
     <Module name = "Ghosting">
         <Test Max="3"/>

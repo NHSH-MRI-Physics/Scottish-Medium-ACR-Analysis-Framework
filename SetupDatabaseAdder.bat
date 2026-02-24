@@ -1,6 +1,6 @@
 
-::set Python=C:/Users/Johnt/anaconda3/envs/ACRPhantom/python.exe
-set Python=C:/Users/John/anaconda3/envs/MedACR/python.exe
+set Python=C:/Users/Johnt/anaconda3/envs/ACRPhantom/python.exe
+::set Python=C:/Users/John/anaconda3/envs/MedACR/python.exe
 
 pyi-makespec DatabaseWriter/DatabaseAdder.py -n DatabaseAdder --paths . --collect-submodules=MedACRModules ^
  --hidden-import=MedACRModules.SNR_Module ^
