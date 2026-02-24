@@ -1,11 +1,11 @@
 class DICOMSet:
   
   def __init__(self,DICOM,path):
-    self.params = self.__GetParamDIct(DICOM)
+    self.params = self.__GetParamDict(DICOM)
     self.DICOM_Data = [DICOM]  # Store the first DICOM in the set
     self.paths = [path]
 
-  def __GetParamDIct (self,DICOM):
+  def __GetParamDict (self,DICOM):
     return {
       "EchoTime": DICOM.EchoTime,
       "RepetitionTime": DICOM.RepetitionTime,
@@ -14,10 +14,11 @@ class DICOMSet:
       "SliceThickness": DICOM.SliceThickness,
       "Matrix": str(DICOM.Rows)+","+ str(DICOM.Columns),
       "PixelSpacing": str(DICOM.PixelSpacing[0]) +"," + str(DICOM.PixelSpacing[1]),
+      "Bandwidth": DICOM.PixelBandwidth
     }
 
   def Does_DICOM_Match(self,DICOM):
-    Test_Params = self.__GetParamDIct(DICOM)
+    Test_Params = self.__GetParamDict(DICOM)
     MatchCount = 0
     for key in self.params:
         if self.params[key] == Test_Params[key]:

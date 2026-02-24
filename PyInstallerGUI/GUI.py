@@ -43,7 +43,6 @@ if getattr(sys, 'frozen', False):
 if getattr(sys, 'frozen', False):
     pyi_splash.close()
 
-UseLegacyLoading = False #incase it doenst work this lets me quickly roll it back
 Options_HolderDict = {}
 try:
     #This is used with the plotly dash which has currently been shelved, 
@@ -191,80 +190,63 @@ try:
         for file in files:
             data = pydicom.dcmread(file)
             if "Loc" not in data.SeriesDescription and "loc" not in data.SeriesDescription:
-                if UseLegacyLoading == True:
-                    #options.append(data.SeriesDescription)
-                    #print( data.SeriesInstanceUID)
-                    if data.SeriesDescription not in Seqs:
-                        Seqs[data.SeriesDescription]=1
-                    else:
-                        Seqs[data.SeriesDescription]+=1
+                if len(DICOM_Holder_Objs)==0: #Stick the first DICOM in the list so we can start checking
+                    DICOM_Holder_Objs.append(DICOM_Holder.DICOMSet(data,file))
                 else:
-                    #new way of doing it which is better..
-                    if len(DICOM_Holder_Objs)==0: #Stick the first DICOM in the list so we can start checking
+                    GotAtLeastOneMatch = False
+                    for OneHolder in DICOM_Holder_Objs:
+                        if OneHolder.Does_DICOM_Match(data) == True:
+                            OneHolder.AddDICOM(data,file)
+                            GotAtLeastOneMatch = True
+                    if GotAtLeastOneMatch == False:
                         DICOM_Holder_Objs.append(DICOM_Holder.DICOMSet(data,file))
-                    else:
-                        GotAtLeastOneMatch = False
-                        for OneHolder in DICOM_Holder_Objs:
-                            if OneHolder.Does_DICOM_Match(data) == True:
-                                OneHolder.AddDICOM(data,file)
-                                GotAtLeastOneMatch = True
-                        if GotAtLeastOneMatch == False:
-                            DICOM_Holder_Objs.append(DICOM_Holder.DICOMSet(data,file))
             else:
                 WarningMessages.append("Series Description: " + data.SeriesDescription + " is assumed to be the localiser and not included")
 
         options=[]
-        if UseLegacyLoading == True:
-            for seq in Seqs.keys():
-                if Seqs[seq] == 11:
-                    options.append(seq)
-                else:
-                    WarningMessages.append("Series Description: " + seq + " has more than 11 slices and not included")
-        else:
-            #new way of doing it...
-            KeptDICOMHolders = []
-            for holder in DICOM_Holder_Objs:
-                if len(holder.DICOM_Data) == 11:
-                    options.append(holder.params["SeriesDescription"])
-                    KeptDICOMHolders.append(holder)
-                else:
-                    WarningMessages.append("Series Description: " + holder.params["SeriesDescription"] + " has more than 11 slices and not included")
+        KeptDICOMHolders = []
+        for holder in DICOM_Holder_Objs:
+            if len(holder.DICOM_Data) == 11:
+                options.append(holder.params["SeriesDescription"])
+                KeptDICOMHolders.append(holder)
+            else:
+                WarningMessages.append("Series Description: " + holder.params["SeriesDescription"] + " has more than 11 slices and not included")
 
-            Options_HolderDict = {}
-            #options= list(set(options))
-            duplicates = set([x for x in options if options.count(x) > 1])
-            for dupe in duplicates: 
-                DupeHolders = []
-                DupeParamHolders = []
-                for holder in KeptDICOMHolders:
-                    if holder.params["SeriesDescription"] == dupe:
-                        DupeHolders.append(holder)
-                        DupeParamHolders.append(holder.params)
-                keys = DupeParamHolders[0].keys()
-                diffs = {}
-                for key in keys:
-                    values = []
-                    for d in DupeParamHolders:
-                        values.append(d[key])
-                    if len(set(values)) > 1:
-                        diffs[key] = values
-                for i in range(len(DupeHolders)):
-                    Prefix = ""
-                    for key in diffs:
-                        if key != "SeriesInstanceUID":
-                            Prefix += key + ": " + str(diffs[key][i]) + ", "
-                        else: 
-                            if len(diffs.keys()) == 1:  # If the only key is SeriesInstanceUID, then use it otherwise dont
-                                Prefix += key + ": " + str(diffs[key][i]) + ", "
-                    Prefix = Prefix[:-2]  # Remove the last comma and space
-                    name = DupeHolders[i].params["SeriesDescription"] + " " +Prefix
-                    Options_HolderDict[name] = DupeHolders[i]
-
+        Options_HolderDict = {}
+        #options= list(set(options))
+        duplicates = set([x for x in options if options.count(x) > 1])
+        for dupe in duplicates: 
+            DupeHolders = []
+            DupeParamHolders = []
             for holder in KeptDICOMHolders:
-                if holder.params["SeriesDescription"] not in duplicates:            
-                    Options_HolderDict[holder.params["SeriesDescription"]] = holder
-            options = list(Options_HolderDict.keys())
-            MedACRAnalysis.DICOM_Holder_Dict = Options_HolderDict  
+                if holder.params["SeriesDescription"] == dupe:
+                    DupeHolders.append(holder)
+                    DupeParamHolders.append(holder.params)
+            keys = DupeParamHolders[0].keys()
+            diffs = {}
+            for key in keys:
+                values = []
+                for d in DupeParamHolders:
+                    values.append(d[key])
+                if len(set(values)) > 1:
+                    diffs[key] = values
+            for i in range(len(DupeHolders)):
+                Prefix = ""
+                for key in diffs:
+                    if key != "SeriesInstanceUID":
+                        Prefix += key + ": " + str(diffs[key][i]) + ", "
+                    else: 
+                        if len(diffs.keys()) == 1:  # If the only key is SeriesInstanceUID, then use it otherwise dont
+                            Prefix += key + ": " + str(diffs[key][i]) + ", "
+                Prefix = Prefix[:-2]  # Remove the last comma and space
+                name = DupeHolders[i].params["SeriesDescription"] + " " +Prefix
+                Options_HolderDict[name] = DupeHolders[i]
+
+        for holder in KeptDICOMHolders:
+            if holder.params["SeriesDescription"] not in duplicates:            
+                Options_HolderDict[holder.params["SeriesDescription"]] = holder
+        options = list(Options_HolderDict.keys())
+        MedACRAnalysis.DICOM_Holder_Dict = Options_HolderDict  
 
         options.sort()
         if len(options) != 0:
@@ -533,10 +515,7 @@ try:
         textResults.delete(1.0, END)
         textResults.configure(state="disabled")
 
-        if UseLegacyLoading == True:
-            MedACRAnalysis.RunAnalysis(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
-        else:
-            MedACRAnalysis.RunAnalysisWithHolder(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
+        MedACRAnalysis.RunAnalysisWithHolder(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
 
 
         EnableOrDisableEverything(True)

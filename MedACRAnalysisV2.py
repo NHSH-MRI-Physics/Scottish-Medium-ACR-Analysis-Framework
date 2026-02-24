@@ -54,9 +54,10 @@ ParamaterOverides = ParamaterOveride()
 
 def RunAnalysisWithHolder(Holder,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False):
     DICOMS_Holder_Obj = DICOM_Holder_Dict[Holder]
-    RunAnalysisWithData(DICOMS_Holder_Obj.paths,DICOMS_Holder_Obj.params["SeriesDescription"],OutputPath,RunAll=RunAll, RunSNR=RunSNR, RunGeoAcc=RunGeoAcc, RunSpatialRes=RunSpatialRes, RunUniformity=RunUniformity, RunGhosting=RunGhosting, RunSlicePos=RunSlicePos, RunSliceThickness=RunSliceThickness)
+    RunAnalysisWithData(DICOMS_Holder_Obj.paths,DICOMS_Holder_Obj.params["SeriesDescription"],OutputPath,RunAll=RunAll, RunSNR=RunSNR, RunGeoAcc=RunGeoAcc, RunSpatialRes=RunSpatialRes, RunUniformity=RunUniformity, RunGhosting=RunGhosting, RunSlicePos=RunSlicePos, RunSliceThickness=RunSliceThickness, DICOM_Params=DICOMS_Holder_Obj.params)
 
 
+'''
 #This is a file which simply contains a function to run the analysis. It is in a seperate file so i can reuse it for the various implementations.
 def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False):
     files = get_dicom_files(DICOMPath)
@@ -68,8 +69,9 @@ def RunAnalysis(Seq,DICOMPath,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=Fa
         ACRDICOMSFiles[data.SeriesDescription].append(file)
     Data = ACRDICOMSFiles[Seq]
     RunAnalysisWithData(Data,Seq,OutputPath,RunAll=RunAll, RunSNR=RunSNR, RunGeoAcc=RunGeoAcc, RunSpatialRes=RunSpatialRes, RunUniformity=RunUniformity, RunGhosting=RunGhosting, RunSlicePos=RunSlicePos, RunSliceThickness=RunSliceThickness)
+'''
 
-def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False):
+def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False,DICOM_Params = None):
     global ReportText
     TestsToRun= {}
     TestsToRun["SNR"] = EmptyModule("SNR")
@@ -79,7 +81,6 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
     TestsToRun["Ghosting"] = EmptyModule("Ghosting")
     TestsToRun["SlicePos"] = EmptyModule("Slice Position")
     TestsToRun["SliceThickness"] = EmptyModule("Slice Thickness")
-
 
     if RunAll == True:
         RunSNR =True
@@ -156,7 +157,7 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
             print("Progress " +str(TestCounter) +"/" +str(TotalTests))
     #ReportFile.close()
 
-    WriteData(FileName,Seq,TextBlocks)
+    WriteData(FileName,Seq,TextBlocks,DICOM_Params)
     
     ReportFile = open(FileName,"r")
     ReportText =  ''.join(ReportFile.readlines())
@@ -220,11 +221,14 @@ def GetROIFigs(Seq,DICOMPath):
     acr_spatial_resolution_task = ACRSpatialResolution(input_data=Data,MediumACRPhantom=True,Paramater_overide = ParamaterOverides)
     return acr_spatial_resolution_task.GetROICrops()
 
-def WriteData(FileName,Seq, TextBlocks):
+def WriteData(FileName,Seq, TextBlocks, DICOM_Holder_Dict):
     ReportFile = open(FileName,"w")
     ReportFile.write("Date Analysed: " + str(date.today()) + "\n")
     ReportFile.write("Sequence Analysed: " + Seq + "\n")
-    ReportFile.write("Version: " + __version__)
+    ReportFile.write("Version: " + __version__  + "\n")
+    ReportFile.write("TE: " + str(DICOM_Holder_Dict["EchoTime"]) + " ms\n")
+    ReportFile.write("TR: " + str(DICOM_Holder_Dict["RepetitionTime"]) + " ms\n")
+    ReportFile.write("BW: " + str(DICOM_Holder_Dict["Bandwidth"]) + " Hz\n")
     for block in TextBlocks:
         ReportFile.write(block)
 
