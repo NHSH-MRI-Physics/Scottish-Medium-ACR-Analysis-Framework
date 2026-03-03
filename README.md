@@ -8,12 +8,8 @@
 
 Derived from the [Hazen MRI QA framework](https://github.com/GSTT-CSC/hazen) project, this is a extension which is designed to work with the medium ACR phantom. Some other additions have also been made such as the GUI although the framework remains intact with the original hazen project.
 
-### Baseline values
-A variety of baseline values from an assortmend of scanners can be found [here](https://med-acr-community-data-dashboard.streamlit.app/). This is an ongoing project and is regularly updated as new QA data is added. 
-
-
 ## Instalation, Set up and Quickstart
-## Requiremenets 
+## Requirements 
 - Windows (Mac and Linux coming soon)
 ## Installation
 - Download the latest [release](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/releases/latest).
@@ -96,6 +92,9 @@ To confirm the scripts, match expected results a testing protocol was developed.
 
 ## Bug Reports and Feature Requests
 Please make any bug reports or feature requests by logging an issue [here](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/issues) or send an email to the developers below. The GUI also includes a "Bug Reporting and Feature requesting" button which will take you to a ms form where bugs and features can be requested. Please note this is only available to NHS Scotland employees. 
+
+### Baseline values
+A variety of baseline values from an assortmend of scanners can be found [here](https://med-acr-community-data-dashboard.streamlit.app/). This is an ongoing project and is regularly updated as new QA data is added. 
 
 ## Developers
 John Tracey NHS Highland (John.tracey@nhs.scot)  <br />
