@@ -226,9 +226,9 @@ def WriteData(FileName,Seq, TextBlocks, Param_Dicts=None):
         ReportFile.write("Date Analysed: " + str(date.today()) + "\n")
         ReportFile.write("Sequence Analysed: " + Seq + "\n")
         ReportFile.write("Version: " + __version__  + "\n")
-        ReportFile.write("TE: " + str(Param_Dicts["EchoTime"]) + " ms\n")
-        ReportFile.write("TR: " + str(Param_Dicts["RepetitionTime"]) + " ms\n")
-        ReportFile.write("BW: " + str(Param_Dicts["Bandwidth"]) + " Hz\n")
+        ReportFile.write("TE: " + str(round(Param_Dicts["EchoTime"],2)) + " ms\n")
+        ReportFile.write("TR: " + str(round(Param_Dicts["RepetitionTime"],2)) + " ms\n")
+        ReportFile.write("BW: " + str(round(Param_Dicts["Bandwidth"],2)) + " Hz\n")
     else:
         ReportFile.write("Date Analysed: " + str(date.today()) + "\n")
         ReportFile.write("Sequence Analysed: " + Seq + "\n")

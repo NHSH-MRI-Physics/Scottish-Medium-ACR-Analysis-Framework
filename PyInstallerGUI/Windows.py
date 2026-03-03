@@ -188,13 +188,19 @@ class GetROIOfResBlock():
                 self.SelectedRects[i].remove()
         self.SelectedRects = [None,None,None,None]
         self.RectID = 0
-        plt.title("Draw a box around the " + str(self.ResTitle[self.RectID])+" grid")
+        if self.FixedSize == False:
+            plt.title("Draw a box around the " + str(self.ResTitle[self.RectID])+" grid")
+        else:
+            plt.title("Click the centre of the " + str(self.ResTitle[self.RectID])+" grid")
         self.canvas.draw() 
         
     def Submit(self,Window):
         for rect in self.SelectedRects:
             if rect == None:
-                messagebox.showerror("Error", "Please draw a box round all 4 resolution grids")
+                if self.FixedSize == False:
+                    messagebox.showerror("Error", "Please draw a box round all 4 resolution grids")
+                else:
+                    messagebox.showerror("Error", "Please click the centre of all 4 resolution grids")
                 return
 
         def get_rectangle_center(rect):
@@ -273,8 +279,11 @@ class GetROIOfResBlock():
                         self.SelectedRects[i].remove()
                         self.SelectedRects[i] = None
                         self.RectID = self.SelectedRects.index(None)
-              
-            plt.title("Draw a box around the " + str(self.ResTitle[self.RectID])+" grid")
+            
+            if self.FixedSize== False:
+                plt.title("Draw a box around the " + str(self.ResTitle[self.RectID])+" grid")
+            else:
+                plt.title("Click the centre of the " + str(self.ResTitle[self.RectID])+" grid")
             self.canvas.draw() 
 
     def release_click_on_plot(self,event):
@@ -285,7 +294,10 @@ class GetROIOfResBlock():
             else:
                 self.RectID = 4
             if self.RectID<=3:
-                plt.title("Draw a box around the " + str(self.ResTitle[self.RectID])+" grid")
+                if self.FixedSize == False:
+                    plt.title("Draw a box around the " + str(self.ResTitle[self.RectID])+" grid")
+                else:
+                    plt.title("Click the centre of the " + str(self.ResTitle[self.RectID])+" grid")
                 self.canvas.draw() 
             else:
                 plt.title("All boxes drawn")
@@ -335,7 +347,10 @@ class GetROIOfResBlock():
                         self.SelectedRects[i].remove()
                         self.SelectedRects[i] = None
                         self.RectID = self.SelectedRects.index(None)
-                        plt.title("Draw a box around the " + str(self.ResTitle[self.RectID])+" grid")
+                        if self.FixedSize == False:
+                            plt.title("Draw a box around the " + str(self.ResTitle[self.RectID])+" grid")
+                        else:
+                            plt.title("Click the centre of the " + str(self.ResTitle[self.RectID])+" grid")
                         self.canvas.draw() 
 
 
@@ -350,7 +365,10 @@ class GetROIOfResBlock():
         def disable_event():
             pass
         Win.protocol("WM_DELETE_WINDOW", disable_event)
-        plt.title("Draw a box around the " + str(self.ResTitle[self.RectID])+" grid")
+        if self.FixedSize == False:
+            plt.title("Draw a box around the " + str(self.ResTitle[self.RectID])+" grid")
+        else:
+            plt.title("Click the centre of the " + str(self.ResTitle[self.RectID])+" grid")
         self.Image = self.Dcms[0].pixel_array
         plt.imshow(self.Image,cmap="gray")
         self.canvas = FigureCanvasTkAgg(plt.gcf(), master = Win) 

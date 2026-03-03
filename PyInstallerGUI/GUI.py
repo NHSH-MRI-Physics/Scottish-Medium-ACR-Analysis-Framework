@@ -761,6 +761,7 @@ try:
     #check version with the github
     try:
         gh = Github(timeout=3) 
+        print(gh.rate_limiting) #It looks like the first time you breach the 60 per hour it breaks? Check this?
         if gh.rate_limiting[0] > 0: #Only do it if we have remaining rate limit
             repo = gh.get_repo("NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework")
             tags = repo.get_tags()
