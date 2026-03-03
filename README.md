@@ -106,3 +106,6 @@ Please make any bug reports or feature requests by logging an issue [here](https
 ## Developers
 John Tracey NHS Highland (John.tracey@nhs.scot)  <br />
 Hamish Richardson NHS Lothian (hamish.richardson@nhs.scot)
+
+## Steering Group
+John Tracey, Blair Johnston, Robert Williams, Jonathan Ashmore and Erin Besse
