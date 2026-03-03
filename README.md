@@ -93,7 +93,7 @@ To confirm the scripts, match expected results a testing protocol was developed.
 ## Bug Reports and Feature Requests
 Please make any bug reports or feature requests by logging an issue [here](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/issues) or send an email to the developers below. The GUI also includes a "Bug Reporting and Feature requesting" button which will take you to a ms form where bugs and features can be requested. Please note this is only available to NHS Scotland employees. 
 
-### Baseline values
+## Baseline values
 A variety of baseline values from an assortmend of scanners can be found [here](https://med-acr-community-data-dashboard.streamlit.app/). This is an ongoing project and is regularly updated as new QA data is added. 
 
 ## Developers
