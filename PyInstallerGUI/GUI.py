@@ -730,6 +730,9 @@ try:
     def OpenDatabaseForm():
         webbrowser.open('https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=veDvEDCgykuAnLXmdF5JmpoBwhWxYCZJmZebFt_oEWNUNk9TVThLRTYwWDlJSVM5VkI5WlJBQTA0OC4u&origin=QRCode', new=0)
 
+    def OpenCommunityDataDash():
+        webbrowser.open('https://med-acr-community-data-dashboard.streamlit.app/', new=0)
+
     def ViewDICOMS():
         if DCMfolder_path.get() == "Not Set!":
             messagebox.showerror("Error", "Set DICOM Path first!")
@@ -743,11 +746,14 @@ try:
     ManualButton = ttk.Button(Optionsframe, text="Open Manual",width=20,command = OpenManual)
     ManualButton.pack(pady=1)
 
-    BugReporting = ttk.Button(Optionsframe, text="Bug reporting and \n feature requesting",width=20,command = OpenBugFeatureSite)
-    BugReporting.pack(pady=1)
+    #BugReporting = ttk.Button(Optionsframe, text="Bug reporting and \n feature requesting",width=20,command = OpenBugFeatureSite)
+    #BugReporting.pack(pady=1)
 
-    ReportData = ttk.Button(Optionsframe, text="Report Data",width=20,command = OpenDatabaseForm)
-    ReportData.pack(pady=1)
+    #ReportData = ttk.Button(Optionsframe, text="Report Data",width=20,command = OpenDatabaseForm)
+    #ReportData.pack(pady=1)
+
+    CommunityDataDashButton = ttk.Button(Optionsframe, text="Community Data \n     Dashboard",width=20,command = OpenCommunityDataDash)
+    CommunityDataDashButton.pack(pady=1)
 
     BugReporting = ttk.Button(Optionsframe, text="View Loaded DICOM",width=20,command = ViewDICOMS)
     BugReporting.pack(pady=1)
@@ -773,6 +779,9 @@ try:
                 LatestTag = ReleaseTags[ReleaseDates.index(max(ReleaseDates))]
                 if "pre-release".lower() in LatestTag.lower():
                     LatestTag = LatestTag.replace("pre-release-v","") + ".a"
+                    Split = LatestTag.split(".")
+                    Split[0] = "0"
+                    LatestTag = ".".join(Split)
             else:
                 print("Warning: GitHub API fetch limit exceeded, cannot check for latest version.\nThe Limit resets every hour, will try again next start up.")            
         except Exception as e:
@@ -782,6 +791,9 @@ try:
         CurrentVersion = __version__
         if "Pre-Release".lower() in CurrentVersion.lower():
             CurrentVersion = CurrentVersion.replace("Pre-Release V","") + ".a"
+            Split = LatestTag.split(".")
+            Split[0] = "0"
+            LatestTag = ".".join(Split)
         if LatestTag != None:
             if (Version(LatestTag) > Version(CurrentVersion)):
                 messagebox.showinfo("Update Available", "A newer version of the Medium ACR Phantom QA Analysis Framework is available. Please visit the GitHub page to download the latest version.")
