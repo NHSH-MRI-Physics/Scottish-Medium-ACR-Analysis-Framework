@@ -39,6 +39,7 @@ jobs:
           Get-ChildItem "dist/windows/ACR QA Analysis"
           Move-Item "ToleranceTable/ToleranceTable_80mmPeg.xml" "dist/windows/ACR QA Analysis/ToleranceTable"
           Move-Item "ToleranceTable/ToleranceTable_90mmPeg.xml" "dist/windows/ACR QA Analysis/ToleranceTable"
+          Move-Item "Medium ACR Scanning Protocol v4.pdf" "dist/windows/ACR QA Analysis"
 
       - uses: actions/upload-artifact@v4
         with:
