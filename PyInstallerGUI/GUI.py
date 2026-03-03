@@ -757,35 +757,34 @@ try:
 
     import hazenlib.logger
 
-    LatestTag= None
-    #check version with the github
-    try:
-        gh = Github(timeout=3) 
-        print(gh.rate_limiting) #It looks like the first time you breach the 60 per hour it breaks? Check this?
-        if gh.rate_limiting[0] > 0: #Only do it if we have remaining rate limit
-            repo = gh.get_repo("NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework")
-            tags = repo.get_tags()
-            ReleaseTags = []
-            ReleaseDates = []
-            for tag in tags:
-                commit = repo.get_commit(tag.commit.sha)
-                ReleaseDates.append(commit.commit.author.date)
-                ReleaseTags.append(tag)
-            LatestTag = ReleaseTags[ReleaseDates.index(max(ReleaseDates))].name
-            if "pre-release".lower() in LatestTag.lower():
-                LatestTag = LatestTag.replace("pre-release-v","") + ".a"
-        else:
-            print("Warning: GitHub API rate limit exceeded, cannot check for latest version")            
-    except Exception as e:
-        print("Warning: Could not check if current version is the latest")
-        pass
+    CheckVersion = True
+    if CheckVersion == True:
+        LatestTag= None
+        #check version with the github
+        try:
+            gh = Github(timeout=3) 
+            if gh.rate_limiting[0] > 0: #Only do it if we have remaining rate limit
+                ReleaseTags = []
+                ReleaseDates = []
+                releases = requests.get(f"https://api.github.com/repos/NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework/releases").json()
+                for release in releases:
+                    ReleaseDates.append(datetime.datetime.strptime(release["published_at"], "%Y-%m-%dT%H:%M:%SZ"))
+                    ReleaseTags.append(release["tag_name"])
+                LatestTag = ReleaseTags[ReleaseDates.index(max(ReleaseDates))]
+                if "pre-release".lower() in LatestTag.lower():
+                    LatestTag = LatestTag.replace("pre-release-v","") + ".a"
+            else:
+                print("Warning: GitHub API fetch limit exceeded, cannot check for latest version.\nThe Limit resets every hour, will try again next start up.")            
+        except Exception as e:
+            print("Warning: Could not check if current version is the latest")
+            pass
 
-    CurrentVersion = __version__
-    if "Pre-Release".lower() in CurrentVersion.lower():
-        CurrentVersion = CurrentVersion.replace("Pre-Release V","") + ".a"
-    if LatestTag != None:
-        if (Version(LatestTag) > Version(CurrentVersion)):
-            messagebox.showinfo("Update Available", "A newer version of the Medium ACR Phantom QA Analysis Framework is available. Please visit the GitHub page to download the latest version.")
+        CurrentVersion = __version__
+        if "Pre-Release".lower() in CurrentVersion.lower():
+            CurrentVersion = CurrentVersion.replace("Pre-Release V","") + ".a"
+        if LatestTag != None:
+            if (Version(LatestTag) > Version(CurrentVersion)):
+                messagebox.showinfo("Update Available", "A newer version of the Medium ACR Phantom QA Analysis Framework is available. Please visit the GitHub page to download the latest version.")
         
     root.mainloop()
 except Exception as e:
