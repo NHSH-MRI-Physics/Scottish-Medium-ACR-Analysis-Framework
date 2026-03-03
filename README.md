@@ -8,15 +8,9 @@
 
 Derived from the [Hazen MRI QA framework](https://github.com/GSTT-CSC/hazen) project, this is a extension which is designed to work with the medium ACR phantom. Some other additions have also been made such as the GUI although the framework remains intact with the original hazen project.
 
-## Current Status and To Do
-- [x] Add medium ACR phantom compatibility to the Hazen code base.
-- [x] Incorporate docker image of the Hazen code base with medium ACR compatibility.
-- [x] Build GUI for the medium ACR phantom implementation.
-- [x] Build a version of the GUI which does not require internet connection.
-- [x] Make a release package
-- [x] Build unit tests.
-- [x] Write documentation.
-- [ ] get baseline values from a series of scanners
+### Baseline values
+A variety of baseline values from an assortmend of scanners can be found [here](https://med-acr-community-data-dashboard.streamlit.app/). This is an ongoing project and is regularly updated as new QA data is added. 
+
 
 ## Instalation, Set up and Quickstart
 ## Requiremenets 
