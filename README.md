@@ -22,9 +22,8 @@ Derived from the [Hazen MRI QA framework](https://github.com/GSTT-CSC/hazen) pro
 - Select whats tests you want to run from the checkboxes.
 - Click "Start Analysis"
 - On completion the results are displayed and you can view individual results by selecting the dropdown (below the "Start Analysis" button) following the "View Results" button.
-
-![path30](https://github.com/user-attachments/assets/0ef4008e-d647-4fdc-a12a-e94b0dac3a79)
-
+  
+<img width="2930" height="1178" alt="ManualImage" src="https://github.com/user-attachments/assets/dc56e0c2-a010-4b7e-b9ed-e71b3e959f79" />
 
 
 ## Scanning Protocol
