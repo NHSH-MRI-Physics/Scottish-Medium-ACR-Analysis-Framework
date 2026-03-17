@@ -549,6 +549,7 @@ try:
         #dropdownResults.config(state="normal")
         print ("Done")
 
+    '''
     def ViewResult():
         ChosenResult = Result_Selection.get()
         Path = Resultsfolder_path.get()
@@ -564,6 +565,7 @@ try:
                 else:
                     opener = "open" if sys.platform == "darwin" else "xdg-open"
                     subprocess.call([opener, file])
+    '''
 
     WidgetsToToggle=[]
     InitalDirDICOM=None
