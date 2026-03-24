@@ -1,13 +1,13 @@
 import os
 import cv2 as cv
+from matplotlib import pyplot as plt
 import pydicom
 import imutils
 import matplotlib
 import numpy as np
-
+import copy
 from collections import defaultdict
 from skimage import filters
-
 import hazenlib.exceptions as exc
 
 matplotlib.use("Agg")
@@ -351,6 +351,46 @@ def rescale_to_byte(array):
 
     return image_equalized.reshape(array.shape).astype("uint8")
 
+def ConvertEnhancedDICOMToStack(PyDICOM_Object):
+    #Check file has 11 slices if not throw an exception
+    #Make 11 copies of the DICOM object
+    #Replace each copy's pixel array with the corresponding slice from the original DICOM object
+    #Write in the slice position to each DICOM object?
+
+    Images = PyDICOM_Object.pixel_array
+    if Images.shape[0] != 11:
+        print("DICOM object does not have 11 slices skiping")
+        return
+    PyDICOM_Objects_dict = {}
+    count = 0
+    for image in Images:
+        PyDICOM_Objects_dict[PyDICOM_Object.SeriesDescription + "_" + str(count)] = copy.copy(PyDICOM_Object)
+        PyDICOM_Objects_dict[PyDICOM_Object.SeriesDescription + "_" + str(count)].NumberOfFrames = 1
+        PyDICOM_Objects_dict[PyDICOM_Object.SeriesDescription + "_" + str(count)].PixelData = image.tobytes()
+        PyDICOM_Objects_dict[PyDICOM_Object.SeriesDescription + "_" + str(count)].ImagePositionPatient  = PyDICOM_Object.PerFrameFunctionalGroupsSequence[count].PlanePositionSequence[0].ImagePositionPatient
+
+        #Get Echo Time
+        echo_seq = PyDICOM_Object.PerFrameFunctionalGroupsSequence[count].MREchoSequence[0]        
+        if "EffectiveEchoTime" in echo_seq:
+            echotime = (float(echo_seq.EffectiveEchoTime))
+        elif "EchoTime" in echo_seq:
+            echotime = (float(echo_seq.EchoTime))
+        else:
+            raise Exception("Could not find Echo Time in enhanced DICOM object")
+        PyDICOM_Objects_dict[PyDICOM_Object.SeriesDescription + "_" + str(count)].EchoTime = echotime
+
+        #Get Repetition Time
+        timing_seq = PyDICOM_Object.SharedFunctionalGroupsSequence[0].MRTimingAndRelatedParametersSequence[0]
+        if "RepetitionTime" in timing_seq:
+            repetition_time = (float(timing_seq.RepetitionTime))
+        else:
+            raise Exception("Could not find Repetition Time in enhanced DICOM object")
+        PyDICOM_Objects_dict[PyDICOM_Object.SeriesDescription + "_" + str(count)].RepetitionTime = repetition_time
+
+        #Add in slice Thickness next
+        count+=1
+    return PyDICOM_Objects_dict
+
 
 class Rod:
     def __init__(self, x, y):
@@ -472,10 +512,3 @@ class ShapeDetector:
             size = (size[1], size[0])
             angle = angle - 90
             return (x, y), size, angle
-
-    def ConvertEnhancedDICOMToStack(file):
-        #Check file has 11 slices if not throw an exception
-        #Make 11 copies of the DICOM object
-        #Replace each copy's pixel array with the corresponding slice from the original DICOM object
-        #Write in the slice position to each DICOM object?
-        pass
