@@ -249,7 +249,7 @@ def WriteData(FileName,Seq, TextBlocks, Param_Dicts=None):
             MaskingOverride = True
     #if len(np.where(ParamaterOverides.MaskingOverride!=None)[0]) != 0:
     if MaskingOverride == True: 
-        OverrideText += "Making Override: True\n"
+        OverrideText += "Masking Override: True\n"
 
 
     if ParamaterOverides.ROIOverride != None:
