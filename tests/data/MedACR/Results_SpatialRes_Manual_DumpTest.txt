@@ -33,5 +33,5 @@ Slice Thickness Module
 Overrides Active
 Center Override Position: 126,130
 Radius Override: 84
-Making Override: True
+Masking Override: True
 ROI Position Override: True
