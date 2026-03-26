@@ -42,11 +42,11 @@ This is computed by moving a 1cm^2 circular ROI over the phantom and computing t
 On the ACR Phantom, the slice position can be determined by examining two bars located at the top of the phantom. The difference in the bars height coresponds to the error in slice position. The code produces a line profile over each bar and determines the offset between them. Hence it can compute the slice position error. 
 
 ### Spatial Resolution
-#### Contrast Response 
-On slice 1 there is a series of dot matrices designed to measure resoloution performance. For each grid, this module automatically attempts to determine what row and coloumn in each grid yeilds the highest contrast response. This is repeated for each grid yeilding a contrast response value as a function of grid size. For more information refer to [here](https://github.com/NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework/blob/main/docs/ContrastResponse.md)
+#### Contrast Response (Recommended option)
+On slice 1 there is a series of dot matrices designed to measure resoloution performance. For each grid, this module automatically attempts to determine what row and coloumn in each grid yeilds the highest contrast response. This is repeated for each grid yeilding a contrast response value as a function of grid size. For more information refer to [here](https://github.com/NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework/blob/main/docs/ContrastResponse.md). If you are having inconsistent results it recommend you try the manual option.
 #### Modulation Transfer Function (MTF)
 On slice 1 an edge is found and a line profile extracted over it. This profile is differentated and the fourier transform taken, computing the MTF. For this to be effective the phantom is expected to be rotated by at least 3 degrees. 
-#### Manual (Recommended option)
+#### Manual
 This module displays to the user each resolution grid. The user then has to highlight the peaks and troughs on each grid image. This is conducted by left clicking 4 times to identify the 4 horizontal peaks (blue crosses) and then 3 times to identify the 3 troughs (blue circles). By holding ctrl then left clicking the user can highlight the 4 vertical peaks and 3 vertical troughs in the same fashion as the horizontal component, these are labeled as red crosses and circles. By Pressing Alt, the troughs are automatically assigned based on the middle location between the peaks. The windowing can also be adjusted by right clicking and dragging. By shift-clicking or ctrl-shift-clicking points already placed on the image can be removed. After all 4 resolution grids have been evaluated the contrast response is computed.
 
 ### Slice Thickness
