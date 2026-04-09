@@ -23,6 +23,7 @@ class VarHolder:
     LoadPreviousRunMode = False 
     PreviousLoadedDataDump = None
     PreviousLoadedDataIsLegacy= False #This is to check if the loaded data is from a version before we added the software version saving
+    PreviousDir=None
 
 class ManualResData:
     ChosenPointsHor = [[],[]]

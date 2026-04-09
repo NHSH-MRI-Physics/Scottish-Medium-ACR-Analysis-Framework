@@ -126,6 +126,7 @@ try:
         LoadDICOMDir(filename)
 
     def LoadPreviousRun():
+        global InitalDirDICOM
         if InitalDirDICOM==None:
             PrevRun = filedialog.askopenfilename()
         else:
@@ -153,6 +154,7 @@ try:
             OptionsPaneObj.SetOptions(data["SettingsPaneOptions"])
         OptionsPaneObj.LoadPreviousRun.set(1) #Need this since this the only setting taht differs from that in the dump file
         LoadDICOMDir("TempDICOM")
+        InitalDirDICOM = PrevRun
 
         if "ResultsText" in VarHolder.PreviousLoadedDataDump:
             textResults.configure(state="normal")
@@ -461,6 +463,10 @@ try:
             if OverrideCurrentSlice == True: 
                 OverrideCentreRadiusObj = Windows.CentreRadiusMaskingWindow(root,DCMfolder_path.get(),selected_option.get(),overridemasking=OptionsPaneObj.GetOptions()["OverrideMasking"],slice=CurrentSlice,PreCalcdCentre=MedACRAnalysis.ParamaterOverides.CentreOverride)
                 OverrideCentreRadiusObj.GetCentreRadiusMask()
+                if OverrideCentreRadiusObj.exit_manual_radmask == True:
+                    print("Radius/Centre/Masking override cancelled")
+                    EnableOrDisableEverything(True)
+                    return
 
             if OptionsPaneObj.GetOptions()["OverrideRadiusAndCentre"] == 1 and CurrentSlice==7:
                 print("Radius and Centre of phantom overriden")
@@ -477,7 +483,12 @@ try:
                 if OptionsPaneObj.GetOptions()["FixedManualROISize"] == 0:
                     overrideRes.FixedSize = False
                 overrideRes.GetROIs()
+                if overrideRes.exit_manual_ROIRes == True:
+                    print("Spatial resolution ROI override cancelled")
+                    EnableOrDisableEverything(True)
+                    return
                 MedACRAnalysis.ParamaterOverides.ROIOverride=overrideRes.crops
+
 
         if VarHolder.LoadPreviousRunMode == True  and VarHolder.PreviousLoadedDataIsLegacy == False:
             #This here reutrns the options back to the previous loaded ones since we only turned them off to show the dialog boxes
@@ -485,13 +496,6 @@ try:
                 OptionsPaneObj.OverrideRadiusAndCentre.set(VarHolder.PreviousLoadedDataDump["SettingsPaneOptions"]["OverrideRadiusAndCentre"])
                 OptionsPaneObj.OverrideMasking.set(VarHolder.PreviousLoadedDataDump["SettingsPaneOptions"]["OverrideMasking"])
                 OptionsPaneObj.OverideResBlockLoc.set(VarHolder.PreviousLoadedDataDump["SettingsPaneOptions"]["OverideResBlockLoc"])
-
-        #ArrayToSave = []
-        #ArrayToSave.append(MedACRAnalysis.ParamaterOverides.CentreOverride)
-        #ArrayToSave.append(MedACRAnalysis.ParamaterOverides.RadiusOverride)
-        #ArrayToSave.append(MedACRAnalysis.ParamaterOverides.MaskingOverride)
-        #ArrayToSave.append(MedACRAnalysis.ParamaterOverides.ROIOverride)
-        #np.savez("Override",ArrayToSave[0],ArrayToSave[1],ArrayToSave[2],ArrayToSave[3][0],ArrayToSave[3][1],ArrayToSave[3][2],ArrayToSave[3][3],allow_pickle=True)
 
 
         MedACRAnalysis.ManualResTestText=None
@@ -529,7 +533,10 @@ try:
                 ManualResObj = Windows.ManualResWindow(root)
                 #MedACRAnalysis.ManualResData = VarHolder.ManualResData
                 MedACRAnalysis.ManualResData = ManualResObj.ManualRes(ROIS)
-                x=0
+                if ManualResObj.exit_manual_res == True:
+                    print("Manual resolution cancelled")
+                    EnableOrDisableEverything(True)
+                    return
                 #SpatialRes=False
 
         textResults.configure(state="normal")
@@ -538,7 +545,6 @@ try:
         textResults.configure(state="disabled")
 
         MedACRAnalysis.RunAnalysisWithHolder(selected_option.get(),DCMfolder_path.get(),Resultsfolder_path.get(),RunAll=RunAll, RunSNR=SNR, RunGeoAcc=GeoAcc, RunSpatialRes=SpatialRes, RunUniformity=Uniformity, RunGhosting=Ghosting, RunSlicePos=SlicePos, RunSliceThickness=SliceThickness)
-
 
         EnableOrDisableEverything(True)
         if RunAll==True:
@@ -761,8 +767,9 @@ try:
         if DCMfolder_path.get() == "Not Set!":
             messagebox.showerror("Error", "Set DICOM Path first!")
             return
+
         ViewDICOMObj = Windows.DisplayLoadedDICOM(root,DCMfolder_path.get(),selected_option.get())
-        ViewDICOMObj.DiplayDICOMS()
+        ViewDICOMObj.DiplayDICOMS(ViewDCM)
 
     OpenOptionsButton = ttk.Button(Optionsframe, text="Open Options",width=20,command = OpenOptionsPane)
     OpenOptionsButton.pack(pady=1)
@@ -779,8 +786,8 @@ try:
     CommunityDataDashButton = ttk.Button(Optionsframe, text="Community Data \n     Dashboard",width=20,command = OpenCommunityDataDash)
     CommunityDataDashButton.pack(pady=1)
 
-    BugReporting = ttk.Button(Optionsframe, text="View Loaded DICOM",width=20,command = ViewDICOMS)
-    BugReporting.pack(pady=1)
+    ViewDCM = ttk.Button(Optionsframe, text="View Loaded DICOM",width=20,command = ViewDICOMS)
+    ViewDCM.pack(pady=1)
 
     Optionsframe.grid(row=11, column=3,padx=8,pady=5,rowspan=3)
     root.resizable(False,False)

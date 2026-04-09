@@ -5,7 +5,6 @@
 ### Scottish Medium ACR Phantom QA project. 
 ![SplashScreen](https://github.com/user-attachments/assets/85599d11-94d9-49e3-8795-e07fd0eb35e3)
 
-
 Derived from the [Hazen MRI QA framework](https://github.com/GSTT-CSC/hazen) project, this is a extension which is designed to work with the medium ACR phantom. Some other additions have also been made such as the GUI although the framework remains intact with the original hazen project.
 
 ## Instalation, Set up and Quickstart
@@ -27,7 +26,7 @@ Derived from the [Hazen MRI QA framework](https://github.com/GSTT-CSC/hazen) pro
 
 
 ## Scanning Protocol
-Scan the ACR Phantom as laid out in the [ACR Large and medium guidance document](https://accreditationsupport.acr.org/helpdesk/attachments/11093487417). It is possible to scan in other orientations than axial but the phantom must be rotated correctly (see below). It is also possible to use other coils than the head but this has not been fully tested. 
+Scan the ACR Phantom as laid out in the [ACR Large and medium guidance document](https://accreditationsupport.acr.org/helpdesk/attachments/11093487417). It is possible to scan in other orientations than axial but the phantom must be rotated correctly (see below). It is also possible to use other coils than the head but this has not been fully tested. A full scanning protocol is included in the release package. 
 
 ## Expected Data Format
 It is expected to be a directory containing DICOM files, where each file coresponds to one slice, it is possible to have several sequeunces contained within the folder. Data should be collected as laid out in the [ACR Large and medium guidance document](https://www.acraccreditation.org/-/media/ACRAccreditation/Documents/MRI/ACR-Large--Med-Phantom-Guidance-102022.pdf). If it is desired to test sagittal and coronal axis, this is possible by rotating the phantom appropriately. It is important that the phantom or field of view is rotated such that circular component as at the top of the image and the resolution block is located at the bottom regardless if you are imaging axial, sagittal or coronal.  See the Image below for an example. 
@@ -42,11 +41,11 @@ This is computed by moving a 1cm^2 circular ROI over the phantom and computing t
 On the ACR Phantom, the slice position can be determined by examining two bars located at the top of the phantom. The difference in the bars height coresponds to the error in slice position. The code produces a line profile over each bar and determines the offset between them. Hence it can compute the slice position error. 
 
 ### Spatial Resolution
-#### Contrast Response 
-On slice 1 there is a series of dot matrices designed to measure resoloution performance. For each grid, this module automatically attempts to determine what row and coloumn in each grid yeilds the highest contrast response. This is repeated for each grid yeilding a contrast response value as a function of grid size. For more information refer to [here](https://github.com/NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework/blob/main/docs/ContrastResponse.md)
+#### Contrast Response (Recommended option)
+On slice 1 there is a series of dot matrices designed to measure resoloution performance. For each grid, this module automatically attempts to determine what row and coloumn in each grid yeilds the highest contrast response. This is repeated for each grid yeilding a contrast response value as a function of grid size. For more information refer to [here](https://github.com/NHSH-MRI-Physics/Scottish-Medium-ACR-Analysis-Framework/blob/main/docs/ContrastResponse.md). If you are having inconsistent results it recommend you try the manual option.
 #### Modulation Transfer Function (MTF)
 On slice 1 an edge is found and a line profile extracted over it. This profile is differentated and the fourier transform taken, computing the MTF. For this to be effective the phantom is expected to be rotated by at least 3 degrees. 
-#### Manual (Recommended option)
+#### Manual
 This module displays to the user each resolution grid. The user then has to highlight the peaks and troughs on each grid image. This is conducted by left clicking 4 times to identify the 4 horizontal peaks (blue crosses) and then 3 times to identify the 3 troughs (blue circles). By holding ctrl then left clicking the user can highlight the 4 vertical peaks and 3 vertical troughs in the same fashion as the horizontal component, these are labeled as red crosses and circles. By Pressing Alt, the troughs are automatically assigned based on the middle location between the peaks. The windowing can also be adjusted by right clicking and dragging. By shift-clicking or ctrl-shift-clicking points already placed on the image can be removed. After all 4 resolution grids have been evaluated the contrast response is computed.
 
 ### Slice Thickness
@@ -79,7 +78,7 @@ Some modules require a binary mask of the phantom, this is usually computed base
 ![image](https://github.com/user-attachments/assets/98afa201-f070-4e23-a93c-63fed9e447a4)
 
 #### Override Res Blocks Location
-Most of the spatial resolution algorithms try to find the position of the four sets of resolution grids located in the ACR phantom, for various reasons the algorithm may struggle to find these. Hence, the location of these can be overridden. To do this, simply draw 4 rectangles (by left clicking) which surround each of the 4 resolution grids. It is important that the correct grid is drawn round, you should work from left to right with the 1.1mm grid being surrounded by the red box, 1.0mm by the green box, 0.9mm by the blue box and 0.8mm by the yellow box. In practice this simple means draw boxes from left to right on the image. If you wish to redraw a box, simply right click within it and redraw it. Please note, at the bottom of the image there is an option to zoom in which will help with accurate drawing. 
+Most of the spatial resolution algorithms try to find the position of the four sets of resolution grids located in the ACR phantom, for various reasons the algorithm may struggle to find these. Hence, the location of these can be overridden. To do this, simply draw 4 rectangles by left clicking at the intersection point of the two grids, see the example below. A coloured box will surround the grid. It is important that the correct grid is drawn round, you should work from left to right with the 1.1mm grid being surrounded by the red box, 1.0mm by the green box, 0.9mm by the blue box and 0.8mm by the yellow box. In practice this simple means draw boxes from left to right on the image. If you wish to redraw a box, simply right click within it and redraw it. Please note, at the bottom of the image there is an option to zoom in which will help with accurate drawing. 
 
 ![image](https://github.com/user-attachments/assets/0a694a64-f1f8-4a5f-bd38-2ee15548d490)
 

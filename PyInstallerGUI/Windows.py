@@ -46,6 +46,7 @@ class CentreRadiusMaskingWindow():
         self.Title = "Displaying Slice " + str(slice+1) + "\nChoose 4 points on the edge of the circle"
         self.overrideMasking = overridemasking
         self.slice = slice
+        self.exit_manual_radmask = False
 
     def  on_click_on_plot(self,event):
         if (self.canvas.toolbar.mode) != '':
@@ -138,8 +139,11 @@ class CentreRadiusMaskingWindow():
         Win.iconbitmap("_internal\ct-scan.ico")
         Win.geometry("500x540")
 
+        #def disable_event():
+        #    pass
         def disable_event():
-            pass
+            self.exit_manual_radmask = True  # Set flag to exit ManualRes
+            Win.destroy()  # Destroy the window to unblock wait_window
         Win.protocol("WM_DELETE_WINDOW", disable_event)
 
         Win.configure(background='white')
@@ -165,6 +169,8 @@ class CentreRadiusMaskingWindow():
         SubmitButton.place(relx=0.75, rely=0.89, anchor='center')
 
         self.root.wait_window(Win)
+        if self.exit_manual_radmask:  # Check flag after window closes
+            return
 
 class GetROIOfResBlock():
     def __init__(self,root,dicomPath,seq):
@@ -180,6 +186,8 @@ class GetROIOfResBlock():
         self.ResTitle = ["1.1mm","1.0mm", "0.9mm", "0.8mm"]
         self.RectID = 0
         self.crops = [None,None,None,None]
+
+        self.exit_manual_ROIRes = False
 
     def Reset(self):
         self.Rect = [None,None,None,None]
@@ -362,8 +370,12 @@ class GetROIOfResBlock():
         Win.configure(background='white')
         Win.resizable(False,False)
 
+        #def disable_event():
+        #    pass
         def disable_event():
-            pass
+            self.exit_manual_ROIRes = True  # Set flag to exit ManualRes
+            Win.destroy()  # Destroy the window to unblock wait_window
+
         Win.protocol("WM_DELETE_WINDOW", disable_event)
         if self.FixedSize == False:
             plt.title("Draw a box around the " + str(self.ResTitle[self.RectID])+" grid")
@@ -393,6 +405,8 @@ class GetROIOfResBlock():
         ResetButton.place(relx=0.75, rely=0.89, anchor='center')
 
         self.root.wait_window(Win)
+        if self.exit_manual_ROIRes:  # Check flag after window closes
+            return
 
 class ManualResWindow():
     def __init__(self,root):
@@ -401,6 +415,7 @@ class ManualResWindow():
 
     def ManualRes(self,ROIS):
         self.VarHolder.ManualResData = {}
+        self.exit_manual_res = False
         for key in ROIS:
             self.VarHolder.ManualResData[key] = VariableHolder.ManualResData()
             self.VarHolder.CurrentROI=key
@@ -410,7 +425,8 @@ class ManualResWindow():
             self.VarHolder.NewWindow.geometry("500x560")
             self.VarHolder.NewWindow.configure(background='white')
             self.VarHolder.NewWindow.resizable(False,False)
-            plt.title(key) 
+            plt.suptitle(key)
+            plt.title("left click on 4 peaks (crosses) then 3 troughs (circles),\n shift + left click to delete points, hold ctrl to change to vertical.",fontsize=8) 
             self.VarHolder.CurrentImage = ROIS[key]
             BaseVmax = np.max(self.VarHolder.CurrentImage)
             BaseVmin = np.min(self.VarHolder.CurrentImage)
@@ -447,11 +463,16 @@ class ManualResWindow():
             self.VarHolder.NewWindow.bind("<ButtonRelease-3>", self.EndTracking)
             self.VarHolder.NewWindow.bind("<B3-Motion>", self.Windowing_handler)
 
+            #def disable_event():
+            #    pass
             def disable_event():
-                pass
+                self.exit_manual_res = True  # Set flag to exit ManualRes
+                self.VarHolder.NewWindow.destroy()  # Destroy the window to unblock wait_window
             self.VarHolder.NewWindow.protocol("WM_DELETE_WINDOW", disable_event)
 
             self.root.wait_window(self.VarHolder.NewWindow)
+            if self.exit_manual_res:  # Check flag after window closes
+                return
             plt.close()
         
         return self.VarHolder.ManualResData
@@ -572,7 +593,8 @@ class ManualResWindow():
                         self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsYPeaks[self.VarHolder.Direction] = list(self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsYPeaks[self.VarHolder.Direction])
                         
                         plt.clf()
-                        plt.title(self.VarHolder.CurrentROI) 
+                        plt.suptitle(self.VarHolder.CurrentROI) 
+                        plt.title("left click on 4 peaks (crosses) then 3 troughs (circles),\n shift + left click to delete points, hold ctrl to change to vertical.",fontsize=8) 
                         plt.plot(self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsXPeaks[0], self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsYPeaks[0], marker="x",color="blue", linestyle = '')
                         plt.plot(self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsXPeaks[1], self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsYPeaks[1], marker="x",color="red", linestyle = '')
                         plt.plot(self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsXTroughs[0], self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsYTroughs[0], marker="o",color="blue", linestyle = '')
@@ -600,7 +622,8 @@ class ManualResWindow():
                         self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsYTroughs[self.VarHolder.Direction] = list(self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsYTroughs[self.VarHolder.Direction])
                         
                         plt.clf()
-                        plt.title(self.VarHolder.CurrentROI) 
+                        plt.suptitle(self.VarHolder.CurrentROI) 
+                        plt.title("left click on 4 peaks (crosses) then 3 troughs (circles),\n shift + left click to delete points, hold ctrl to change to vertical.",fontsize=8) 
                         plt.plot(self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsXPeaks[0], self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsYPeaks[0], marker="x",color="blue", linestyle = '')
                         plt.plot(self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsXPeaks[1], self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsYPeaks[1], marker="x",color="red", linestyle = '')
                         plt.plot(self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsXTroughs[0], self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsYTroughs[0], marker="o",color="blue", linestyle = '')
@@ -650,7 +673,8 @@ class ManualResWindow():
                         self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsYTroughs[Direction].append( (SortedYPeaks[idx] + SortedYPeaks[idx+1])/2.0 )
 
             plt.clf()
-            plt.title(self.VarHolder.CurrentROI) 
+            plt.suptitle(self.VarHolder.CurrentROI) 
+            plt.title("left click on 4 peaks (crosses) then 3 troughs (circles),\n shift + left click to delete points, hold ctrl to change to vertical.",fontsize=8) 
             plt.plot(self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsXPeaks[0], self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsYPeaks[0], marker="x",color="blue", linestyle = '')
             plt.plot(self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsXPeaks[1], self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsYPeaks[1], marker="x",color="red", linestyle = '')
             plt.plot(self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsXTroughs[0], self.VarHolder.ManualResData[self.VarHolder.CurrentROI].ChosenPointsYTroughs[0], marker="o",color="blue", linestyle = '')
@@ -705,7 +729,8 @@ class DisplayLoadedDICOM():
                 plt.imshow(masked_data, interpolation='none',alpha=0.4)
         self.canvas.draw() 
 
-    def DiplayDICOMS(self):
+    def DiplayDICOMS(self,button):
+        button.config(state=DISABLED)
         plt.close('all')
         self.Win = tkinter.Toplevel(self.root)
         self.Win.iconbitmap("_internal\ct-scan.ico")
@@ -737,3 +762,4 @@ class DisplayLoadedDICOM():
         
 
         self.root.wait_window(self.Win)
+        button.config(state=NORMAL)
