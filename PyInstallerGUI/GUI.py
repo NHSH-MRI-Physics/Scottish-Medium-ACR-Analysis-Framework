@@ -199,6 +199,7 @@ try:
         if len(files) == 0: #This can happen with the enhanced DICOMS.
             AllFiles = glob.glob(os.path.join(DCMfolder_path.get(),"*"))
             EnhancedDICOMs = []
+            count = 1
             for file in AllFiles:
                 data = pydicom.dcmread(file)
                 if "PixelData" in data:
@@ -206,10 +207,14 @@ try:
                         #EnhancedDICOMs.append(data)
                         print("Enhanced DICOM Detected at file: " + file + " attempting to convert to stack of 11 single slice DICOMS")
                         Temp_DICOM = hazenlib.utils.ConvertEnhancedDICOMToStack(data)
-                        x=0
                         if Temp_DICOM != None:
+                            if not os.path.exists("TempDICOM"):os.makedirs("TempDICOM")
                             for key in Temp_DICOM:
-                                DICOM_files[key] = Temp_DICOM[key]
+                                path = os.path.join("TempDICOM",str(count)+".dcm")
+                                Temp_DICOM[key].save_as(path)
+                                DICOM_files[path] = Temp_DICOM[key]
+                                count+=1
+        x=0
         #for file in files:
         for file in DICOM_files:
             data = DICOM_files[file] 
@@ -575,6 +580,9 @@ try:
         DropDownOptions.append(DropDownOptions[0])
         #dropdownResults.set_menu(*DropDownOptions)
         #dropdownResults.config(state="normal")
+        if os.path.exists("TempDICOM"):
+            shutil.rmtree("TempDICOM")
+            print("Cleaned up temporary DICOM files")
         print ("Done")
 
     '''

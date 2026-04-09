@@ -364,9 +364,14 @@ def ConvertEnhancedDICOMToStack(PyDICOM_Object):
     PyDICOM_Objects_dict = {}
     count = 0
     for image in Images:
-        PyDICOM_Objects_dict[PyDICOM_Object.SeriesDescription + "_" + str(count)] = copy.copy(PyDICOM_Object)
+        PyDICOM_Objects_dict[PyDICOM_Object.SeriesDescription + "_" + str(count)] = copy.deepcopy(PyDICOM_Object)
         PyDICOM_Objects_dict[PyDICOM_Object.SeriesDescription + "_" + str(count)].NumberOfFrames = 1
         PyDICOM_Objects_dict[PyDICOM_Object.SeriesDescription + "_" + str(count)].PixelData = image.tobytes()
+
+
+        #plt.imshow(PyDICOM_Objects_dict[PyDICOM_Object.SeriesDescription + "_" + str(count)].pixel_array,cmap="gray")
+        #plt.savefig(f"test_{count}.png")
+
         PyDICOM_Objects_dict[PyDICOM_Object.SeriesDescription + "_" + str(count)].ImagePositionPatient  = PyDICOM_Object.PerFrameFunctionalGroupsSequence[count].PlanePositionSequence[0].ImagePositionPatient
 
         #Get Echo Time

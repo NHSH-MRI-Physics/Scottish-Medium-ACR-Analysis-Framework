@@ -171,8 +171,12 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
     ScannerInfo = {}
     data = pydicom.dcmread(Data[0])
     acq_date = data.get("AcquisitionDate", None)   # Format: YYYYMMDD
-    acq_time = data.get("AcquisitionTime", None).split(".")[0]   # Format: HHMMSS.frac, the split removes the fraction
-    TimeRan = datetime.datetime.strptime(acq_date + acq_time, "%Y%m%d%H%M%S")
+    acq_time = data.get("AcquisitionTime", None)
+    if acq_time != None:
+        acq_time = acq_time.split(".")[0]   # Format: HHMMSS.frac, the split removes the fraction
+    TimeRan = None
+    if acq_date != None and acq_time != None:
+        TimeRan = datetime.datetime.strptime(acq_date + acq_time, "%Y%m%d%H%M%S")
     ScannerInfo["Manufacturer"] = getattr(data, "Manufacturer", None) #data.Manufacturer
     ScannerInfo["Institution Name"] = getattr(data, "InstitutionName", None) #data.InstitutionName
     ScannerInfo["Model Name"] = getattr(data, "ManufacturerModelName", None) #data.ManufacturerModelName
