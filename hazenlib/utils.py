@@ -388,7 +388,30 @@ def ConvertEnhancedDICOMToStack(PyDICOM_Object):
         PyDICOM_Objects_dict[PyDICOM_Object.SeriesDescription + "_" + str(count)].RepetitionTime = repetition_time
 
         #Add in slice Thickness next
+        Slice = PyDICOM_Object.PerFrameFunctionalGroupsSequence[0].PixelMeasuresSequence[0]
+        if "SliceThickness" in Slice:
+            slice_thickness = float(Slice.SliceThickness)
+        else:
+            raise Exception("Could not find slice thickness in enhanced DICOM object")
+        PyDICOM_Objects_dict[PyDICOM_Object.SeriesDescription + "_" + str(count)].SliceThickness = slice_thickness
+
+        #Add in pixel spacing
+        if "PixelSpacing" in Slice:
+            pixel_spacing = [float(x) for x in Slice.PixelSpacing]
+        else:
+            raise Exception("Could not find pixel spacing in enhanced DICOM object")
+        PyDICOM_Objects_dict[PyDICOM_Object.SeriesDescription + "_" + str(count)].PixelSpacing = pixel_spacing
+        
+        BW = PyDICOM_Object.SharedFunctionalGroupsSequence[0].MRImagingModifierSequence[0]
+        #Add in bandwidth
+        if "PixelBandwidth" in BW:
+            bandwidth = float(BW.PixelBandwidth) 
+        else:
+            raise Exception("Could not find bandwidth in enhanced DICOM object")
+        PyDICOM_Objects_dict[PyDICOM_Object.SeriesDescription + "_" + str(count)].PixelBandwidth = bandwidth
         count+=1
+
+        
     return PyDICOM_Objects_dict
 
 

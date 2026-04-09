@@ -8,6 +8,8 @@ from tkinter import IntVar
 import sys
 sys.path.append(".")
 from hazenlib.utils import get_dicom_files
+from hazenlib.utils import is_enhanced_dicom
+from hazenlib.utils import ConvertEnhancedDICOMToStack
 import pydicom
 from tkinter import DISABLED, NORMAL, N, S, E, W, LEFT, RIGHT, TOP, BOTTOM, messagebox, END, NW, CENTER
 import MedACRAnalysisV2 as MedACRAnalysis
@@ -187,8 +189,28 @@ try:
         WarningMessages = []
         DICOM_Holder_Objs = []
 
+        DICOM_files = {}
         for file in files:
             data = pydicom.dcmread(file)
+            DICOM_files[file] = data
+
+        if len(files) == 0: #This can happen with the enhanced DICOMS.
+            AllFiles = glob.glob(os.path.join(DCMfolder_path.get(),"*"))
+            EnhancedDICOMs = []
+            for file in AllFiles:
+                data = pydicom.dcmread(file)
+                if "PixelData" in data:
+                    if hazenlib.utils.is_enhanced_dicom(data):
+                        #EnhancedDICOMs.append(data)
+                        print("Enhanced DICOM Detected at file: " + file + " attempting to convert to stack of 11 single slice DICOMS")
+                        Temp_DICOM = hazenlib.utils.ConvertEnhancedDICOMToStack(data)
+                        x=0
+                        if Temp_DICOM != None:
+                            for key in Temp_DICOM:
+                                DICOM_files[key] = Temp_DICOM[key]
+        #for file in files:
+        for file in DICOM_files:
+            data = DICOM_files[file] 
             if "Loc" not in data.SeriesDescription and "loc" not in data.SeriesDescription:
                 if len(DICOM_Holder_Objs)==0: #Stick the first DICOM in the list so we can start checking
                     DICOM_Holder_Objs.append(DICOM_Holder.DICOMSet(data,file))
@@ -201,7 +223,7 @@ try:
                     if GotAtLeastOneMatch == False:
                         DICOM_Holder_Objs.append(DICOM_Holder.DICOMSet(data,file))
             else:
-                WarningMessages.append("Series Description: " + data.SeriesDescription + " is assumed to be the localiser and not included")
+                WarningMessages.append("Series Description: " + data.SeriesDescription + " is assumed to be the localiser and not\n included")
 
         options=[]
         KeptDICOMHolders = []
