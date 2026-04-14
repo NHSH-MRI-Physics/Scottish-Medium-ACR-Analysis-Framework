@@ -9,6 +9,7 @@ import copy
 from collections import defaultdict
 from skimage import filters
 import hazenlib.exceptions as exc
+import random
 
 matplotlib.use("Agg")
 
@@ -414,10 +415,31 @@ def ConvertEnhancedDICOMToStack(PyDICOM_Object):
         else:
             raise Exception("Could not find bandwidth in enhanced DICOM object")
         PyDICOM_Objects_dict[PyDICOM_Object.SeriesDescription + "_" + str(count)].PixelBandwidth = bandwidth
+
+        PyDICOM_Objects_dict[PyDICOM_Object.SeriesDescription + "_" + str(count)].InstanceNumber = str(count+1)
+
         count+=1
 
         
     return PyDICOM_Objects_dict
+
+def ConvertEnhancedDICOMToStackAndSave(AllFiles,DICOM_files):
+    count = 1
+    for file in AllFiles:
+        data = pydicom.dcmread(file)
+        if "PixelData" in data:
+            if is_enhanced_dicom(data):
+                #EnhancedDICOMs.append(data)
+                print("Enhanced DICOM Detected at file: " + file + " attempting to convert to stack of 11 single slice DICOMS")
+                Temp_DICOM = ConvertEnhancedDICOMToStack(data)
+                if Temp_DICOM != None:
+                    if not os.path.exists("TempDICOM"):os.makedirs("TempDICOM")
+                    for key in Temp_DICOM:
+                        path = os.path.join("TempDICOM",str(count)+".dcm")
+                        Temp_DICOM[key].save_as(path)
+                        DICOM_files[path] = Temp_DICOM[key]
+                        count+=1
+    return DICOM_files
 
 
 class Rod:

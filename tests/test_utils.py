@@ -668,5 +668,43 @@ class TestMedACRAnalysis(unittest.TestCase):
 
         self.assertListEqual(Expectedlines,Outputlines)
 
+
+    def test_16_Check_EnhancedDICOM(self):
+        
+        #Load in unehanced and run it
+        ACR_DATA_Med_Unenhanced = pathlib.Path(TEST_DATA_DIR / "EnhancedMedACRDICOM" / "Unenhanced")
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(os.path.join("ToleranceTable","ToleranceTable_80mmPeg.xml"))
+        MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
+        MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.MAGNETMETHOD
+        MedACRAnalysis.RunAnalysis("ACR_TRA_T1",ACR_DATA_Med_Unenhanced,pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
+        most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        f =open(most_recent_file,"r")
+        Outputlines_Unenhanced = f.readlines()[3:]
+        f.close()
+
+        #Load in enhanced and run it
+        ACR_DATA_Med_Enhanced = pathlib.Path(TEST_DATA_DIR / "EnhancedMedACRDICOM" / "Enhanced")
+        files = hazen_tools.get_dicom_files(ACR_DATA_Med_Enhanced)
+        DICOM_files = {}
+        for file in files:
+            data = pydicom.dcmread(file)
+            DICOM_files[file] = data
+
+        
+        AllFiles = glob.glob(os.path.join(ACR_DATA_Med_Enhanced,"*"))
+        DICOM_files = hazen_tools.ConvertEnhancedDICOMToStackAndSave(AllFiles,DICOM_files)
+        MedACR_ToleranceTableChecker.SetUpToleranceTable(os.path.join("ToleranceTable","ToleranceTable_80mmPeg.xml"))
+        MedACRAnalysis.SpatialResMethod=MedACROptions.ResOptions.ContrastResponseMethod
+        MedACRAnalysis.GeoMethod=MedACROptions.GeometryOptions.MAGNETMETHOD
+        MedACRAnalysis.RunAnalysis("ACR_TRA_T1","TempDICOM",pathlib.PurePath.joinpath(TEST_REPORT_DIR),RunAll=True, RunSNR=False, RunGeoAcc=False, RunSpatialRes=False, RunUniformity=False, RunGhosting=False, RunSlicePos=False, RunSliceThickness=False)
+        most_recent_file = max(TEST_REPORT_DIR.glob("*.txt"), key=os.path.getmtime)
+        f =open(most_recent_file,"r")
+        Outputlines_Enhanced = f.readlines()[3:]
+        f.close()
+
+        
+        self.assertListEqual(Outputlines_Unenhanced,Outputlines_Enhanced)
+        
+
 if __name__ == "__main__":
     unittest.main()
