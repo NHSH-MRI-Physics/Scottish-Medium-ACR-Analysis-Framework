@@ -118,7 +118,10 @@ try:
         if InitalDirDICOM==None:
             filename = filedialog.askdirectory()
         else:
-            filename = filedialog.askdirectory(initialdir=InitalDirDICOM)
+            if os.path.isfile(InitalDirDICOM):
+                filename = filedialog.askdirectory(initialdir=os.path.dirname(InitalDirDICOM))
+            else:
+                filename = filedialog.askdirectory(initialdir=InitalDirDICOM)
 
         if filename=="":
             return
@@ -130,7 +133,10 @@ try:
         if InitalDirDICOM==None:
             PrevRun = filedialog.askopenfilename()
         else:
-            PrevRun = filedialog.askopenfilename(initialdir=InitalDirDICOM)
+            if os.path.isfile(InitalDirDICOM):
+                PrevRun = filedialog.askopenfilename(initialdir=os.path.dirname(InitalDirDICOM))
+            else:
+                PrevRun = filedialog.askopenfilename(initialdir=InitalDirDICOM)
 
         if PrevRun=="":
             return
@@ -140,6 +146,12 @@ try:
 
         if not os.path.exists("TempDICOM"):
             os.makedirs("TempDICOM")
+            
+        if os.path.exists("TempDICOM"): #Make sure the folder is empty before we start filling it again
+            files = glob.glob(os.path.join("TempDICOM","*"))
+            for f in files:
+                os.remove(f)
+
         VarHolder.PreviousLoadedDataDump = data
         DICOMData = data["DICOM"]
         DICOMS = []
@@ -153,7 +165,7 @@ try:
         if "SettingsPaneOptions" in data:
             OptionsPaneObj.SetOptions(data["SettingsPaneOptions"])
         OptionsPaneObj.LoadPreviousRun.set(1) #Need this since this the only setting taht differs from that in the dump file
-        LoadDICOMDir("TempDICOM")
+        LoadDICOMDir("TempDICOM",cleanup=False)
         InitalDirDICOM = PrevRun
 
         if "ResultsText" in VarHolder.PreviousLoadedDataDump:
@@ -177,10 +189,19 @@ try:
             VarHolder.PreviousLoadedDataIsLegacy = True
         
     
-    def LoadDICOMDir(filename):
+    def LoadDICOMDir(filename,cleanup=True):
         global InitalDirDICOM
         #dropdownResults.config(state="disabled")
         #ViewResultsBtn.config(state="disabled")
+
+        EnableOrDisableEverything(False)
+
+        if cleanup:
+            if os.path.exists("TempDICOM"):
+                files = glob.glob(os.path.join("TempDICOM","*"))
+                for f in files:
+                    os.remove(f)
+                print("Cleaned up temporary DICOM files")
 
         DCMfolder_path.set(filename)
         InitalDirDICOM=DCMfolder_path.get()
@@ -198,23 +219,10 @@ try:
 
         if len(files) == 0: #This can happen with the enhanced DICOMS.
             AllFiles = glob.glob(os.path.join(DCMfolder_path.get(),"*"))
-            EnhancedDICOMs = []
-            count = 1
-            for file in AllFiles:
-                data = pydicom.dcmread(file)
-                if "PixelData" in data:
-                    if hazenlib.utils.is_enhanced_dicom(data):
-                        #EnhancedDICOMs.append(data)
-                        print("Enhanced DICOM Detected at file: " + file + " attempting to convert to stack of 11 single slice DICOMS")
-                        Temp_DICOM = hazenlib.utils.ConvertEnhancedDICOMToStack(data)
-                        if Temp_DICOM != None:
-                            if not os.path.exists("TempDICOM"):os.makedirs("TempDICOM")
-                            for key in Temp_DICOM:
-                                path = os.path.join("TempDICOM",str(count)+".dcm")
-                                Temp_DICOM[key].save_as(path)
-                                DICOM_files[path] = Temp_DICOM[key]
-                                count+=1
-        x=0
+            if len(AllFiles)>0:
+                DICOM_files =hazenlib.utils.ConvertEnhancedDICOMToStackAndSave(AllFiles,DICOM_files)
+
+
         #for file in files:
         for file in DICOM_files:
             data = DICOM_files[file] 
@@ -290,6 +298,7 @@ try:
         if len(WarningMessages) > 0:
             for warn in WarningMessages:
                 print(warn)
+        EnableOrDisableEverything(True)
 
     def SetResultsOutput():
         global InitalDirOutput
@@ -580,9 +589,6 @@ try:
         DropDownOptions.append(DropDownOptions[0])
         #dropdownResults.set_menu(*DropDownOptions)
         #dropdownResults.config(state="normal")
-        if os.path.exists("TempDICOM"):
-            shutil.rmtree("TempDICOM")
-            print("Cleaned up temporary DICOM files")
         print ("Done")
 
     '''
@@ -752,6 +758,7 @@ try:
 
         if OptionsPaneObj.GetOptions()["LoadPreviousRun"] == 1:
             DCMPathButton.config(text="Load in previous run",command=LoadPreviousRun)
+            DCMfolder_path.set("Not Set!")
             VarHolder.LoadPreviousRunMode = True
         else:
             DCMPathButton.config(text="Set DICOM Path", command=SetDCMPath)
