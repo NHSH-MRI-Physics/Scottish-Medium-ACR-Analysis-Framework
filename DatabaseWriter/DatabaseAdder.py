@@ -25,6 +25,7 @@ resultDict = None
 Weighting = StringVar(root, "T1") 
 Coil = StringVar(root, "Head") 
 Orientation = StringVar(root, "Axial") 
+Anonymise = tk.BooleanVar(value=False)
 data = None
 
 # Label placed at the top-left corner
@@ -93,10 +94,13 @@ def Update_Spreadsheet():
         else:
             Row.append(data["ScannerDetails"]["Manufacturer"])
         
-        if data["ScannerDetails"]["Institution Name"] == None:
-            Row.append(CheckIfNeedingUserInput("Input Required", "Institution Name is missing from the DICOM data. Please enter it now:"))
+        if Anonymise.get() == False :
+            if data["ScannerDetails"]["Institution Name"] == None:
+                Row.append(CheckIfNeedingUserInput("Input Required", "Institution Name is missing from the DICOM data. Please enter it now:"))
+            else:
+                Row.append(data["ScannerDetails"]["Institution Name"])
         else:
-            Row.append(data["ScannerDetails"]["Institution Name"])
+            Row.append("Anonymised")
 
         if data["ScannerDetails"]["Model Name"] == None:
             Row.append(CheckIfNeedingUserInput("Input Required", "Model Name is missing from the DICOM data. Please enter it now:"))
@@ -248,21 +252,25 @@ WeightingLabels = tk.Label(WeightingFrame,text="Weighting").pack(side = TOP, ipa
 for (text, value) in {"T1" : "T1", "T2" : "T2"} .items(): 
     Radiobutton(WeightingFrame, text = text, variable = Weighting, 
         value = value).pack(side = TOP, ipady = 5,ipadx=10, anchor=W) 
-WeightingFrame.grid(padx=10, pady=0,row=0, column=0,sticky="nw")
+WeightingFrame.grid(padx=0, pady=0,row=0, column=0,sticky="nw")
 
 CoilFrame = tk.Frame(OptionsFrame, width=50, height=100)
 CoilLabels = tk.Label(CoilFrame,text="Coil").pack(side = TOP, ipady = 5, anchor=N) 
 for (text, value) in {"Head" : "Head", "Body AA" : "Body AA", "Head T/R" : "Head T/R","Integrated Body":"Integrated Body"} .items(): 
     Radiobutton(CoilFrame, text = text, variable = Coil, 
         value = value).pack(side = TOP, ipady = 0,ipadx=10, anchor=W) 
-CoilFrame.grid(padx=10, pady=0,row=0, column=1,sticky="nw")
+CoilFrame.grid(padx=0, pady=0,row=0, column=1,sticky="nw")
 
 OrientationFrame = tk.Frame(OptionsFrame, width=50, height=100)
 OrientationLabels = tk.Label(OrientationFrame,text="Orientation").pack(side = TOP, ipady = 5, anchor=N) 
 for (text, value) in {"Axial" : "Axial", "Sagittal" : "Sagittal", "Coronal":"Coronal"} .items(): 
     Radiobutton(OrientationFrame, text = text, variable = Orientation, 
         value = value).pack(side = TOP, ipady = 0,ipadx=10, anchor=W) 
-OrientationFrame.grid(padx=10, pady=0,row=0, column=2,sticky="nw")
+OrientationFrame.grid(padx=0, pady=0,row=0, column=2,sticky="nw")
+
+OptionsFrame = tk.Frame(OptionsFrame, width=50, height=100)
+anonymise_box = tk.Checkbutton(OptionsFrame, text="Anonymise\nResult", variable=Anonymise).pack(side = TOP, ipady = 5, anchor=N)
+OptionsFrame.grid(padx=0, pady=0,row=0, column=3,sticky="nw")
 
 UpdateSpread = tk.Button(root, text="Update Spreadsheet", command=Update_Spreadsheet)
 UpdateSpread.grid(padx=10, pady=5,row=3, column=1,sticky="nesw")
