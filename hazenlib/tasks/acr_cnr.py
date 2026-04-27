@@ -2,10 +2,16 @@ import os
 import sys
 import traceback
 import pydicom
-
-import numpy as np
-from scipy import ndimage
+import matplotlib.pyplot as plt
 import SimpleITK as sitk
+import numpy as np
+#RefDicom = pydicom.dcmread("_internal\\StandardDicom\\IM_0048")
+#plt.imshow(RefDicom.pixel_array)
+#plt.show()
+
+
+from scipy import ndimage
+
 import hazenlib.utils
 from hazenlib.HazenTask import HazenTask
 from hazenlib.ACRObject import ACRObject
@@ -17,8 +23,5 @@ class ACRCNR(HazenTask):
         self.ACR_obj = ACRObject(self.dcm_list,kwargs)
 
     def run(self) -> dict:
-        ContrastSliceDCM = self.ACR_obj.dcm_list[-1]
+        ContrastSliceDCM = self.ACR_obj.dcms[-1]
         RefDicom = pydicom.dcmread("_internal\\StandardDicom\\IM_0048")
-
-        fixed = sitk.GetImageFromArray(ContrastSliceDCM.pixel_array.astype(np.float32))
-        moving = sitk.GetImageFromArray(RefDicom.pixel_array.astype(np.float32))

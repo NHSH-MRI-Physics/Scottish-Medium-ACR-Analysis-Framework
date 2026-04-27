@@ -9,8 +9,8 @@ from hazenlib.ACRObject import ACRObject
 import pathlib
 from tests import TEST_DATA_DIR, TEST_REPORT_DIR
 
-OutputPath = "C:\\Users\\Johnt\\Documents\\GitHub\\Scottish-Medium-ACR-Analysis-Framework\\OutputFolder"
-Data = get_dicom_files("C:\\Users\\Johnt\\Documents\\GitHub\\Scottish-Medium-ACR-Analysis-Framework\\MedACRTestingSetAndResults\\Forth Valley ACR Blair T1")
+OutputPath = "OutputFolder"
+Data = get_dicom_files("MedACRTestingSetAndResults\\Forth Valley ACR Blair T1")
 x=0
 
 acr_cnr_task = ACRCNR(input_data=Data, report_dir=OutputPath,report=True,MediumACRPhantom=True)
