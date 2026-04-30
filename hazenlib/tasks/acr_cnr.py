@@ -23,8 +23,9 @@ class ACRCNR(HazenTask):
         self.ACR_obj = ACRObject(self.dcm_list,kwargs)
 
     def run(self) -> dict:
+        '''
         inputSlice = self.ACR_obj.dcms[-1]
-        crop = inputSlice.pixel_array[self.ACR_obj.centre[1]-25:self.ACR_obj.centre[1]+25,self.ACR_obj.centre[0]-25:self.ACR_obj.centre[0]+25]
+        crop = inputSlice.pixel_array[self.ACR_obj.centre[1]-50:self.ACR_obj.centre[1]+50,self.ACR_obj.centre[0]-50:self.ACR_obj.centre[0]+50]
         Thresh = filters.threshold_otsu(crop)
         mask = crop > Thresh
         labels, nb = ndimage.label(mask)
@@ -46,7 +47,7 @@ class ACRCNR(HazenTask):
             TestObj = TestObject(x=center[1],y=center[0],Diamater=Diameter,disanceFromCentre=Dist)
             Objects.append(TestObj)
         Objects.sort(key=lambda x: x.disanceFromCentre, reverse=False)
-        Objects = Objects[:10]
+        #Objects = Objects[:10]
 
         plt.imshow(crop, cmap="gray")
         for Obj in Objects:
@@ -142,5 +143,5 @@ class ACRCNR(HazenTask):
         for RefIdx in RefPhysIdx:
             axs[2].plot(RefIdx[0], RefIdx[1], 'rx',ms=0.2)  # Plot the test point on the moving image
         plt.savefig("test.png",dpi=300)
-        '''
+        
         

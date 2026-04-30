@@ -1,29 +1,24 @@
-
-
+import os
 import sys
-sys.path.insert(0,"C:\\Users\\Johnt\\Documents\\GitHub\\Scottish-Medium-ACR-Analysis-Framework")
-sys.path.insert(0,"D:\\Hazen-ScottishACR-Fork")
-from hazenlib.utils import get_dicom_files
-from hazenlib.tasks.acr_cnr import ACRCNR
-from hazenlib.tasks.acr_uniformity import ACRUniformity
-from hazenlib.ACRObject import ACRObject
-import pathlib
-from tests import TEST_DATA_DIR, TEST_REPORT_DIR
-
-import SimpleITK as sitk
-import matplotlib.pyplot as plt
+import traceback
+from unittest import result
 import pydicom
+import matplotlib.pyplot as plt
+import SimpleITK as sitk
+import numpy as np
+#RefDicom = pydicom.dcmread("_internal\\StandardDicom\\IM_0048")
+#plt.imshow(RefDicom.pixel_array)
+#plt.show()
+from scipy import ndimage
+#import hazenlib.utils
+#from hazenlib.HazenTask import HazenTask
+#from hazenlib.ACRObject import ACRObject
+from pydicom.pixel_data_handlers.util import apply_modality_lut
+from scipy import ndimage
+from skimage import filters
+import math
 
-OutputPath = "OutputFolder"
-Data = get_dicom_files("MedACRTestingSetAndResults\\Blair Gartnavel")
-#x=0
 
-acr_cnr_task = ACRCNR(input_data=Data, report_dir=OutputPath,report=True,MediumACRPhantom=True)
-results = acr_cnr_task.run()
-
-'''
-sys.exit()
-#Get a 2d image
 ref3d = sitk.ReadImage("_internal\\StandardDicom\\I1100000")
 input3d = sitk.ReadImage("MedACRTestingSetAndResults\Blair Gartnavel\IM_0048")
 
@@ -60,21 +55,51 @@ elastixImageFilter.SetParameterMap(sitk.GetDefaultParameterMap("affine"))
 elastixImageFilter.Execute()
 result = elastixImageFilter.GetResultImage()
 
-
-RefPhys = [130.86,116.22]#In phys space in mm
+RefPhysPoints =[ [130.86,116.22],
+                    [136.72,121.10],
+                    [137.70,128.91],
+                    [134.77,135.75],
+                    [127.93,139.65],
+                    [120.12,138.68],
+                    [114.26,133.79],
+                    [112.31,125.98],
+                    [116.22,118.17],
+                    [123.05,115.24]
+                ]#In phys space in mm
+RefPhysIdx = []
+for RefPhys in RefPhysPoints:
+    RefIdx = refimage.TransformPhysicalPointToIndex(RefPhys)
+    RefPhysIdx.append(RefIdx)
 RefIdx = refimage.TransformPhysicalPointToIndex(RefPhys)
-
 
 fixed_array = sitk.GetArrayFromImage(refimage)
 moving_array = sitk.GetArrayFromImage(inputimage)
 result_array = sitk.GetArrayFromImage(result)
 
+'''
 fig, axs = plt.subplots(1, 3, figsize=(15, 5))
 axs[0].imshow(fixed_array, cmap="gray"); axs[0].set_title("Fixed (this is the reference image)"); axs[0].axis("off")
-axs[0].plot(RefIdx[0], RefIdx[1], 'rx')  # Plot the test point on the moving image
+for RefIdx in RefPhysIdx:
+    axs[0].plot(RefIdx[0], RefIdx[1], 'rx',ms=0.5)  # Plot the test point on the moving image
 axs[1].imshow(moving_array, cmap="gray"); axs[1].set_title("Moving (this is our input image)"); axs[1].axis("off")
 axs[2].imshow(fixed_array, cmap="gray")
 axs[2].imshow(result_array, cmap="Blues", alpha=0.3)
-axs[2].plot(RefIdx[0], RefIdx[1], 'rx')  # Plot the test point on the moving image
-plt.savefig("test2.png",dpi=300)
+for RefIdx in RefPhysIdx:
+    axs[2].plot(RefIdx[0], RefIdx[1], 'rx',ms=0.5)  # Plot the test point on the moving image
+plt.show()
 '''
+
+from dataclasses import dataclass
+@dataclass
+class Disc:
+    Diamater: float
+    crop: float
+    x:float
+    y:float
+    SpokeNumber: int
+    SpokeDepth: str
+
+Radii =[7.0]
+
+Pixels = math.ceil((7.0/moving.GetSpacing()[0]/2.0)*1.5)
+Spoke1 = Disc(Diamater=7.0, crop=result_array[RefPhysIdx[0][1]-Pixels:RefPhysIdx[0][1]+Pixels,RefPhysIdx[0][0]-Pixels:RefPhysIdx[0][0]+Pixels], x=0.0, y=0.0, SpokeNumber=1, SpokeDepth="inner")
