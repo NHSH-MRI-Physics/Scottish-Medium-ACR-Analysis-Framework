@@ -123,20 +123,20 @@ def GetDiscCrops(DiscPoints, RegisteredInputImage):
 
     return discs
 
-def PlotDiscs(Discs,title=""):
+def PlotDiscs(Discs,WL,WW,title=""):
     fig, axes = plt.subplots(10, 3, figsize=(6, 20))
-    fig.suptitle(title, fontsize=16,y=1)
+    fig.suptitle(title, fontsize=16,y=0.997)
     SpokeCount = 0
     for Spoke in Discs:
         DiscCount = 0
         for disc in Spoke:
-            axes[SpokeCount, DiscCount].imshow(disc.crop, cmap="gray")
+            axes[SpokeCount, DiscCount].imshow(disc.crop, cmap="gray",vmax=WL+WW/2.0,vmin=WL-WW/2.0, interpolation='none')
             axes[SpokeCount, DiscCount].axis("off")
-            axes[SpokeCount, DiscCount].set_title(f"Spoke {disc.SpokeNumber} - {disc.SpokeDepth}", fontsize=8,y=0.92)
+            axes[SpokeCount, DiscCount].set_title(f"Spoke {disc.SpokeNumber} - {disc.SpokeDepth}", fontsize=8,y=0.97)
             DiscCount+=1
         SpokeCount+=1
     plt.tight_layout()
-    plt.savefig("MedACRTesting\LowContrastDetectTesting.py\Discs_" + title +".png",dpi=300)
+    plt.savefig("MedACRTesting\LowContrastDetectTesting\Discs_" + title +".png",dpi=300)
     plt.close()
 
 def PlotRegistration(RefImage_array,InputImage_array,RegisteredInputImage,DiscPoints,title=""):
@@ -151,7 +151,7 @@ def PlotRegistration(RefImage_array,InputImage_array,RegisteredInputImage,DiscPo
     for Spoke in DiscPoints:
         for RefIdx in Spoke:
             axs[2].plot(RefIdx[0], RefIdx[1], 'rx',ms=0.5)  # Plot the test point on the moving image
-    plt.savefig("MedACRTesting\LowContrastDetectTesting.py\Registration_" + title +".png",dpi=300)
+    plt.savefig("MedACRTesting\LowContrastDetectTesting\Registration_" + title +".png",dpi=300)
     plt.close()
 
 
@@ -170,5 +170,5 @@ def PlotSquares(RegisteredInputImage,Discs,WL,WW,title):
             rect = patches.Rectangle((Disc.x-Disc.CropSize, Disc.y-Disc.CropSize), Disc.CropSize*2.0, Disc.CropSize*2.0, linewidth=1, edgecolor=colors[count], facecolor='none')
             plt.gca().add_patch(rect)
         count +=1
-    plt.savefig("MedACRTesting\LowContrastDetectTesting.py\Squares_" + title +".png",dpi=300)
+    plt.savefig("MedACRTesting\LowContrastDetectTesting\Squares_" + title +".png",dpi=300)
     plt.close()
