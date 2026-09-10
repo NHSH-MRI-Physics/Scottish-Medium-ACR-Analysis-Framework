@@ -1,3 +1,5 @@
+from tkinter import Image
+
 import cv2
 import scipy
 import scipy.version
@@ -9,7 +11,7 @@ import matplotlib.pyplot as plt
 from hazenlib.utils import get_image_orientation
 from pydicom.pixel_data_handlers.util import apply_modality_lut
 import os 
-
+import PIL  
 
 class ACRObject:
     def __init__(self, dcm_list,kwargs={}):
@@ -46,6 +48,10 @@ class ACRObject:
         self.orientation_checks()
         # Determine whether image rotation is necessary
         self.rot_angle = self.determine_rotation()
+        if "FixRotation" in kwargs.keys():
+            if kwargs["FixRotation"]==True:
+                self.rotate_images()
+
         # Store the DCM object of slice 7 as it is used often
         self.slice7_dcm = self.dcms[6]
         # Find the centre coordinates of the phantom (circle)
@@ -72,7 +78,6 @@ class ACRObject:
                     raise Exception("Radius not within the mask in slice " + str(i+1))
 
         self.kwargs = kwargs
-        
 
     def sort_images(self):
         """
@@ -228,9 +233,17 @@ class ACRObject:
             The rotated images.
         """
 
-        return skimage.transform.rotate(
-            self.images, self.rot_angle, resize=False, preserve_range=True
-        )
+        for dcm in self.dcms:
+            original_dtype = dcm.pixel_array.dtype
+            img = PIL.Image.fromarray(dcm.pixel_array)
+            rotated_img = img.rotate(self.rot_angle, expand=False, resample=PIL.Image.BICUBIC)
+            rotated_array = np.array(rotated_img).astype(original_dtype)
+            dcm.PixelData = rotated_array.tobytes()
+
+
+        #return skimage.transform.rotate(
+        #    self.images, self.rot_angle, resize=False, preserve_range=True
+        #)
 
     def find_phantom_center(self):
         """

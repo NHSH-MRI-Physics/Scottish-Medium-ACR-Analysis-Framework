@@ -26,6 +26,7 @@ from hazenlib.HazenTask import HazenTask
 from hazenlib.ACRObject import ACRObject
 
 
+
 class ACRSliceThickness(HazenTask):
     """Slice width measurement class for DICOM images of the ACR phantom
 
@@ -206,6 +207,7 @@ class ACRSliceThickness(HazenTask):
             float: measured slice thickness
         """
         img = dcm.pixel_array
+
 
         if 'PixelSpacing' in dcm:
             res = dcm.PixelSpacing  # In-plane resolution from metadata

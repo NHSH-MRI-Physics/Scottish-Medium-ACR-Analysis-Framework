@@ -19,7 +19,7 @@ class SliceThicknessModule(MedACRModule):
         UseLegacySliceThicknessAlgo = self.settings["UseLegacySliceThicknessAlgo"]
 
         print("Running Slice Thickness")
-        acr_slice_thickness_task = ACRSliceThickness(input_data=Data,report_dir=OutputPath,report=True,MediumACRPhantom=True,Paramater_overide = ParamaterOverides, UseLegacySliceThicknessAlgo=UseLegacySliceThicknessAlgo)
+        acr_slice_thickness_task = ACRSliceThickness(input_data=Data,report_dir=OutputPath,report=True,MediumACRPhantom=True,Paramater_overide = ParamaterOverides, UseLegacySliceThicknessAlgo=UseLegacySliceThicknessAlgo,FixRotation=False)
         self.results = acr_slice_thickness_task.run()
 
 
