@@ -16,7 +16,7 @@ class SlicePosModule(MedACRModule):
         Data = self.settings["Data"]
         OutputPath = self.settings["OutputPath"]
         ParamaterOverides = self.settings["ParamaterOverides"]
-        acr_slice_position_task = ACRSlicePosition(input_data=Data,report_dir=OutputPath,report=True,MediumACRPhantom=True,Paramater_overide = ParamaterOverides)
+        acr_slice_position_task = ACRSlicePosition(input_data=Data,report_dir=OutputPath,report=True,MediumACRPhantom=True,Paramater_overide = ParamaterOverides,settings=self.settings)
         self.results = acr_slice_position_task.run()
 
         #Divide by 2 to get the true error in slice position.

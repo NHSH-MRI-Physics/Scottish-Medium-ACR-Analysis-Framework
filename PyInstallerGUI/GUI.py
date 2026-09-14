@@ -358,6 +358,11 @@ try:
         else:
             MedACRAnalysis.DumpToExcel = False
 
+        if OptionsPaneObj.GetOptions()["CorrectRotation"] == 1:
+            MedACRAnalysis.RotCorrection = True
+        else:
+            MedACRAnalysis.RotCorrection = False
+
         MedACRAnalysis.SettingsPaneObject = OptionsPaneObj
 
     def RunAnalysis():
@@ -736,7 +741,7 @@ try:
         OptionsPaneWin = tkinter.Toplevel(root)
         OptionsPaneWin.grab_set()
         OptionsPaneWin.iconbitmap("_internal\ct-scan.ico")
-        OptionsPaneWin.geometry("800x540")
+        OptionsPaneWin.geometry("800x570")
         OptionsPaneWin.resizable(False,False)
         def disable_event():
             pass

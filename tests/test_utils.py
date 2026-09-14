@@ -704,6 +704,7 @@ class TestMedACRAnalysis(unittest.TestCase):
 
         
         self.assertListEqual(Outputlines_Unenhanced,Outputlines_Enhanced)
+
         
 
 if __name__ == "__main__":

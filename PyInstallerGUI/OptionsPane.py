@@ -22,6 +22,7 @@ class OptionsPaneHolder():
         self.DumpToExcel=IntVar(value=0)
         self.FixedManualROISize=IntVar(value=1)
         self.LoadPreviousRun=IntVar(value=0)
+        self.CorrectRotation=IntVar(value=0)
 
         self.Use11mm=IntVar(value=1)
         self.Use10mm=IntVar(value=1)
@@ -64,6 +65,7 @@ class OptionsPaneHolder():
         self.AddOptionRowCheckbox(text='Dump Results to Excel file',variable=self.DumpToExcel)
         self.AddOptionRowCheckbox(text='Fixed manual ROI size',variable=self.FixedManualROISize)
         self.AddOptionRowCheckbox(text="Load in Previous Run", variable=self.LoadPreviousRun)
+        self.AddOptionRowCheckbox(text="Correct Rotation", variable=self.CorrectRotation)
 
         labelRes = ttk.Label(self.OptionsPane, text="Manual Res Targets", anchor='s')
         labelRes.grid(row=self.currentRow, column=0,padx=5,pady=5,sticky=W+S)
@@ -88,6 +90,8 @@ class OptionsPaneHolder():
         OptionsDict["UniformityOptions"] = self.UniformityOption.get()
         OptionsDict["FixedManualROISize"] = self.FixedManualROISize.get()
         OptionsDict["LoadPreviousRun"] = self.LoadPreviousRun.get()
+        OptionsDict["CorrectRotation"] = self.CorrectRotation.get()
+
         OptionsDict["Use11mm"] = self.Use11mm.get()
         OptionsDict["Use10mm"] = self.Use10mm.get()
         OptionsDict["Use09mm"] = self.Use09mm.get()
@@ -106,6 +110,7 @@ class OptionsPaneHolder():
         self.UniformityOption.set(OptionsDict["UniformityOptions"])
         self.FixedManualROISize.set(OptionsDict["FixedManualROISize"])
         self.LoadPreviousRun.set(OptionsDict["LoadPreviousRun"])
+        self.CorrectRotation.set(OptionsDict["CorrectRotation"])
 
         if "Use11mm" in OptionsDict:
             self.Use11mm.set(OptionsDict["Use11mm"])

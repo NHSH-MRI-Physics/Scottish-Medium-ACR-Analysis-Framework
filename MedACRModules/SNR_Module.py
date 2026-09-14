@@ -18,7 +18,7 @@ class SNRModule(MedACRModule):
         OutputPath = self.settings["OutputPath"]
         ParamaterOverides = self.settings["ParamaterOverides"]
 
-        acr_snr_task = ACRSNR(input_data=Data, report_dir=OutputPath,report=True,MediumACRPhantom=True,Paramater_overide = ParamaterOverides)
+        acr_snr_task = ACRSNR(input_data=Data, report_dir=OutputPath,report=True,MediumACRPhantom=True,Paramater_overide = ParamaterOverides,settings=self.settings)
         self.results = acr_snr_task.run()
 
     def GetReportText(self):

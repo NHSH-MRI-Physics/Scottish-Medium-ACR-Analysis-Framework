@@ -25,7 +25,7 @@ class SpatialResModule(MedACRModule):
         print("Running Spatial Resolution")
         #Run the dot matrix version
         if SpatialResMethod != ResOptions.Manual:
-            acr_spatial_resolution_task = ACRSpatialResolution(input_data=Data,report_dir=OutputPath,report=True,MediumACRPhantom=True,Paramater_overide = ParamaterOverides)
+            acr_spatial_resolution_task = ACRSpatialResolution(input_data=Data,report_dir=OutputPath,report=True,MediumACRPhantom=True,Paramater_overide = ParamaterOverides,settings=self.settings)
             acr_spatial_resolution_task.ResOption=SpatialResMethod
             self.results = acr_spatial_resolution_task.run()
 

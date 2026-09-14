@@ -22,11 +22,11 @@ class GeoAccModule(MedACRModule):
         GeoMethod = self.settings["GeoMethod"]
 
         if (GeoMethod == GeometryOptions.ACRMETHOD):
-            acr_geometric_accuracy_task = ACRGeometricAccuracy(input_data=Data,report_dir=OutputPath,MediumACRPhantom=True,report=True,Paramater_overide = ParamaterOverides)
+            acr_geometric_accuracy_task = ACRGeometricAccuracy(input_data=Data,report_dir=OutputPath,MediumACRPhantom=True,report=True,Paramater_overide = ParamaterOverides,settings=self.settings)
             self.results = acr_geometric_accuracy_task.run()
 
         if (GeoMethod == GeometryOptions.MAGNETMETHOD):
-            acr_geometric_accuracy_MagNetMethod = ACRGeometricAccuracyMagNetMethod(input_data=Data,report_dir=OutputPath,MediumACRPhantom=True,report=True, SkipGaussFit=True,Paramater_overide = ParamaterOverides)
+            acr_geometric_accuracy_MagNetMethod = ACRGeometricAccuracyMagNetMethod(input_data=Data,report_dir=OutputPath,MediumACRPhantom=True,report=True, SkipGaussFit=True,Paramater_overide = ParamaterOverides,settings=self.settings)
             self.results = acr_geometric_accuracy_MagNetMethod.run()
 
     def GetReportText(self):

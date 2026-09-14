@@ -3,6 +3,8 @@ import unittest
 import pathlib
 import pydicom
 import numpy as np
+import copy
+import glob 
 
 from hazenlib import HazenTask
 from hazenlib.ACRObject import ACRObject
@@ -24,8 +26,20 @@ class TestACRTools(unittest.TestCase):
             for i in os.listdir(os.path.join(TEST_DATA_DIR, "acr", "GE"))
         ]
 
+        self.MedACR_data = []
+        dcm_files = glob.glob(os.path.join(TEST_DATA_DIR, "MedACR","*.dcm"))
+        for file in dcm_files:
+            self.MedACR_data.append(pydicom.read_file(file))
+        self.MedACR_data_noRot = copy.deepcopy(self.MedACR_data)
+
         self.Siemens_ACR_obj = ACRObject(self.Siemens_data)
         self.GE_ACR_obj = ACRObject(self.GE_data)
+
+        Keywords = {"MediumACRPhantom": True, "settings":{"RotCorrection":True}}
+        self.MedACR_data_obj = ACRObject(self.MedACR_data,Keywords)
+
+        Keywords = {"MediumACRPhantom": True, "settings":{"RotCorrection":False}}
+        self.MedACR_NoRot_data_obj = ACRObject(self.MedACR_data_noRot,Keywords)
 
     def test_find_rotation(self):
         assert self.rotation[0] == np.round(
@@ -45,3 +59,6 @@ class TestACRTools(unittest.TestCase):
         )
         rotated_point = np.round(rotated_point, 2)
         assert (rotated_point == self.test_point).all() == True
+
+    #def test_rotate_images(self):
+    #    assert self.MedACR_data_obj.determine_rotation() == 0.0

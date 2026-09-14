@@ -18,7 +18,7 @@ class GhostingModule(MedACRModule):
         ParamaterOverides = self.settings["ParamaterOverides"]
 
         print("Running Ghosting")
-        acr_ghosting_task = ACRGhosting(input_data=Data,report_dir=OutputPath,MediumACRPhantom=True,report=True,Paramater_overide = ParamaterOverides)
+        acr_ghosting_task = ACRGhosting(input_data=Data,report_dir=OutputPath,MediumACRPhantom=True,report=True,Paramater_overide = ParamaterOverides,settings=self.settings)
         self.results = acr_ghosting_task.run()
 
 

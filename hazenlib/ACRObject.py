@@ -48,9 +48,13 @@ class ACRObject:
         self.orientation_checks()
         # Determine whether image rotation is necessary
         self.rot_angle = self.determine_rotation()
-        if "FixRotation" in kwargs.keys():
-            if kwargs["FixRotation"]==True:
-                self.rotate_images()
+        if "settings" in kwargs.keys():
+            if "RotCorrection" in kwargs["settings"].keys():
+                if kwargs["settings"]["RotCorrection"]==True:
+                    self.rotate_images()
+                    self.images, self.dcms = self.sort_images()
+                    self.orientation_checks()
+                    self.rot_angle = self.determine_rotation()
 
         # Store the DCM object of slice 7 as it is used often
         self.slice7_dcm = self.dcms[6]

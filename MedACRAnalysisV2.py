@@ -47,6 +47,7 @@ UniformityMethod = UniformityOptions.ACRMETHOD
 UseLegacySliceThicknessAlgo = False
 DumpToExcel = False
 DICOM_Holder_Dict = None
+RotCorrection = False
 
 SettingsPaneObject = None
 
@@ -90,6 +91,7 @@ def RunAnalysisWithData(Data,Seq,OutputPath,RunAll=True, RunSNR=False, RunGeoAcc
         RunSlicePos =True
         RunSliceThickness =True
     settings = {"Data":Data,"OutputPath":OutputPath,"ParamaterOverides":ParamaterOverides}
+    settings["RotCorrection"] = RotCorrection
     TotalTests=0
     if RunSNR ==True:
         TotalTests+=1

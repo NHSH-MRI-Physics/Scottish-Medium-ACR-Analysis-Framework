@@ -17,7 +17,7 @@ class UniformityModule(MedACRModule):
         Data = self.settings["Data"]
         OutputPath = self.settings["OutputPath"]
         ParamaterOverides = self.settings["ParamaterOverides"]
-        acr_uniformity_task = ACRUniformity(input_data=Data,report_dir=OutputPath,MediumACRPhantom=True,report=True,Paramater_overide = ParamaterOverides)
+        acr_uniformity_task = ACRUniformity(input_data=Data,report_dir=OutputPath,MediumACRPhantom=True,report=True,Paramater_overide = ParamaterOverides,settings=self.settings)
         acr_uniformity_task.UniformityMethod = self.settings["UniformityMethod"]
         self.results=acr_uniformity_task.run()
 
