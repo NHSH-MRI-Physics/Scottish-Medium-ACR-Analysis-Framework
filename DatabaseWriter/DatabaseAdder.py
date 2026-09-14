@@ -248,10 +248,16 @@ OptionsFrame.grid(padx=10, pady=0,row=2, column=1,sticky="n")
 
 WeightingFrame = tk.Frame(OptionsFrame, width=50, height=100)
 
+def Reset():
+    FileDropped.config(text="No File Dropped")
+    StandardLabel.config(bg="lightgray",text="No File Dropped")
+    for item in tree.get_children():
+        tree.delete(item)
+
 WeightingLabels = tk.Label(WeightingFrame,text="Weighting").pack(side = TOP, ipady = 5, anchor=W) 
 for (text, value) in {"T1" : "T1", "T2" : "T2"} .items(): 
     Radiobutton(WeightingFrame, text = text, variable = Weighting, 
-        value = value).pack(side = TOP, ipady = 5,ipadx=10, anchor=W) 
+        value = value,command=Reset).pack(side = TOP, ipady = 5,ipadx=10, anchor=W) 
 WeightingFrame.grid(padx=0, pady=0,row=0, column=0,sticky="nw")
 
 CoilFrame = tk.Frame(OptionsFrame, width=50, height=100)

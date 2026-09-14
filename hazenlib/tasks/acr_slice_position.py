@@ -258,6 +258,7 @@ class ACRSlicePosition(HazenTask):
         #plt.axvline(x=peaks[0])
         #plt.axvline(x=peaks[1])
         #plt.imshow(img)
+        #plt.imshow(mask,alpha=0.4)
         #plt.plot([x_pts[0], x_pts[0]], [y_pts[0], y_pts[1]], "b")
         #plt.plot([x_pts[1], x_pts[1]], [y_pts[0], y_pts[1]], "r")
         #plt.savefig("test.png")
