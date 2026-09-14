@@ -60,5 +60,5 @@ class TestACRTools(unittest.TestCase):
         rotated_point = np.round(rotated_point, 2)
         assert (rotated_point == self.test_point).all() == True
 
-    #def test_rotate_images(self):
-    #    assert self.MedACR_data_obj.determine_rotation() == 0.0
+    def test_rotate_images(self):
+        assert self.MedACR_data_obj.determine_rotation() == 0.0
