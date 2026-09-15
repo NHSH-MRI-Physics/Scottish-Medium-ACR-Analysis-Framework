@@ -51,8 +51,8 @@ class ACRObject:
         if "settings" in kwargs.keys():
             if "RotCorrection" in kwargs["settings"].keys():
                 if kwargs["settings"]["RotCorrection"]==True:
-                    self.rotate_images()
-                    self.images, self.dcms = self.sort_images()
+                    DataType = self.rotate_images()
+                    self.images, self.dcms = self.sort_images(dtype=DataType)
                     self.orientation_checks()
                     self.rot_angle = self.determine_rotation()
 
@@ -83,7 +83,7 @@ class ACRObject:
 
         self.kwargs = kwargs
 
-    def sort_images(self):
+    def sort_images(self,dtype='uint16'):
         """
         Sort a stack of images based on slice position.
 
@@ -129,7 +129,7 @@ class ACRObject:
                         dicom_stack.append(dcm)
 
         img_stack = [dicom.pixel_array for dicom in dicom_stack]
-        img_stack = [apply_modality_lut(dicom.pixel_array,dicom).astype('uint16') for dicom in dicom_stack]
+        img_stack = [apply_modality_lut(dicom.pixel_array,dicom).astype(dtype) for dicom in dicom_stack]
 
         return img_stack, dicom_stack
 
@@ -248,6 +248,7 @@ class ACRObject:
         #return skimage.transform.rotate(
         #    self.images, self.rot_angle, resize=False, preserve_range=True
         #)
+        return original_dtype
 
     def find_phantom_center(self):
         """
