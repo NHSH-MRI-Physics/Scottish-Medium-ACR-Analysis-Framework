@@ -9,7 +9,7 @@ Derived from the [Hazen MRI QA framework](https://github.com/GSTT-CSC/hazen) pro
 
 ## Instalation, Set up and Quickstart
 ## Requirements 
-- Windows (Mac and Linux coming soon)
+- Windows
 ## Installation
 - Download the latest [release](https://github.com/NHSH-MRI-Physics/Hazen-ScottishACR-Fork/releases/latest).
 - Unzip the file and navigate to where it was downloaded.

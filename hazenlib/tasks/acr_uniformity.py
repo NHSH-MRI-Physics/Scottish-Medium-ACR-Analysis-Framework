@@ -94,7 +94,7 @@ class ACRUniformity(HazenTask):
         """
         img = dcm.pixel_array
         from pydicom.pixel_data_handlers.util import apply_modality_lut
-        img = apply_modality_lut(dcm.pixel_array, dcm).astype('uint16')
+        img = apply_modality_lut(dcm.pixel_array, dcm).astype(self.ACR_obj.datatype)
 
         if 'PixelSpacing' in dcm:
             res = dcm.PixelSpacing  # In-plane resolution from metadata

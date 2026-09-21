@@ -15,7 +15,7 @@ import PIL
 
 class ACRObject:
     def __init__(self, dcm_list,kwargs={}):
-        
+        self.datatype = 'uint16'
         #Added in a medium ACR phantom flag, not sure if this is the best way of doing this but will leave it for now..
         self.MediumACRPhantom = False
         if "MediumACRPhantom" in kwargs.keys():
@@ -129,7 +129,7 @@ class ACRObject:
                         dicom_stack.append(dcm)
 
         img_stack = [dicom.pixel_array for dicom in dicom_stack]
-        img_stack = [apply_modality_lut(dicom.pixel_array,dicom).astype('uint16') for dicom in dicom_stack]
+        img_stack = [apply_modality_lut(dicom.pixel_array,dicom).astype(self.datatype) for dicom in dicom_stack]
 
         return img_stack, dicom_stack
 
@@ -239,6 +239,7 @@ class ACRObject:
 
         for dcm in self.dcms:
             original_dtype = dcm.pixel_array.dtype
+            self.datatype = original_dtype
             img = PIL.Image.fromarray(dcm.pixel_array)
             rotated_img = img.rotate(self.rot_angle, expand=False, resample=PIL.Image.BICUBIC)
             rotated_array = np.array(rotated_img).astype(original_dtype)
@@ -248,6 +249,7 @@ class ACRObject:
         #return skimage.transform.rotate(
         #    self.images, self.rot_angle, resize=False, preserve_range=True
         #)
+        #return original_dtype
 
     def find_phantom_center(self):
         """
