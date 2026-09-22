@@ -5,18 +5,11 @@ import pydicom
 from matplotlib import pyplot as plt
 from skimage.measure import profile_line
 import numpy as np
-
-dcm_list = []
+from pathlib import Path
+from datetime import datetime
+from scipy.ndimage import gaussian_filter
 
 def rotate_points(points, center, angle_degrees):
-    """
-    Rotates a list of points around a center point by a given angle.
-    
-    :param points: List or array of two points, e.g., [(x1, y1), (x2, y2)]
-    :param center: Tuple or array of the center point (cx, cy)
-    :param angle_degrees: Angle of rotation in degrees
-    :return: NumPy array of the rotated points
-    """
     # Convert angle to radians
     theta = np.radians(angle_degrees)
     
@@ -36,80 +29,224 @@ def rotate_points(points, center, angle_degrees):
         
     return np.array(rotated_points)
 
-def ComputeRes(fileLoc):
-    files = get_dicom_files(fileLoc)
+def ComputeRes(files,blur=0):
+    #files = get_dicom_files(fileLoc)
+    dcm_list = []
     for file in files:
         dcm_list.append(pydicom.dcmread(file))
 
     ACRObj = ACRObject(dcm_list,kwargs={'MediumACRPhantom': True})
     Image = ACRObj.images[6]
+
+    if blur != 0:
+        Image = gaussian_filter(Image, sigma=blur)
+
     Mask = ACRObj.mask_image
-
     LineLen = len(Image[0])
-
-    start_point = (ACRObj.centre[1], 0)   # (y1, x1)
-    end_point = (ACRObj.centre[1],LineLen)  # (y2, x2)
-
-    RotatedPoints = rotate_points([start_point, end_point], ACRObj.centre, 45)
-
-    plt.imshow(Mask, cmap='gray')
+    cx, cy = ACRObj.centre[0], ACRObj.centre[1]
+    
+    plt.imshow(Image, cmap='gray')
+    #plt.imshow(Mask, cmap='gray')
     plt.plot(ACRObj.centre[0], ACRObj.centre[1], 'r+')
-    plt.plot([start_point[1], end_point[1]], [start_point[0], end_point[0]], 'x', lw=2,color='green')
-    plt.plot([start_point[1], end_point[1]], [start_point[0], end_point[0]], 'x', lw=2,color='green')
+    CentreSignal = np.mean(Image[int(cy)-20:int(cy)+20, int(cx)-20:int(cx)+20])*0.9
+
+    profiles = []
+    MaskedProfiles = []
+    angles = []
+
+    for Angle in range(0,180,1):
+        start_point = (cx - LineLen / 2, cy)  # (x1, y1)
+        end_point =   (cx + LineLen / 2, cy)  # (x2, y2)
+        RotatedPoints = rotate_points([start_point, end_point], ACRObj.centre, Angle)
+
+        #Get back to y,x so we can extract the profiles...
+        start_point_rot = (RotatedPoints[0][1], RotatedPoints[0][0])
+        end_point_rot   = (RotatedPoints[1][1], RotatedPoints[1][0])
+        #plt.plot([start_point_rot[1], end_point_rot[1]], [start_point_rot[0], end_point_rot[0]], 'x', lw=2,color='red',linestyle='dashed')
+
+        profile = profile_line(Image, start_point_rot, end_point_rot, linewidth=1,mode='constant', cval=0)
+        profileMask = profile_line(Mask, start_point_rot, end_point_rot, linewidth=1,mode='constant', cval=0)
+        profile = np.clip(profile, a_min=None, a_max=CentreSignal)
+        profiles.append(profile)
+        MaskedProfiles.append(profileMask)
+        angles.append(Angle)
     plt.colorbar()
-    plt.savefig("Image.png")
+    if blur == 0:
+        plt.savefig("ResTesting\\Image.png")
+    else:
+        plt.savefig("ResTesting\\Image Blur " +str(blur)+".png")
     plt.close()
 
+    HorRes=[]
+    VertRes= []
+    AllRes = []
 
-    '''
-    profile = profile_line(Image, start_point, end_point, linewidth=3)
-    profile = np.clip(profile, a_min=None, a_max=1600)
+    Results = []
+    for i in range(len(profiles)):
+        MaskProfile = MaskedProfiles[i]
+        Edges = np.diff(MaskProfile)
 
-    plt.plot(profile)
-    plt.savefig("Profile.png")
+        '''
+        plt.plot(Edges)
+        plt.savefig("Edges.png")
+        plt.close()
+
+        plt.plot(MaskProfile)
+        plt.savefig("MaskProfile.png")
+        plt.close()
+        '''
+
+        LowerEdge = np.where(Edges == 1)[0][0]
+        UpperEdge = np.where(Edges == -1)[0][0]
+
+        LineProfile = profiles[i]
+        CandidateProfiles = [LineProfile[LowerEdge-10:LowerEdge+10], LineProfile[UpperEdge-10:UpperEdge+10]]
+
+        ExtractedProfiles = []
+        for profile in CandidateProfiles:
+            if len(np.where(profile >= CentreSignal)[0])>3:  
+                ExtractedProfiles.append(profile)
+        
+        MTF = []
+        Res = []
+        freq=[]
+        for profile in ExtractedProfiles:
+                lsf = np.diff(profile)
+                window = np.hamming(len(lsf))
+                lsf_windowed = lsf * window
+                fft_vals = np.fft.fft(lsf_windowed, n=512)
+                mtf = np.abs(fft_vals)
+                mtf = mtf / mtf[0]
+                frequencies = np.fft.fftfreq(512)[:256]
+                mtf_positive = mtf[:256]
+                mtf_Perfect = np.ones(256)
+                integral_area = np.trapz(mtf_positive, frequencies)
+                PerfectIntegral =  np.trapz(mtf_Perfect, frequencies)
+                res = integral_area/PerfectIntegral
+                MTF.append(mtf_positive)
+                Res.append(res)
+                freq.append(frequencies)
+
+        '''
+        for profile in ExtractedProfiles:
+            plt.plot(profile)
+        plt.title("Profiles at "+str(angles[i])+"°")
+        plt.savefig("Profile.png")
+        plt.close()
+
+        plt.figure(figsize=(6, 4))
+        for I in range(len(MTF)):
+            plt.plot(freq[I], MTF[I], lw=2)
+        plt.title("Modulation Transfer Function (MTF)")
+        plt.xlabel("Spatial Frequency (cycles/pixel)")
+        plt.ylabel("MTF (Response)")
+        plt.grid(True)
+        plt.ylim(0, 1.05)
+        plt.savefig("MTF.png")
+        plt.close()
+        '''
+        #print("Resolution at "+str(angles[i])+"°: "+str(np.mean(Res)))
+
+        Results.append([angles[i]]+Res)
+
+        if angles[i] < 45 or angles[i] > 135 and angles[i] < 225 or angles[i] > 315:
+            HorRes+=Res
+        else:
+            VertRes += Res
+        AllRes += Res
+
+    return Results, np.mean(HorRes), np.mean(VertRes), np.mean(AllRes)
+
+#fileLoc = "MedACRTestingSetAndResults\\Blair Gartnavel"
+#Results, HorRes, VertRes, AllRes = ComputeRes(fileLoc)
+
+#print("Horizontal Resolution: ", HorRes)
+#print("Vertical Resolution: ", VertRes)
+#print("Overall Resolution: ", AllRes)
+
+def TestBatch(blur=0):
+    target_path = Path("C:\\Users\\Johnt\\Desktop\\MedACRRuns")
+    folders = [f for f in target_path.iterdir() if f.is_dir()]
+    f = open("ResTesting/Result.txt","w")
+
+    dates = []
+    VertResults = []
+    HorResults = []
+    HorVertResults = []
+
+    for folder in folders:
+        Fullpath = Path.joinpath(folder,"DICOMS")
+        files = get_dicom_files(Fullpath)
+        DICOMDict = {}
+        for file in files:
+            seq = pydicom.dcmread(file).SeriesDescription 
+            if seq not in DICOMDict.keys():
+                DICOMDict[seq] = []
+            DICOMDict[seq].append(file)
+
+        for key in DICOMDict.keys():
+            Results, HorRes, VertRes, AllRes = ComputeRes(DICOMDict[key],blur)
+
+
+            AllResults = []
+            for Result in Results:
+                AllResults+=Result[1:]
+
+            Text ="Folder: " + folder.name+ " Seq:" + key + " Hor: " + str(round(HorRes,3)) + " Vert:" + str(round(VertRes,3)) + " AllRes:" + str(round(AllRes,3)) + " ("+ str(round(np.max(AllResults),3)) +","+str(round(np.min(AllResults),3))+")"
+            f.write(Text+"\n")
+            f.flush()
+
+            dates.append(datetime.strptime(folder.name.split("_")[-1], "%Y-%m-%d %H-%M-%S"))
+            VertResults.append(VertRes)
+            HorResults.append(HorRes)
+            HorVertResults.append(AllRes)
+            
+    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12, 8))
+    ax1.plot(dates, VertResults, color='tab:blue',linestyle="",marker="x")
+    Mean = np.mean(VertResults)
+    STD = [np.mean(VertResults)-np.std(VertResults),np.mean(VertResults)+np.std(VertResults)]
+    ax1.axhline(Mean,label="Average=" + str(round(Mean,3)))
+    ax1.axhline(STD[0],label="Upper STD=" + str(round(STD[0],3)),linestyle="--")
+    ax1.axhline(STD[1],label="Lower STD=" + str(round(STD[1],3)),linestyle="--")
+    ax1.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+    ax1.set_title('Vertical Res')
+
+    ax2.plot(dates, HorResults, color='tab:orange',linestyle="",marker="x")
+    Mean = np.mean(HorResults)
+    STD = [np.mean(HorResults)-np.std(HorResults),np.mean(HorResults)+np.std(HorResults)]
+    ax2.axhline(Mean,label="Average=" + str(round(Mean,3)))
+    ax2.axhline(STD[0],label="Upper STD=" + str(round(STD[0],3)),linestyle="--")
+    ax2.axhline(STD[1],label="Lower STD=" + str(round(STD[1],3)),linestyle="--")
+    ax2.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+    ax2.set_title('Horizontal Res')
+
+    ax3.plot(dates, HorVertResults, color='tab:green',linestyle="",marker="x")
+    Mean = np.mean(HorVertResults)
+    STD = [np.mean(HorVertResults)-np.std(HorVertResults),np.mean(HorVertResults)+np.std(HorVertResults)]
+    ax3.axhline(Mean,label="Average=" + str(round(Mean,3)))
+    ax3.axhline(STD[0],label="Upper STD=" + str(round(STD[0],3)),linestyle="--")
+    ax3.axhline(STD[1],label="Lower STD=" + str(round(STD[1],3)),linestyle="--")
+    ax3.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+    ax3.set_title('Hor and Vert Res')
+
+    plt.tight_layout()
+    if blur !=0:
+        plt.savefig("ResTesting/Results-Blur "+str(blur)+".png")
+    else:
+        plt.savefig("ResTesting/Results.png")
     plt.close()
+    return Mean
 
-    lsf = np.diff(profile)
-    plt.plot(lsf)
-    plt.savefig("LSF.png")
-    plt.close()
+def TestBlur():
+    blur = 0
+    Blur = np.arange(0, 2.1, 0.2)
+    AvgRes = []
+    for blur in Blur:
+        AvgRes.append(TestBatch(blur))
+    
+    plt.plot(Blur,AvgRes)
+    plt.xlabel("Guassian Sigma")
+    plt.ylabel("Res")
+    plt.savefig("ResTesting/Blur.png")
 
-    window = np.hamming(len(lsf))
-    lsf_windowed = lsf * window
-    plt.plot(lsf_windowed)
-    plt.savefig("LSF_Windowed.png")
-
-    # 4. Compute the Fast Fourier Transform (FFT) and take the magnitude
-    fft_vals = np.fft.fft(lsf_windowed, n=512) # Zero-padding for smooth curve
-    mtf = np.abs(fft_vals)
-
-    # 5. Normalize so the DC component (zero frequency) is 1.0
-    mtf = mtf / mtf[0]
-
-    # Keep only the positive frequencies (first half)
-    frequencies = np.fft.fftfreq(512)[:256]
-    mtf_positive = mtf[:256]
-    mtf_Perfect = np.ones(256)
-
-    # Plotting the MTF
-    plt.figure(figsize=(6, 4))
-    plt.plot(frequencies, mtf_positive, color='blue', lw=2)
-    plt.title("Modulation Transfer Function (MTF)")
-    plt.xlabel("Spatial Frequency (cycles/pixel)")
-    plt.ylabel("MTF (Response)")
-    plt.grid(True)
-    plt.ylim(0, 1.05)
-    plt.savefig("MTF.png")
-
-    integral_area = np.trapz(mtf_positive, frequencies)
-
-    PerfectIntegral =  np.trapz(mtf_Perfect, frequencies)
-
-    print(integral_area/PerfectIntegral)
-    '''
-
-
-
-
-fileLoc = "MedACRTestingSetAndResults\\Blair Gartnavel"
-ComputeRes(fileLoc)
+TestBlur()
