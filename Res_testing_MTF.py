@@ -87,7 +87,7 @@ def ComputeRes(files,blur=0):
         MaskProfile = MaskedProfiles[i]
         Edges = np.diff(MaskProfile)
 
-        '''
+        
         plt.plot(Edges)
         plt.savefig("Edges.png")
         plt.close()
@@ -95,7 +95,7 @@ def ComputeRes(files,blur=0):
         plt.plot(MaskProfile)
         plt.savefig("MaskProfile.png")
         plt.close()
-        '''
+        
 
         LowerEdge = np.where(Edges == 1)[0][0]
         UpperEdge = np.where(Edges == -1)[0][0]
@@ -114,7 +114,7 @@ def ComputeRes(files,blur=0):
         for profile in ExtractedProfiles:
                 lsf = np.diff(profile)
                 window = np.hamming(len(lsf))
-                lsf_windowed = lsf * window
+                lsf_windowed = lsf #* window
                 fft_vals = np.fft.fft(lsf_windowed, n=512)
                 mtf = np.abs(fft_vals)
                 mtf = mtf / mtf[0]
@@ -125,10 +125,10 @@ def ComputeRes(files,blur=0):
                 PerfectIntegral =  np.trapz(mtf_Perfect, frequencies)
                 res = integral_area/PerfectIntegral
                 MTF.append(mtf_positive)
-                Res.append(res)
+                Res.append(res*100.0)
                 freq.append(frequencies)
 
-        '''
+        
         for profile in ExtractedProfiles:
             plt.plot(profile)
         plt.title("Profiles at "+str(angles[i])+"°")
@@ -145,7 +145,7 @@ def ComputeRes(files,blur=0):
         plt.ylim(0, 1.05)
         plt.savefig("MTF.png")
         plt.close()
-        '''
+        
         #print("Resolution at "+str(angles[i])+"°: "+str(np.mean(Res)))
 
         Results.append([angles[i]]+Res)
@@ -166,7 +166,9 @@ def ComputeRes(files,blur=0):
 #print("Overall Resolution: ", AllRes)
 
 def TestBatch(blur=0):
-    target_path = Path("C:\\Users\\John\\Desktop\\MedACRRuns")
+    target_path = Path("C:\\Users\\Johnt\\Desktop\\MedACRRuns")
+    target_path = Path("C:\\Users\\Johnt\\Desktop\\MedACRRuns")
+
     folders = [f for f in target_path.iterdir() if f.is_dir()]
     f = open("ResTesting/Result.txt","w")
 
@@ -209,26 +211,27 @@ def TestBatch(blur=0):
             f.write(Text+"\n")
             f.flush()
 
-            dates.append(datetime.strptime(folder.name.split("_")[-1], "%Y-%m-%d %H-%M-%S"))
             VertResults.append(VertRes)
             HorResults.append(HorRes)
             HorVertResults.append(AllRes)
+            dates.append(datetime.strptime(folder.name.split("_")[-1], "%Y-%m-%d %H-%M-%S"))
 
-            DumpFiles = glob.glob(str(Path.joinpath(folder,"*.docx")))
-            for DumpFile in DumpFiles:
-                with open(DumpFile, 'rb') as FILE:
-                    data = pickle.load(FILE)
-                    DUMP = (data["Test"]["SpatialRes"].results["measurement"])
-                    DumpResults['1.1mm holes Horizontal'].append(DUMP['1.1mm holes Horizontal'])
-                    DumpResults['1.0mm holes Horizontal'].append(DUMP['1.0mm holes Horizontal'])
-                    DumpResults['0.9mm holes Horizontal'].append(DUMP['0.9mm holes Horizontal'])
-                    DumpResults['0.8mm holes Horizontal'].append(DUMP['0.8mm holes Horizontal'])
+            if folder.name != "MRI1 DL QA" and folder.name != "MRI2 DL QA":
+                DumpFiles = glob.glob(str(Path.joinpath(folder,"*.docx")))
+                for DumpFile in DumpFiles:
+                    with open(DumpFile, 'rb') as FILE:
+                        data = pickle.load(FILE)
+                        DUMP = (data["Test"]["SpatialRes"].results["measurement"])
+                        DumpResults['1.1mm holes Horizontal'].append(DUMP['1.1mm holes Horizontal'])
+                        DumpResults['1.0mm holes Horizontal'].append(DUMP['1.0mm holes Horizontal'])
+                        DumpResults['0.9mm holes Horizontal'].append(DUMP['0.9mm holes Horizontal'])
+                        DumpResults['0.8mm holes Horizontal'].append(DUMP['0.8mm holes Horizontal'])
 
-                    DumpResults['1.1mm holes Vertical'].append(DUMP['1.1mm holes Vertical'])
-                    DumpResults['0.9mm holes Vertical'].append(DUMP['1.0mm holes Vertical'])
-                    DumpResults['0.8mm holes Vertical'].append(DUMP['0.9mm holes Vertical'])
-                    DumpResults['0.8mm holes Vertical'].append(DUMP['0.8mm holes Vertical'])
-                    DumpDates.append(data["date_scanned"])
+                        DumpResults['1.1mm holes Vertical'].append(DUMP['1.1mm holes Vertical'])
+                        DumpResults['1.0mm holes Vertical'].append(DUMP['1.0mm holes Vertical'])
+                        DumpResults['0.9mm holes Vertical'].append(DUMP['0.9mm holes Vertical'])
+                        DumpResults['0.8mm holes Vertical'].append(DUMP['0.8mm holes Vertical'])
+                        DumpDates.append(data["date_scanned"])
             
     fig, axes = plt.subplots(3, 5, figsize=(60, 20))
 
@@ -241,52 +244,23 @@ def TestBatch(blur=0):
         axes[i, j].axhline(STD[1],label="Lower STD=" + str(round(STD[1],3)),linestyle="--")
         axes[i, j].legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
         axes[i, j].set_title(title)
+        axes[i, j].set_ylim(0,100)
 
-    Plot(0,0,dates,VertResults,'Vertical Res')
-    Plot(1,0,dates,HorResults,'Horizontal Res')
-    Plot(2,0,dates,HorVertResults,'Hor and Vert Res')
+    Plot(0,0,dates,VertResults,'New Method Vertical Res')
+    Plot(1,0,dates,HorResults,'New Method Horizontal Res')
+    Plot(2,0,dates,HorVertResults,'New Method Hor and Vert Res')
 
     Plot(0,1,DumpDates,DumpResults["1.1mm holes Vertical"],'1.1mm Vertical Res')
     Plot(1,1,DumpDates,DumpResults["1.1mm holes Horizontal"],'1.1mm Horizontal Res')
 
-    Plot(0,1,DumpDates,DumpResults["1.0mm holes Vertical"],'1.0mm Vertical Res')
-    Plot(1,1,DumpDates,DumpResults["1.0mm holes Horizontal"],'1.0mm Horizontal Res')
+    Plot(0,2,DumpDates,DumpResults["1.0mm holes Vertical"],'1.0mm Vertical Res')
+    Plot(1,2,DumpDates,DumpResults["1.0mm holes Horizontal"],'1.0mm Horizontal Res')
 
-    Plot(0,1,DumpDates,DumpResults["0.9mm holes Vertical"],'0.9mm Vertical Res')
-    Plot(1,1,DumpDates,DumpResults["0.9mm holes Horizontal"],'0.9mm Horizontal Res')
+    Plot(0,3,DumpDates,DumpResults["0.9mm holes Vertical"],'0.9mm Vertical Res')
+    Plot(1,3,DumpDates,DumpResults["0.9mm holes Horizontal"],'0.9mm Horizontal Res')
 
-    Plot(0,1,DumpDates,DumpResults["0.8mm holes Vertical"],'0.8mm Vertical Res')
-    Plot(1,1,DumpDates,DumpResults["0.8mm holes Horizontal"],'0.8mm Horizontal Res')
-
-    '''
-    axes[0, 0].plot(dates, VertResults, color='tab:blue',linestyle="",marker="x")
-    Mean = np.mean(VertResults)
-    STD = [np.mean(VertResults)-np.std(VertResults),np.mean(VertResults)+np.std(VertResults)]
-    axes[0, 0].axhline(Mean,label="Average=" + str(round(Mean,3)))
-    axes[0, 0].axhline(STD[0],label="Upper STD=" + str(round(STD[0],3)),linestyle="--")
-    axes[0, 0].axhline(STD[1],label="Lower STD=" + str(round(STD[1],3)),linestyle="--")
-    axes[0, 0].legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
-    axes[0, 0].set_title('Vertical Res')
-
-    axes[1, 0].plot(dates, HorResults, color='tab:orange',linestyle="",marker="x")
-    Mean = np.mean(HorResults)
-    STD = [np.mean(HorResults)-np.std(HorResults),np.mean(HorResults)+np.std(HorResults)]
-    axes[1, 0].axhline(Mean,label="Average=" + str(round(Mean,3)))
-    axes[1, 0].axhline(STD[0],label="Upper STD=" + str(round(STD[0],3)),linestyle="--")
-    axes[1, 0].axhline(STD[1],label="Lower STD=" + str(round(STD[1],3)),linestyle="--")
-    axes[1, 0].legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
-    axes[1, 0].set_title('Horizontal Res')
-
-    axes[2, 0].plot(dates, HorVertResults, color='tab:green',linestyle="",marker="x")
-    Mean = np.mean(HorVertResults)
-    STD = [np.mean(HorVertResults)-np.std(HorVertResults),np.mean(HorVertResults)+np.std(HorVertResults)]
-    axes[2, 0].axhline(Mean,label="Average=" + str(round(Mean,3)))
-    axes[2, 0].axhline(STD[0],label="Upper STD=" + str(round(STD[0],3)),linestyle="--")
-    axes[2, 0].axhline(STD[1],label="Lower STD=" + str(round(STD[1],3)),linestyle="--")
-    axes[2, 0].legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
-    axes[2, 0].set_title('Hor and Vert Res')
-    '''
-
+    Plot(0,4,DumpDates,DumpResults["0.8mm holes Vertical"],'0.8mm Vertical Res')
+    Plot(1,4,DumpDates,DumpResults["0.8mm holes Horizontal"],'0.8mm Horizontal Res')
 
     plt.tight_layout()
     if blur !=0:
@@ -311,3 +285,4 @@ def TestBlur():
 #TestBlur()
 
 TestBatch()
+
