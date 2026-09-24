@@ -8,6 +8,7 @@ import numpy as np
 from pathlib import Path
 from datetime import datetime
 from scipy.ndimage import gaussian_filter
+import pickle
 
 def rotate_points(points, center, angle_degrees):
     # Convert angle to radians
@@ -165,7 +166,7 @@ def ComputeRes(files,blur=0):
 #print("Overall Resolution: ", AllRes)
 
 def TestBatch(blur=0):
-    target_path = Path("C:\\Users\\Johnt\\Desktop\\MedACRRuns")
+    target_path = Path("C:\\Users\\John\\Desktop\\MedACRRuns")
     folders = [f for f in target_path.iterdir() if f.is_dir()]
     f = open("ResTesting/Result.txt","w")
 
@@ -173,6 +174,18 @@ def TestBatch(blur=0):
     VertResults = []
     HorResults = []
     HorVertResults = []
+
+    DumpResults = {}
+    DumpResults['1.1mm holes Horizontal']=[]
+    DumpResults['1.0mm holes Horizontal']=[]
+    DumpResults['0.9mm holes Horizontal']=[]
+    DumpResults['0.8mm holes Horizontal']=[]
+
+    DumpResults['1.1mm holes Vertical']=[]
+    DumpResults['1.0mm holes Vertical']=[]
+    DumpResults['0.9mm holes Vertical']=[]
+    DumpResults['0.8mm holes Vertical']=[]
+    DumpDates = []
 
     for folder in folders:
         Fullpath = Path.joinpath(folder,"DICOMS")
@@ -200,34 +213,80 @@ def TestBatch(blur=0):
             VertResults.append(VertRes)
             HorResults.append(HorRes)
             HorVertResults.append(AllRes)
+
+            DumpFiles = glob.glob(str(Path.joinpath(folder,"*.docx")))
+            for DumpFile in DumpFiles:
+                with open(DumpFile, 'rb') as FILE:
+                    data = pickle.load(FILE)
+                    DUMP = (data["Test"]["SpatialRes"].results["measurement"])
+                    DumpResults['1.1mm holes Horizontal'].append(DUMP['1.1mm holes Horizontal'])
+                    DumpResults['1.0mm holes Horizontal'].append(DUMP['1.0mm holes Horizontal'])
+                    DumpResults['0.9mm holes Horizontal'].append(DUMP['0.9mm holes Horizontal'])
+                    DumpResults['0.8mm holes Horizontal'].append(DUMP['0.8mm holes Horizontal'])
+
+                    DumpResults['1.1mm holes Vertical'].append(DUMP['1.1mm holes Vertical'])
+                    DumpResults['0.9mm holes Vertical'].append(DUMP['1.0mm holes Vertical'])
+                    DumpResults['0.8mm holes Vertical'].append(DUMP['0.9mm holes Vertical'])
+                    DumpResults['0.8mm holes Vertical'].append(DUMP['0.8mm holes Vertical'])
+                    DumpDates.append(data["date_scanned"])
             
-    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12, 8))
-    ax1.plot(dates, VertResults, color='tab:blue',linestyle="",marker="x")
+    fig, axes = plt.subplots(3, 5, figsize=(60, 20))
+
+    def Plot(i,j,x,y,title):
+        axes[i, j].plot(x, y, color='tab:blue',linestyle="",marker="x")
+        Mean = np.mean(y)
+        STD = [np.mean(y)-np.std(y),np.mean(y)+np.std(y)]
+        axes[i, j].axhline(Mean,label="Average=" + str(round(Mean,3)))
+        axes[i, j].axhline(STD[0],label="Upper STD=" + str(round(STD[0],3)),linestyle="--")
+        axes[i, j].axhline(STD[1],label="Lower STD=" + str(round(STD[1],3)),linestyle="--")
+        axes[i, j].legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+        axes[i, j].set_title(title)
+
+    Plot(0,0,dates,VertResults,'Vertical Res')
+    Plot(1,0,dates,HorResults,'Horizontal Res')
+    Plot(2,0,dates,HorVertResults,'Hor and Vert Res')
+
+    Plot(0,1,DumpDates,DumpResults["1.1mm holes Vertical"],'1.1mm Vertical Res')
+    Plot(1,1,DumpDates,DumpResults["1.1mm holes Horizontal"],'1.1mm Horizontal Res')
+
+    Plot(0,1,DumpDates,DumpResults["1.0mm holes Vertical"],'1.0mm Vertical Res')
+    Plot(1,1,DumpDates,DumpResults["1.0mm holes Horizontal"],'1.0mm Horizontal Res')
+
+    Plot(0,1,DumpDates,DumpResults["0.9mm holes Vertical"],'0.9mm Vertical Res')
+    Plot(1,1,DumpDates,DumpResults["0.9mm holes Horizontal"],'0.9mm Horizontal Res')
+
+    Plot(0,1,DumpDates,DumpResults["0.8mm holes Vertical"],'0.8mm Vertical Res')
+    Plot(1,1,DumpDates,DumpResults["0.8mm holes Horizontal"],'0.8mm Horizontal Res')
+
+    '''
+    axes[0, 0].plot(dates, VertResults, color='tab:blue',linestyle="",marker="x")
     Mean = np.mean(VertResults)
     STD = [np.mean(VertResults)-np.std(VertResults),np.mean(VertResults)+np.std(VertResults)]
-    ax1.axhline(Mean,label="Average=" + str(round(Mean,3)))
-    ax1.axhline(STD[0],label="Upper STD=" + str(round(STD[0],3)),linestyle="--")
-    ax1.axhline(STD[1],label="Lower STD=" + str(round(STD[1],3)),linestyle="--")
-    ax1.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
-    ax1.set_title('Vertical Res')
+    axes[0, 0].axhline(Mean,label="Average=" + str(round(Mean,3)))
+    axes[0, 0].axhline(STD[0],label="Upper STD=" + str(round(STD[0],3)),linestyle="--")
+    axes[0, 0].axhline(STD[1],label="Lower STD=" + str(round(STD[1],3)),linestyle="--")
+    axes[0, 0].legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+    axes[0, 0].set_title('Vertical Res')
 
-    ax2.plot(dates, HorResults, color='tab:orange',linestyle="",marker="x")
+    axes[1, 0].plot(dates, HorResults, color='tab:orange',linestyle="",marker="x")
     Mean = np.mean(HorResults)
     STD = [np.mean(HorResults)-np.std(HorResults),np.mean(HorResults)+np.std(HorResults)]
-    ax2.axhline(Mean,label="Average=" + str(round(Mean,3)))
-    ax2.axhline(STD[0],label="Upper STD=" + str(round(STD[0],3)),linestyle="--")
-    ax2.axhline(STD[1],label="Lower STD=" + str(round(STD[1],3)),linestyle="--")
-    ax2.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
-    ax2.set_title('Horizontal Res')
+    axes[1, 0].axhline(Mean,label="Average=" + str(round(Mean,3)))
+    axes[1, 0].axhline(STD[0],label="Upper STD=" + str(round(STD[0],3)),linestyle="--")
+    axes[1, 0].axhline(STD[1],label="Lower STD=" + str(round(STD[1],3)),linestyle="--")
+    axes[1, 0].legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+    axes[1, 0].set_title('Horizontal Res')
 
-    ax3.plot(dates, HorVertResults, color='tab:green',linestyle="",marker="x")
+    axes[2, 0].plot(dates, HorVertResults, color='tab:green',linestyle="",marker="x")
     Mean = np.mean(HorVertResults)
     STD = [np.mean(HorVertResults)-np.std(HorVertResults),np.mean(HorVertResults)+np.std(HorVertResults)]
-    ax3.axhline(Mean,label="Average=" + str(round(Mean,3)))
-    ax3.axhline(STD[0],label="Upper STD=" + str(round(STD[0],3)),linestyle="--")
-    ax3.axhline(STD[1],label="Lower STD=" + str(round(STD[1],3)),linestyle="--")
-    ax3.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
-    ax3.set_title('Hor and Vert Res')
+    axes[2, 0].axhline(Mean,label="Average=" + str(round(Mean,3)))
+    axes[2, 0].axhline(STD[0],label="Upper STD=" + str(round(STD[0],3)),linestyle="--")
+    axes[2, 0].axhline(STD[1],label="Lower STD=" + str(round(STD[1],3)),linestyle="--")
+    axes[2, 0].legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+    axes[2, 0].set_title('Hor and Vert Res')
+    '''
+
 
     plt.tight_layout()
     if blur !=0:
@@ -235,7 +294,7 @@ def TestBatch(blur=0):
     else:
         plt.savefig("ResTesting/Results.png")
     plt.close()
-    return Mean
+    return np.mean(HorVertResults)
 
 def TestBlur():
     blur = 0
@@ -249,4 +308,6 @@ def TestBlur():
     plt.ylabel("Res")
     plt.savefig("ResTesting/Blur.png")
 
-TestBlur()
+#TestBlur()
+
+TestBatch()
